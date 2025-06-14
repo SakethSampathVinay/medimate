@@ -13,7 +13,10 @@ import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 
-const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false, loading: () => <MapPlaceholder /> });
+// Simpler loading for dynamic imports
+const simpleMapLoading = () => <div className="h-full w-full bg-muted flex items-center justify-center text-sm"><Loader2 className="h-4 w-4 animate-spin mr-2" /> Initializing Map Library...</div>;
+
+const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false, loading: simpleMapLoading });
 const TileLayer = dynamic(() => import('react-leaflet').then(mod => mod.TileLayer), { ssr: false });
 const Marker = dynamic(() => import('react-leaflet').then(mod => mod.Marker), { ssr: false });
 const Popup = dynamic(() => import('react-leaflet').then(mod => mod.Popup), { ssr: false });
@@ -84,14 +87,14 @@ export default function HospitalsPage() {
   const [selectedHospitalId, setSelectedHospitalId] = useState<number | null>(null);
   
   const hospitalCardsRef = useRef<{ [key: number]: HTMLDivElement | null }>({});
-  const mapContainerRef = useRef<HTMLDivElement | null>(null); // For scrolling the page to the map
+  const mapContainerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     setIsClient(true);
   }, []);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (isClient) {
       import('leaflet').then(LModule => {
         const L = LModule.default;
         // @ts-ignore
@@ -103,7 +106,7 @@ export default function HospitalsPage() {
         });
       }).catch(err => console.error("Failed to load Leaflet for icon fix:", err));
     }
-  }, []);
+  }, [isClient]);
 
 
   useEffect(() => {
@@ -131,7 +134,7 @@ export default function HospitalsPage() {
   const fetchNearbyHospitals = async (lat: number, lon: number) => {
     setIsLoading(true);
     setError(null);
-    setHospitals([]); // Clear previous hospitals
+    setHospitals([]);
     const overpassQuery = `
       [out:json][timeout:30];
       (
@@ -169,7 +172,7 @@ export default function HospitalsPage() {
             const postcode = el.tags['addr:postcode'] || '';
             address = `${housenumber} ${street}, ${city} ${postcode}`.replace(/^ +|, +$/, '').replace(/ ,/g, ',');
           }
-          if (!address.trim() && el.tags.name) address = el.tags.name;
+          if (!address.trim() && el.tags.name) address = el.tags.name; // Fallback to name if address is still empty
 
           return {
             id: el.id,
@@ -214,8 +217,8 @@ export default function HospitalsPage() {
 
   const centerMapOnUser = () => {
     if (userCoordinates) {
-      setMapCenter(userCoordinates);
-      setSelectedHospitalId(null);
+      setMapCenter(userCoordinates); // This will trigger ChangeView via MapContainer prop
+      setSelectedHospitalId(null); // Clear selection to focus on user
     } else {
         setError("Your location is not available to re-center the map.");
     }
@@ -243,7 +246,7 @@ export default function HospitalsPage() {
         <div ref={mapContainerRef} className="h-[50vh] md:h-[60vh] w-full rounded-lg overflow-hidden shadow-lg border">
           {isClient ? (
             <MapContainer
-              key="hospital-map-container" // Static key for stability
+              key="hospital-map-container" 
               center={mapCenter}
               zoom={DEFAULT_ZOOM}
               scrollWheelZoom={true}
@@ -255,19 +258,21 @@ export default function HospitalsPage() {
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
               {userCoordinates && typeof userCoordinates[0] === 'number' && typeof userCoordinates[1] === 'number' && (
-                <Marker position={userCoordinates as [number, number]}>
+                 // Ensure useMap hook is available for Marker if it uses it internally
+                 useMap ? <Marker position={userCoordinates as [number, number]}>
                   <Popup>Your current location</Popup>
-                </Marker>
+                </Marker> : null
               )}
               {hospitals.map(hospital => (
-                <Marker
+                // Ensure useMap hook is available for Marker if it uses it internally
+                useMap ? <Marker
                   key={hospital.id}
                   position={[hospital.latitude, hospital.longitude]}
                   eventHandlers={{ click: () => handleMarkerClick(hospital.id) }}
                   opacity={selectedHospitalId === hospital.id ? 1 : 0.7}
                 >
                   <Popup>{hospital.name}</Popup>
-                </Marker>
+                </Marker> : null
               ))}
             </MapContainer>
           ) : (
@@ -313,7 +318,7 @@ export default function HospitalsPage() {
                   key={hospital.id}
                   ref={el => hospitalCardsRef.current[hospital.id] = el}
                   className={`flex flex-col overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border-2 ${selectedHospitalId === hospital.id ? 'border-primary scale-105' : 'border-transparent'}`}
-                  onClick={() => handleViewOnMapClick(hospital)} // Make card itself clickable to view on map
+                  onClick={() => handleViewOnMapClick(hospital)}
                 >
                   <CardHeader>
                     <CardTitle className="font-headline text-lg">{hospital.name}</CardTitle>
@@ -351,3 +356,5 @@ export default function HospitalsPage() {
     </AppLayout>
   );
 }
+
+    
