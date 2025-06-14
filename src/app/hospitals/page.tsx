@@ -16,12 +16,12 @@ import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 // Dynamically import react-leaflet components
 const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), {
   ssr: false,
-  loading: () => null, // Render nothing while the dynamic component itself loads
+  loading: () => <MapPlaceholder />, // Use MapPlaceholder while MapContainer code loads
 });
-const TileLayer = dynamic(() => import('react-leaflet').then(mod => mod.TileLayer), { ssr: false });
-const Marker = dynamic(() => import('react-leaflet').then(mod => mod.Marker), { ssr: false });
-const Popup = dynamic(() => import('react-leaflet').then(mod => mod.Popup), { ssr: false });
-const useMap = dynamic(() => import('react-leaflet').then(mod => mod.useMap), { ssr: false });
+const TileLayer = dynamic(() => import('react-leaflet').then(mod => mod.TileLayer), { ssr: false, loading: () => null });
+const Marker = dynamic(() => import('react-leaflet').then(mod => mod.Marker), { ssr: false, loading: () => null });
+const Popup = dynamic(() => import('react-leaflet').then(mod => mod.Popup), { ssr: false, loading: () => null });
+const useMap = dynamic(() => import('react-leaflet').then(mod => mod.useMap), { ssr: false, loading: () => null });
 
 
 interface OsmHospitalElement {
@@ -70,7 +70,7 @@ function MapPlaceholder() {
 }
 
 const ChangeView: React.FC<{ selectedHospital?: HospitalDisplayData | null }> = ({ selectedHospital }) => {
-  const mapHook = useMap!(); // Dynamically imported useMap
+  const mapHook = useMap!(); 
   useEffect(() => {
     if (selectedHospital && mapHook) {
       mapHook.flyTo([selectedHospital.latitude, selectedHospital.longitude], 15);
@@ -113,7 +113,7 @@ export default function HospitalsPage() {
 
 
   useEffect(() => {
-    if (!isClient) return; // Don't run geolocation logic if not on client yet
+    if (!isClient) return; 
 
     setIsLoading(true);
     if (navigator.geolocation) {
@@ -134,12 +134,12 @@ export default function HospitalsPage() {
       setError('Geolocation is not supported by your browser. Showing hospitals for default area.');
       fetchNearbyHospitals(DEFAULT_LOCATION[0] as number, DEFAULT_LOCATION[1] as number);
     }
-  }, [isClient]); // Rerun if isClient changes (though it only changes once)
+  }, [isClient]); 
 
   const fetchNearbyHospitals = async (lat: number, lon: number) => {
     setIsLoading(true);
     setError(null);
-    setHospitals([]); // Clear previous hospitals
+    setHospitals([]); 
     const overpassQuery = `
       [out:json][timeout:30];
       (
@@ -162,7 +162,7 @@ export default function HospitalsPage() {
       }
 
       const fetchedHospitals: HospitalDisplayData[] = data.elements
-        .filter((el: OsmHospitalElement) => el.tags?.name && (el.lat || el.center?.lat)) // Ensure name and coordinates exist
+        .filter((el: OsmHospitalElement) => el.tags?.name && (el.lat || el.center?.lat)) 
         .map((el: OsmHospitalElement) => {
           let Rlat, Rlon;
           if (el.lat && el.lon) {
@@ -172,7 +172,7 @@ export default function HospitalsPage() {
             Rlat = el.center.lat;
             Rlon = el.center.lon;
           } else {
-            return null; // Should be filtered out by the condition above
+            return null; 
           }
 
           let address = el.tags['addr:full'] || '';
@@ -327,7 +327,7 @@ export default function HospitalsPage() {
                   key={hospital.id}
                   ref={el => hospitalCardsRef.current[hospital.id] = el}
                   className={`flex flex-col overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border-2 ${selectedHospitalId === hospital.id ? 'border-primary scale-105' : 'border-transparent'}`}
-                  onClick={() => handleViewOnMapClick(hospital)} // Allow clicking card to select on map
+                  onClick={() => handleViewOnMapClick(hospital)} 
                 >
                   <CardHeader>
                     <CardTitle className="font-headline text-lg">{hospital.name}</CardTitle>
@@ -373,3 +373,5 @@ export default function HospitalsPage() {
     </AppLayout>
   );
 }
+
+    
