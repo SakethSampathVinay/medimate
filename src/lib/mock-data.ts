@@ -12,56 +12,202 @@ export interface Medicine {
   category: string;
 }
 
-export const mockMedicines: Medicine[] = [
+const medicinesData = [
   {
-    id: '1',
-    name: 'Paracetamol 500mg',
-    imageUrl: 'https://placehold.co/300x200.png',
-    dataAiHint: 'pill medicine',
-    useCase: 'Pain relief, Fever reduction',
-    description: 'Paracetamol is a common pain reliever and fever reducer. It is used to treat many conditions such as headache, muscle aches, arthritis, backache, toothaches, colds, and fevers.',
-    dosage: '1-2 tablets every 4-6 hours as needed. Max 8 tablets in 24 hours.',
-    sideEffects: 'Rare, but may include skin rash, allergic reactions.',
-    precautions: 'Do not exceed stated dose. Avoid alcohol. Consult doctor if symptoms persist.',
-    category: 'Pain Relief',
+    "medicine_name": "Paracetamol",
+    "tags": ["Pain Relief", "Fever"],
+    "description": "Used to reduce fever and relieve mild to moderate pain.",
+    "photo_url": "https://placehold.co/300x200.png"
   },
   {
-    id: '2',
-    name: 'Amoxicillin 250mg',
-    imageUrl: 'https://placehold.co/300x200.png',
-    dataAiHint: 'capsule medicine',
-    useCase: 'Bacterial infections',
-    description: 'Amoxicillin is a penicillin antibiotic that fights bacteria. It is used to treat many different types of infection caused by bacteria, such as tonsillitis, bronchitis, pneumonia, and infections of the ear, nose, throat, skin, or urinary tract.',
-    dosage: 'As prescribed by doctor. Usually 250mg to 500mg three times a day.',
-    sideEffects: 'Diarrhea, nausea, rash. Seek medical attention for severe reactions.',
-    precautions: 'Complete the full course. Inform doctor of any allergies, especially to penicillin.',
-    category: 'Antibiotics',
+    "medicine_name": "Ibuprofen",
+    "tags": ["Anti-inflammatory", "Pain Relief"],
+    "description": "Non-steroidal anti-inflammatory drug for pain and inflammation.",
+    "photo_url": "https://placehold.co/300x200.png"
   },
   {
-    id: '3',
-    name: 'Loratadine 10mg',
-    imageUrl: 'https://placehold.co/300x200.png',
-    dataAiHint: 'allergy medicine',
-    useCase: 'Allergy relief',
-    description: 'Loratadine is an antihistamine that treats symptoms such as itching, runny nose, watery eyes, and sneezing from "hay fever" and other allergies. It is also used to relieve itching from hives.',
-    dosage: 'One tablet daily.',
-    sideEffects: 'Headache, drowsiness, fatigue.',
-    precautions: 'May cause drowsiness. Avoid activities requiring mental alertness until you know how it affects you.',
-    category: 'Antihistamines',
+    "medicine_name": "Amoxicillin",
+    "tags": ["Antibiotic", "Bacterial Infections"],
+    "description": "Penicillin-based antibiotic used for bacterial infections.",
+    "photo_url": "https://placehold.co/300x200.png"
   },
-   {
-    id: '4',
-    name: 'Ibuprofen 200mg',
-    imageUrl: 'https://placehold.co/300x200.png',
-    dataAiHint: 'painkiller pills',
-    useCase: 'Pain relief, Anti-inflammatory',
-    description: 'Ibuprofen is a nonsteroidal anti-inflammatory drug (NSAID) used for relieving pain, helping with fever, and reducing inflammation.',
-    dosage: '1-2 tablets every 4-6 hours as needed. Max 6 tablets in 24 hours.',
-    sideEffects: 'Stomach upset, heartburn, nausea. Take with food.',
-    precautions: 'Do not use if you have stomach ulcers or bleeding problems. Consult doctor if you have heart, kidney, or liver disease.',
-    category: 'Pain Relief',
+  {
+    "medicine_name": "Cetirizine",
+    "tags": ["Antihistamine", "Allergies"],
+    "description": "Used to relieve allergy symptoms such as runny nose and itching.",
+    "photo_url": "https://placehold.co/300x200.png"
   },
+  {
+    "medicine_name": "Aspirin",
+    "tags": ["Blood Thinner", "Pain Relief"],
+    "description": "Used for pain relief and reducing the risk of heart attacks.",
+    "photo_url": "https://placehold.co/300x200.png"
+  },
+  {
+    "medicine_name": "Metformin",
+    "tags": ["Diabetes", "Blood Sugar Control"],
+    "description": "Helps control blood sugar levels in people with type 2 diabetes.",
+    "photo_url": "https://placehold.co/300x200.png"
+  },
+  {
+    "medicine_name": "Omeprazole",
+    "tags": ["Acid Reflux", "Stomach Ulcers"],
+    "description": "Reduces stomach acid for treating GERD and ulcers.",
+    "photo_url": "https://placehold.co/300x200.png"
+  },
+  {
+    "medicine_name": "Ciprofloxacin",
+    "tags": ["Antibiotic", "Bacterial Infections"],
+    "description": "Broad-spectrum antibiotic used for bacterial infections.",
+    "photo_url": "https://placehold.co/300x200.png"
+  },
+  {
+    "medicine_name": "Atorvastatin",
+    "tags": ["Cholesterol", "Heart Health"],
+    "description": "Used to lower cholesterol and reduce risk of heart disease.",
+    "photo_url": "https://placehold.co/300x200.png"
+  },
+  {
+    "medicine_name": "Salbutamol",
+    "tags": ["Asthma", "Bronchodilator"],
+    "description": "Relieves breathing difficulties in asthma and COPD.",
+    "photo_url": "https://placehold.co/300x200.png"
+  },
+  {
+    "medicine_name": "Ranitidine",
+    "tags": ["Heartburn", "Acid Reduction"],
+    "description": "Reduces stomach acid to relieve heartburn and indigestion.",
+    "photo_url": "https://placehold.co/300x200.png"
+  },
+  {
+    "medicine_name": "Doxycycline",
+    "tags": ["Antibiotic", "Bacterial Infections"],
+    "description": "Used to treat bacterial infections and acne.",
+    "photo_url": "https://placehold.co/300x200.png"
+  },
+  {
+    "medicine_name": "Loratadine",
+    "tags": ["Antihistamine", "Allergies"],
+    "description": "Non-drowsy antihistamine for allergy relief.",
+    "photo_url": "https://placehold.co/300x200.png"
+  },
+  {
+    "medicine_name": "Clopidogrel",
+    "tags": ["Blood Thinner", "Heart Health"],
+    "description": "Prevents blood clots and reduces risk of heart attacks.",
+    "photo_url": "https://placehold.co/300x200.png"
+  },
+  {
+    "medicine_name": "Hydrochlorothiazide",
+    "tags": ["Diuretic", "Blood Pressure"],
+    "description": "Helps control high blood pressure by reducing fluid retention.",
+    "photo_url": "https://placehold.co/300x200.png"
+  },
+  {
+    "medicine_name": "Levothyroxine",
+    "tags": ["Thyroid Hormone", "Hypothyroidism"],
+    "description": "Used to treat underactive thyroid conditions.",
+    "photo_url": "https://placehold.co/300x200.png"
+  },
+  {
+    "medicine_name": "Simvastatin",
+    "tags": ["Cholesterol", "Heart Health"],
+    "description": "Lowers cholesterol and reduces risk of heart disease.",
+    "photo_url": "https://placehold.co/300x200.png"
+  },
+  {
+    "medicine_name": "Prednisolone",
+    "tags": ["Steroid", "Anti-inflammatory"],
+    "description": "Used to reduce inflammation and suppress the immune system.",
+    "photo_url": "https://placehold.co/300x200.png"
+  },
+  {
+    "medicine_name": "Acetaminophen",
+    "tags": ["Pain Relief", "Fever"],
+    "description": "Alternative to Paracetamol for pain and fever relief.",
+    "photo_url": "https://placehold.co/300x200.png"
+  },
+  {
+    "medicine_name": "Losartan",
+    "tags": ["Blood Pressure", "Heart Health"],
+    "description": "Used to treat high blood pressure and protect kidney function.",
+    "photo_url": "https://placehold.co/300x200.png"
+  },
+  {
+    "medicine_name": "Gabapentin",
+    "tags": ["Nerve Pain", "Seizures"],
+    "description": "Helps manage nerve pain and epilepsy.",
+    "photo_url": "https://placehold.co/300x200.png"
+  },
+  {
+    "medicine_name": "Fluoxetine",
+    "tags": ["Antidepressant", "Mental Health"],
+    "description": "Used to treat depression and anxiety disorders.",
+    "photo_url": "https://placehold.co/300x200.png"
+  },
+  {
+    "medicine_name": "Warfarin",
+    "tags": ["Blood Thinner", "Clot Prevention"],
+    "description": "Reduces the risk of blood clots and strokes.",
+    "photo_url": "https://placehold.co/300x200.png"
+  },
+  {
+    "medicine_name": "Azithromycin",
+    "tags": ["Antibiotic", "Bacterial Infections"],
+    "description": "Common antibiotic for treating bacterial infections.",
+    "photo_url": "https://placehold.co/300x200.png"
+  },
+  {
+    "medicine_name": "Diphenhydramine",
+    "tags": ["Antihistamine", "Sleep Aid"],
+    "description": "Used for allergies and as a sleep aid.",
+    "photo_url": "https://placehold.co/300x200.png"
+  },
+  {
+    "medicine_name": "Montelukast",
+    "tags": ["Asthma", "Allergy Control"],
+    "description": "Helps control asthma and allergic rhinitis.",
+    "photo_url": "https://placehold.co/300x200.png"
+  },
+  {
+    "medicine_name": "Naproxen",
+    "tags": ["Pain Relief", "Anti-inflammatory"],
+    "description": "Long-lasting pain relief for arthritis and muscle pain.",
+    "photo_url": "https://placehold.co/300x200.png"
+  },
+  {
+    "medicine_name": "Furosemide",
+    "tags": ["Diuretic", "Heart Failure"],
+    "description": "Used to reduce fluid buildup in conditions like heart failure.",
+    "photo_url": "https://placehold.co/300x200.png"
+  }
 ];
+
+export const mockMedicines: Medicine[] = medicinesData.map((med, index) => {
+  const firstTag = med.tags[0] || 'General';
+  const secondTag = med.tags[1] || '';
+  let dataAiHint = firstTag.toLowerCase();
+  if (secondTag) {
+    dataAiHint += ` ${secondTag.toLowerCase()}`;
+  }
+  // Ensure dataAiHint is max two words
+  dataAiHint = dataAiHint.split(' ').slice(0, 2).join(' ');
+
+
+  return {
+    id: `med${index + 1}`,
+    name: med.medicine_name,
+    imageUrl: med.photo_url.replace("https://example.com/", "https://placehold.co/").replace(".jpg", ".png"), // Use .png for placeholders
+    dataAiHint: dataAiHint || 'medicine',
+    useCase: med.description, // Using the provided description as the main use case/summary
+    description: `${med.medicine_name} is typically used for ${med.tags.join(', ')}. For detailed information, including specific uses, contraindications, and potential interactions, please consult a healthcare professional or refer to the patient information leaflet that comes with the medicine.`,
+    dosage: 'Dosage varies depending on the condition being treated and individual patient factors. Always follow the dosage instructions provided by your doctor or pharmacist. Do not exceed the recommended dose.',
+    sideEffects: 'Like all medicines, this drug can cause side effects, although not everybody gets them. Common side effects may include [mention 1-2 very generic, mild side effects if appropriate, otherwise state "nausea or headache"]. If you experience any severe side effects or allergic reactions, seek medical attention immediately.',
+    precautions: 'Before taking this medicine, inform your doctor or pharmacist if you have any allergies, pre-existing medical conditions (such as liver or kidney problems), or if you are pregnant, planning to become pregnant, or breastfeeding. Avoid consuming alcohol if advised against it with this medication. Keep out of reach of children.',
+    category: firstTag,
+  };
+});
+
 
 export interface Hospital {
   id: string;
