@@ -5,7 +5,7 @@ import AppLayout from '@/components/layout/app-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { mockPrescriptions, Prescription, mockTestResults, TestResult, mockTabletReminders, TabletReminder } from '@/lib/mock-data';
-import { FileText, Beaker, Bell, PlusCircle, Download, ChevronRight, CalendarClock, Edit2, LogIn, Loader2, UserCircle } from 'lucide-react'; // Added UserCircle
+import { FileText, Beaker, Bell, PlusCircle, Download, ChevronRight, CalendarClock, Edit2, LogIn, Loader2, UserCircle as UserProfileIcon, Save } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -16,28 +16,56 @@ import { Input } from '@/components/ui/input';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
-
+import { useToast } from "@/hooks/use-toast";
 
 export default function ProfilePage() {
-  const { user, isLoading: authLoading, session } = useAuth();
+  const { user, isLoading: authLoading, updateUserMetadata } = useAuth();
   const router = useRouter();
+  const { toast } = useToast();
 
   const [isAddPrescriptionModalOpen, setIsAddPrescriptionModalOpen] = useState(false);
   const [isAddTestResultModalOpen, setIsAddTestResultModalOpen] = useState(false);
   const [isAddReminderModalOpen, setIsAddReminderModalOpen] = useState(false);
 
   const [reminders, setReminders] = useState(mockTabletReminders);
+
+  const [isEditingUsername, setIsEditingUsername] = useState(false);
+  const [newUsername, setNewUsername] = useState('');
+  const [usernameLoading, setUsernameLoading] = useState(false);
+
+  useEffect(() => {
+    if (user?.user_metadata?.username) {
+      setNewUsername(user.user_metadata.username);
+    } else if (user?.email) {
+      setNewUsername(user.email.split('@')[0]); // Default to part of email
+    }
+  }, [user]);
+
   const toggleReminder = (id: string) => {
     setReminders(prev => prev.map(r => r.id === id ? { ...r, isActive: !r.isActive } : r));
   };
   
-  // Effect to redirect if not logged in and auth loading is complete
   useEffect(() => {
     if (!authLoading && !user) {
-      // Instead of direct redirect, we show a message as per requirements
-      // router.push('/login?redirect=/profile');
+      // Handled by UI below
     }
   }, [user, authLoading, router]);
+
+  const handleUsernameUpdate = async () => {
+    if (!newUsername.trim()) {
+      toast({ title: "Error", description: "Username cannot be empty.", variant: "destructive" });
+      return;
+    }
+    setUsernameLoading(true);
+    const { error } = await updateUserMetadata({ username: newUsername.trim() });
+    setUsernameLoading(false);
+    if (error) {
+      toast({ title: "Update Failed", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Success", description: "Username updated successfully!", className: "bg-green-500 text-white" });
+      setIsEditingUsername(false);
+    }
+  };
 
   if (authLoading) {
     return (
@@ -55,7 +83,7 @@ export default function ProfilePage() {
       <AppLayout>
         <div className="flex flex-col items-center justify-center h-[calc(100vh-10rem)] text-center p-4">
           <Card className="max-w-md w-full p-8 shadow-lg">
-            <UserCircle className="h-16 w-16 text-primary mx-auto mb-6" />
+            <UserProfileIcon className="h-16 w-16 text-primary mx-auto mb-6" />
             <h2 className="font-headline text-2xl mb-3">Access Denied</h2>
             <p className="text-muted-foreground mb-6">
               Please log in to access your personal health profile and medical records.
@@ -71,18 +99,42 @@ export default function ProfilePage() {
     );
   }
 
+  const currentDisplayName = user.user_metadata?.username || user.email?.split('@')[0] || "MediMate User";
+
   return (
     <AppLayout>
       <div className="space-y-8">
         <Card>
-          <CardHeader className="flex flex-row items-center space-x-4">
+          <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
             <Image src="https://placehold.co/100x100.png" alt="User Avatar" width={80} height={80} className="rounded-full border shadow" data-ai-hint="profile avatar" />
-            <div>
-              <CardTitle className="font-headline text-3xl">MediMate User</CardTitle>
-              <CardDescription>{user.email || 'Manage your health information securely.'}</CardDescription>
-               <Button variant="outline" size="sm" className="mt-2">
-                <Edit2 className="mr-2 h-3 w-3" /> Edit Profile
-              </Button>
+            <div className="flex-grow">
+              {!isEditingUsername ? (
+                <>
+                  <CardTitle className="font-headline text-3xl">{currentDisplayName}</CardTitle>
+                  <CardDescription>{user.email || 'Manage your health information securely.'}</CardDescription>
+                  <Button variant="outline" size="sm" className="mt-2" onClick={() => { setNewUsername(currentDisplayName); setIsEditingUsername(true); }}>
+                    <Edit2 className="mr-2 h-3 w-3" /> Edit Username
+                  </Button>
+                </>
+              ) : (
+                <div className="space-y-2">
+                  <Label htmlFor="username">Edit Username</Label>
+                  <Input 
+                    id="username" 
+                    value={newUsername} 
+                    onChange={(e) => setNewUsername(e.target.value)} 
+                    className="max-w-sm"
+                    placeholder="Enter your new username"
+                  />
+                  <div className="flex space-x-2 mt-2">
+                    <Button onClick={handleUsernameUpdate} disabled={usernameLoading} size="sm">
+                      {usernameLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                      Save
+                    </Button>
+                    <Button variant="outline" onClick={() => setIsEditingUsername(false)} disabled={usernameLoading} size="sm">Cancel</Button>
+                  </div>
+                </div>
+              )}
             </div>
           </CardHeader>
         </Card>
@@ -206,7 +258,6 @@ export default function ProfilePage() {
               <Label htmlFor="medName" className="text-right">Medicine</Label>
               <Input id="medName" placeholder="e.g., Paracetamol 500mg" className="col-span-3" />
             </div>
-             {/* Add more fields: Dosage, Frequency, Doctor, Date, Upload Image */}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsAddPrescriptionModalOpen(false)}>Cancel</Button>
@@ -215,7 +266,6 @@ export default function ProfilePage() {
         </DialogContent>
       </Dialog>
       
-      {/* Add Test Result Modal */}
        <Dialog open={isAddTestResultModalOpen} onOpenChange={setIsAddTestResultModalOpen}>
         <DialogContent>
           <DialogHeader>
@@ -227,7 +277,6 @@ export default function ProfilePage() {
               <Label htmlFor="testName" className="text-right">Test Name</Label>
               <Input id="testName" placeholder="e.g., Lipid Profile" className="col-span-3" />
             </div>
-             {/* Add more fields: Date, Summary, Upload Report/Image */}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsAddTestResultModalOpen(false)}>Cancel</Button>
@@ -236,7 +285,6 @@ export default function ProfilePage() {
         </DialogContent>
       </Dialog>
 
-      {/* Add Reminder Modal */}
        <Dialog open={isAddReminderModalOpen} onOpenChange={setIsAddReminderModalOpen}>
         <DialogContent>
           <DialogHeader>
@@ -248,7 +296,6 @@ export default function ProfilePage() {
               <Label htmlFor="remMedName" className="text-right">Medicine</Label>
               <Input id="remMedName" placeholder="e.g., Vitamin C" className="col-span-3" />
             </div>
-             {/* Add more fields: Time, Days */}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsAddReminderModalOpen(false)}>Cancel</Button>
@@ -260,4 +307,3 @@ export default function ProfilePage() {
     </AppLayout>
   );
 }
-

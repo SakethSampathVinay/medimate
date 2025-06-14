@@ -9,7 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { useAuth } from '@/contexts/AuthContext'; // Import useAuth
+import { useAuth } from '@/contexts/AuthContext'; 
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -20,7 +20,6 @@ export default function AppLayout({ children }: AppLayoutProps) {
     <div className="flex flex-col min-h-screen bg-background">
       <header className="fixed top-0 left-0 right-0 z-50 flex h-16 items-center justify-between border-b bg-background/95 backdrop-blur-sm px-4 md:px-6">
         <div className="flex items-center gap-2 sm:gap-4">
-          {/* Mobile Nav Trigger */}
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="md:hidden flex-shrink-0">
@@ -39,7 +38,6 @@ export default function AppLayout({ children }: AppLayoutProps) {
             </SheetContent>
           </Sheet>
 
-          {/* Desktop Logo */}
           <Link href="/" className="hidden md:flex items-center gap-2">
             <Stethoscope className="h-8 w-8 text-primary" />
             <h1 className="text-2xl font-headline font-semibold text-primary">MediMate</h1>
@@ -47,11 +45,11 @@ export default function AppLayout({ children }: AppLayoutProps) {
         </div>
         
         <div className="flex items-center gap-2 md:gap-4">
-          <TopbarNav /> {/* Desktop Nav */}
+          <TopbarNav /> 
           <UserMenu />
         </div>
       </header>
-      <main className="flex-1 pt-28 p-4 md:p-6 lg:p-8"> {/* Increased pt-24 to pt-28 */}
+      <main className="flex-1 pt-28 p-4 md:p-6 lg:p-8">
         {children}
       </main>
     </div>
@@ -59,7 +57,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
 }
 
 function UserMenu() {
-  const { user, signOut, isLoading } = useAuth(); // Use the useAuth hook
+  const { user, signOut, isLoading } = useAuth(); 
 
   if (isLoading) {
     return (
@@ -71,15 +69,19 @@ function UserMenu() {
     );
   }
 
+  const displayName = user?.user_metadata?.username || user?.email?.split('@')[0] || "User";
+  const fallbackChar = displayName.charAt(0).toUpperCase();
+
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-10 w-10 rounded-full flex-shrink-0">
           <Avatar className="h-9 w-9">
             {user ? (
-              <AvatarImage src="https://placehold.co/100x100.png" alt="User avatar" data-ai-hint="user avatar" />
+              <AvatarImage src="https://placehold.co/100x100.png" alt={displayName} data-ai-hint="user avatar" />
             ) : null}
-            <AvatarFallback>{user ? user.email?.charAt(0).toUpperCase() || 'U' : <UserCircle className="h-6 w-6"/>}</AvatarFallback>
+            <AvatarFallback>{user ? fallbackChar : <UserCircle className="h-6 w-6"/>}</AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
@@ -88,10 +90,12 @@ function UserMenu() {
           <>
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">MediMate User</p>
-                <p className="text-xs leading-none text-muted-foreground">
-                  {user.email}
-                </p>
+                <p className="text-sm font-medium leading-none">{displayName}</p>
+                {user.email && (
+                  <p className="text-xs leading-none text-muted-foreground">
+                    {user.email}
+                  </p>
+                )}
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />

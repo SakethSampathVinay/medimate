@@ -57,8 +57,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const signUp = async (credentials: SignUpWithPasswordCredentials) => {
     setIsLoading(true);
     setError(null);
-    // Supabase's signUp might automatically sign in the user or require email confirmation
-    // based on your Supabase project settings.
     const { data, error: signUpError } = await supabase.auth.signUp(credentials);
      if (signUpError) setError(signUpError);
     setIsLoading(false);
@@ -73,7 +71,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setUser(null);
     setSession(null);
     setIsLoading(false);
-    router.push('/'); // Redirect to home page after logout
+    router.push('/'); 
     return { error: signOutError };
   };
 
@@ -83,12 +81,26 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const { error: googleSignInError } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/profile` // Or wherever you want them to land after Google auth
+        redirectTo: `${window.location.origin}/profile`
       }
     });
     if (googleSignInError) setError(googleSignInError);
     setIsLoading(false);
     return { error: googleSignInError };
+  };
+
+  const updateUserMetadata = async (metadata: { [key: string]: any; }) => {
+    setIsLoading(true);
+    setError(null);
+    const { data, error: updateError } = await supabase.auth.updateUser({ data: metadata });
+    if (updateError) {
+      setError(updateError);
+    } else if (data.user) {
+      // Supabase onAuthStateChange should pick this up, but we can explicitly set user if needed
+      // setUser(data.user); // This might be redundant if onAuthStateChange is quick
+    }
+    setIsLoading(false);
+    return { error: updateError };
   };
 
   const clearError = () => {
@@ -104,6 +116,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     signUp,
     signOut,
     signInWithGoogle,
+    updateUserMetadata,
     clearError,
   };
 

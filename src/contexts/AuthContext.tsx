@@ -13,6 +13,7 @@ export interface AuthContextType {
   signUp: (credentials: SignUpWithPasswordCredentials) => Promise<{ error: AuthError | null }>;
   signOut: () => Promise<{ error: AuthError | null }>;
   signInWithGoogle: () => Promise<{ error: AuthError | null }>;
+  updateUserMetadata: (metadata: { [key: string]: any; }) => Promise<{ error: AuthError | null }>;
   clearError: () => void;
 }
 
