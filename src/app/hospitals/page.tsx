@@ -209,9 +209,7 @@ export default function HospitalsPage() {
     if (userCoordinates) {
       setMapCenter(userCoordinates);
       setSelectedHospitalId(null); 
-      if (mapRef.current) {
-        mapRef.current.setView(userCoordinates, DEFAULT_ZOOM + 2);
-      }
+      // The ChangeView component will handle map.setView when mapCenter changes
     } else {
         setError("Your location is not available to re-center the map.");
     }
@@ -239,11 +237,12 @@ export default function HospitalsPage() {
         <div ref={mapContainerRef} className="h-[50vh] md:h-[60vh] w-full rounded-lg overflow-hidden shadow-lg border">
           {typeof window !== 'undefined' && (
             <MapContainer
+              ref={mapRef} // Use ref prop here
               center={mapCenter}
               zoom={DEFAULT_ZOOM}
               scrollWheelZoom={true}
               style={{ height: '100%', width: '100%' }}
-              whenCreated={(mapInstance) => { mapRef.current = mapInstance; }}
+              // whenCreated removed
             >
               <ChangeView center={mapCenter} zoom={DEFAULT_ZOOM} selectedHospital={selectedHospital} />
               <TileLayer
@@ -260,8 +259,6 @@ export default function HospitalsPage() {
                   key={hospital.id}
                   position={[hospital.latitude, hospital.longitude]}
                   eventHandlers={{ click: () => handleMarkerClick(hospital.id) }}
-                  // Cast to an L.Icon manually if Leaflet's default type inference is problematic
-                  // icon={L.icon({ iconUrl: markerIcon.src, iconRetinaUrl: markerIcon2x.src, shadowUrl: markerShadow.src, iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41] })}
                   opacity={selectedHospitalId === hospital.id ? 1 : 0.7}
                 >
                   <Popup>{hospital.name}</Popup>
@@ -346,4 +343,3 @@ export default function HospitalsPage() {
     </AppLayout>
   );
 }
-
