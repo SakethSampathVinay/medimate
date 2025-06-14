@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Hospital as HospitalIconLucide, Loader2, MapPin, Phone, Globe, AlertTriangle, LocateFixed } from 'lucide-react';
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import type { LatLngExpression, Map as LeafletMapType } from 'leaflet'; 
+import type { LatLngExpression, Map as LeafletMapType } from 'leaflet';
 import dynamic from 'next/dynamic';
 
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
@@ -23,7 +23,7 @@ interface OsmHospitalElement {
   id: number;
   lat?: number;
   lon?: number;
-  center?: { lat: number; lon: number }; 
+  center?: { lat: number; lon: number };
   tags: {
     name?: string;
     "addr:street"?: string;
@@ -40,7 +40,7 @@ interface OsmHospitalElement {
   };
 }
 
-interface HospitalDisplayData {
+export interface HospitalDisplayData {
   id: number;
   name: string;
   latitude: number;
@@ -64,15 +64,13 @@ function MapPlaceholder() {
   );
 }
 
-const ChangeView: React.FC<{ center: LatLngExpression; zoom: number; selectedHospital?: HospitalDisplayData | null }> = ({ center, zoom, selectedHospital }) => {
-  const map = useMap!(); 
+const ChangeView: React.FC<{ selectedHospital?: HospitalDisplayData | null }> = ({ selectedHospital }) => {
+  const map = useMap!();
   useEffect(() => {
-    if (selectedHospital) {
-      map.setView([selectedHospital.latitude, selectedHospital.longitude], 15);
-    } else {
-      map.setView(center, zoom);
+    if (selectedHospital && map) {
+      map.flyTo([selectedHospital.latitude, selectedHospital.longitude], 15);
     }
-  }, [center, zoom, selectedHospital, map]);
+  }, [selectedHospital, map]);
   return null;
 };
 
@@ -84,9 +82,9 @@ export default function HospitalsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedHospitalId, setSelectedHospitalId] = useState<number | null>(null);
-  const mapRef = useRef<LeafletMapType | null>(null);
+  
   const hospitalCardsRef = useRef<{ [key: number]: HTMLDivElement | null }>({});
-  const mapContainerRef = useRef<HTMLDivElement | null>(null);
+  const mapContainerRef = useRef<HTMLDivElement | null>(null); // For scrolling the page to the map
 
   useEffect(() => {
     setIsClient(true);
@@ -96,7 +94,8 @@ export default function HospitalsPage() {
     if (typeof window !== 'undefined') {
       import('leaflet').then(LModule => {
         const L = LModule.default;
-        delete (L.Icon.Default.prototype as any)._getIconUrl;
+        // @ts-ignore
+        delete L.Icon.Default.prototype._getIconUrl;
         L.Icon.Default.mergeOptions({
           iconRetinaUrl: markerIcon2x.src,
           iconUrl: markerIcon.src,
@@ -132,7 +131,7 @@ export default function HospitalsPage() {
   const fetchNearbyHospitals = async (lat: number, lon: number) => {
     setIsLoading(true);
     setError(null);
-    setHospitals([]);
+    setHospitals([]); // Clear previous hospitals
     const overpassQuery = `
       [out:json][timeout:30];
       (
@@ -149,7 +148,7 @@ export default function HospitalsPage() {
       }
       const data = await response.json();
       const fetchedHospitals: HospitalDisplayData[] = data.elements
-        .filter((el: OsmHospitalElement) => el.tags?.name) 
+        .filter((el: OsmHospitalElement) => el.tags?.name)
         .map((el: OsmHospitalElement) => {
           let Rlat, Rlon;
           if (el.lat && el.lon) {
@@ -159,7 +158,7 @@ export default function HospitalsPage() {
             Rlat = el.center.lat;
             Rlon = el.center.lon;
           } else {
-            return null; 
+            return null;
           }
 
           let address = el.tags['addr:full'] || '';
@@ -170,7 +169,7 @@ export default function HospitalsPage() {
             const postcode = el.tags['addr:postcode'] || '';
             address = `${housenumber} ${street}, ${city} ${postcode}`.replace(/^ +|, +$/, '').replace(/ ,/g, ',');
           }
-          if (!address.trim() && el.tags.name) address = el.tags.name; 
+          if (!address.trim() && el.tags.name) address = el.tags.name;
 
           return {
             id: el.id,
@@ -184,7 +183,7 @@ export default function HospitalsPage() {
           };
         })
         .filter((h: HospitalDisplayData | null): h is HospitalDisplayData => h !== null);
-      
+
       setHospitals(fetchedHospitals);
     } catch (err) {
       console.error("Error fetching hospitals:", err);
@@ -201,7 +200,7 @@ export default function HospitalsPage() {
       cardRef.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   };
-  
+
   const handleViewOnMapClick = (hospital: HospitalDisplayData) => {
     setSelectedHospitalId(hospital.id);
     if (mapContainerRef.current) {
@@ -216,7 +215,7 @@ export default function HospitalsPage() {
   const centerMapOnUser = () => {
     if (userCoordinates) {
       setMapCenter(userCoordinates);
-      setSelectedHospitalId(null); 
+      setSelectedHospitalId(null);
     } else {
         setError("Your location is not available to re-center the map.");
     }
@@ -232,25 +231,25 @@ export default function HospitalsPage() {
               <HospitalIconLucide className="mr-3 h-8 w-8 text-primary" />
               Nearby Hospitals
             </CardTitle>
-            <CardDescription>Real-time hospital data from OpenStreetMap based on your location.</CardDescription>
+            <CardDescription>Real-time hospital data from OpenStreetMap based on your location (or a default area).</CardDescription>
           </CardHeader>
           <CardContent>
-             <Button onClick={centerMapOnUser} variant="outline" size="sm" disabled={!userCoordinates}>
+             <Button onClick={centerMapOnUser} variant="outline" size="sm" disabled={!userCoordinates && !error}>
                 <LocateFixed className="mr-2 h-4 w-4" /> Center on My Location
             </Button>
           </CardContent>
         </Card>
-       
+
         <div ref={mapContainerRef} className="h-[50vh] md:h-[60vh] w-full rounded-lg overflow-hidden shadow-lg border">
           {isClient ? (
             <MapContainer
-              ref={mapRef}
+              key="hospital-map-container" // Static key for stability
               center={mapCenter}
               zoom={DEFAULT_ZOOM}
               scrollWheelZoom={true}
               style={{ height: '100%', width: '100%' }}
             >
-              <ChangeView center={mapCenter} zoom={DEFAULT_ZOOM} selectedHospital={selectedHospital} />
+              <ChangeView selectedHospital={selectedHospital} />
               <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -290,7 +289,7 @@ export default function HospitalsPage() {
             </CardHeader>
             <CardContent>
               <p className="text-destructive-foreground">{error}</p>
-              {!userCoordinates && <p className="text-destructive-foreground mt-2">Please ensure location services are enabled in your browser and for this site.</p>}
+              {!userCoordinates && <p className="text-destructive-foreground mt-2">Please ensure location services are enabled in your browser and for this site to see hospitals truly near you. Displaying data for a default location.</p>}
             </CardContent>
           </Card>
         )}
@@ -300,7 +299,7 @@ export default function HospitalsPage() {
             <CardContent className="text-center py-12">
               <HospitalIconLucide className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
               <p className="text-lg font-medium">No hospitals found nearby</p>
-              <p className="text-muted-foreground">Try zooming out on the map or check again later.</p>
+              <p className="text-muted-foreground">Try zooming out on the map or check again later. Data is from OpenStreetMap.</p>
             </CardContent>
           </Card>
         )}
@@ -310,10 +309,11 @@ export default function HospitalsPage() {
             <h2 className="font-headline text-2xl font-semibold mb-4">Hospitals Found ({hospitals.length})</h2>
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
               {hospitals.map(hospital => (
-                <Card 
-                  key={hospital.id} 
+                <Card
+                  key={hospital.id}
                   ref={el => hospitalCardsRef.current[hospital.id] = el}
                   className={`flex flex-col overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border-2 ${selectedHospitalId === hospital.id ? 'border-primary scale-105' : 'border-transparent'}`}
+                  onClick={() => handleViewOnMapClick(hospital)} // Make card itself clickable to view on map
                 >
                   <CardHeader>
                     <CardTitle className="font-headline text-lg">{hospital.name}</CardTitle>
@@ -326,19 +326,19 @@ export default function HospitalsPage() {
                     {hospital.phone && (
                       <div className="flex items-center">
                         <Phone className="mr-2 h-4 w-4 text-muted-foreground flex-shrink-0" />
-                        <a href={`tel:${hospital.phone}`} className="text-primary hover:underline">{hospital.phone}</a>
+                        <a href={`tel:${hospital.phone}`} onClick={(e) => e.stopPropagation()} className="text-primary hover:underline">{hospital.phone}</a>
                       </div>
                     )}
                     {hospital.website && (
                       <div className="flex items-center">
                         <Globe className="mr-2 h-4 w-4 text-muted-foreground flex-shrink-0" />
-                        <a href={hospital.website.startsWith('http') ? hospital.website : `//${hospital.website}`} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline truncate">{hospital.website}</a>
+                        <a href={hospital.website.startsWith('http') ? hospital.website : `//${hospital.website}`} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-primary hover:underline truncate">{hospital.website}</a>
                       </div>
                     )}
                      {hospital.openingHours && <p className="text-xs text-muted-foreground">Hours: {hospital.openingHours}</p>}
                   </CardContent>
                   <CardFooter>
-                    <Button variant="outline" className="w-full" onClick={() => handleViewOnMapClick(hospital)}>
+                    <Button variant="outline" className="w-full" onClick={(e) => { e.stopPropagation(); handleViewOnMapClick(hospital); }}>
                       View on Map
                     </Button>
                   </CardFooter>
@@ -351,4 +351,3 @@ export default function HospitalsPage() {
     </AppLayout>
   );
 }
-
