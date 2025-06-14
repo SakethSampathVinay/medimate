@@ -6,17 +6,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Hospital as HospitalIconLucide, Loader2, MapPin, Phone, Globe, AlertTriangle, LocateFixed } from 'lucide-react';
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import type { LatLngExpression, Map as LeafletMapType } from 'leaflet'; // Keep type imports
+import type { LatLngExpression, Map as LeafletMapType } from 'leaflet'; 
 import dynamic from 'next/dynamic';
 
-// Import marker images using ES module imports
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
-
-// Leaflet CSS is imported in globals.css
-// The Leaflet icon fix that directly imported 'L' has been removed to prevent SSR errors.
-// If marker icons are missing, this fix might need to be re-applied strictly client-side within a useEffect.
 
 const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false, loading: () => <MapPlaceholder /> });
 const TileLayer = dynamic(() => import('react-leaflet').then(mod => mod.TileLayer), { ssr: false });
@@ -28,7 +23,7 @@ interface OsmHospitalElement {
   id: number;
   lat?: number;
   lon?: number;
-  center?: { lat: number; lon: number }; // For ways/relations
+  center?: { lat: number; lon: number }; 
   tags: {
     name?: string;
     "addr:street"?: string;
@@ -82,6 +77,7 @@ const ChangeView: React.FC<{ center: LatLngExpression; zoom: number; selectedHos
 };
 
 export default function HospitalsPage() {
+  const [isClient, setIsClient] = useState(false);
   const [userCoordinates, setUserCoordinates] = useState<LatLngExpression | null>(null);
   const [mapCenter, setMapCenter] = useState<LatLngExpression>(DEFAULT_LOCATION);
   const [hospitals, setHospitals] = useState<HospitalDisplayData[]>([]);
@@ -92,13 +88,14 @@ export default function HospitalsPage() {
   const hospitalCardsRef = useRef<{ [key: number]: HTMLDivElement | null }>({});
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
 
-  // Effect for Leaflet icon fix - to be run strictly on client
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      // Dynamically import Leaflet only on the client within useEffect
       import('leaflet').then(LModule => {
         const L = LModule.default;
-        // Leaflet icon fix for Next.js
         delete (L.Icon.Default.prototype as any)._getIconUrl;
         L.Icon.Default.mergeOptions({
           iconRetinaUrl: markerIcon2x.src,
@@ -245,7 +242,7 @@ export default function HospitalsPage() {
         </Card>
        
         <div ref={mapContainerRef} className="h-[50vh] md:h-[60vh] w-full rounded-lg overflow-hidden shadow-lg border">
-          {typeof window !== 'undefined' && (
+          {isClient ? (
             <MapContainer
               ref={mapRef}
               center={mapCenter}
@@ -274,6 +271,8 @@ export default function HospitalsPage() {
                 </Marker>
               ))}
             </MapContainer>
+          ) : (
+            <MapPlaceholder />
           )}
         </div>
 
@@ -352,3 +351,4 @@ export default function HospitalsPage() {
     </AppLayout>
   );
 }
+
