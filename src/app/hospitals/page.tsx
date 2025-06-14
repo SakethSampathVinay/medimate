@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Hospital as HospitalIconLucide, Loader2, MapPin, Phone, Globe, AlertTriangle, LocateFixed } from 'lucide-react';
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import L, { LatLngExpression, Map as LeafletMap } from 'leaflet';
+import type { LatLngExpression, Map as LeafletMapType } from 'leaflet'; // Keep type imports
 import dynamic from 'next/dynamic';
 
 // Import marker images using ES module imports
@@ -15,15 +15,8 @@ import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 
 // Leaflet CSS is imported in globals.css
-// Leaflet icon fix for Next.js
-if (typeof window !== 'undefined') {
-  delete (L.Icon.Default.prototype as any)._getIconUrl;
-  L.Icon.Default.mergeOptions({
-    iconRetinaUrl: markerIcon2x.src,
-    iconUrl: markerIcon.src,
-    shadowUrl: markerShadow.src,
-  });
-}
+// The Leaflet icon fix that directly imported 'L' has been removed to prevent SSR errors.
+// If marker icons are missing, this fix might need to be re-applied strictly client-side within a useEffect.
 
 const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false, loading: () => <MapPlaceholder /> });
 const TileLayer = dynamic(() => import('react-leaflet').then(mod => mod.TileLayer), { ssr: false });
@@ -95,9 +88,27 @@ export default function HospitalsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedHospitalId, setSelectedHospitalId] = useState<number | null>(null);
-  const mapRef = useRef<LeafletMap | null>(null);
+  const mapRef = useRef<LeafletMapType | null>(null);
   const hospitalCardsRef = useRef<{ [key: number]: HTMLDivElement | null }>({});
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
+
+  // Effect for Leaflet icon fix - to be run strictly on client
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      // Dynamically import Leaflet only on the client within useEffect
+      import('leaflet').then(LModule => {
+        const L = LModule.default;
+        // Leaflet icon fix for Next.js
+        delete (L.Icon.Default.prototype as any)._getIconUrl;
+        L.Icon.Default.mergeOptions({
+          iconRetinaUrl: markerIcon2x.src,
+          iconUrl: markerIcon.src,
+          shadowUrl: markerShadow.src,
+        });
+      }).catch(err => console.error("Failed to load Leaflet for icon fix:", err));
+    }
+  }, []);
+
 
   useEffect(() => {
     setIsLoading(true);
@@ -209,7 +220,6 @@ export default function HospitalsPage() {
     if (userCoordinates) {
       setMapCenter(userCoordinates);
       setSelectedHospitalId(null); 
-      // The ChangeView component will handle map.setView when mapCenter changes
     } else {
         setError("Your location is not available to re-center the map.");
     }
@@ -237,12 +247,11 @@ export default function HospitalsPage() {
         <div ref={mapContainerRef} className="h-[50vh] md:h-[60vh] w-full rounded-lg overflow-hidden shadow-lg border">
           {typeof window !== 'undefined' && (
             <MapContainer
-              ref={mapRef} // Use ref prop here
+              ref={mapRef}
               center={mapCenter}
               zoom={DEFAULT_ZOOM}
               scrollWheelZoom={true}
               style={{ height: '100%', width: '100%' }}
-              // whenCreated removed
             >
               <ChangeView center={mapCenter} zoom={DEFAULT_ZOOM} selectedHospital={selectedHospital} />
               <TileLayer
