@@ -89,7 +89,7 @@ const ReelCard: React.FC<{ reel: HealthReel; isVisible: boolean }> = ({ reel, is
       </CardFooter>
        <div className="absolute bottom-4 left-4 z-10 text-white text-sm">
           <p className="font-semibold">{reel.uploader}</p>
-          <p className="text-xs flex items-center"><Eye className="w-4 h-4 mr-1"/>{reel.likes} views</p>
+          <p className="text-xs flex items-center"><Eye className="w-5 h-5 mr-1"/>{reel.likes} views</p>
         </div>
     </Card>
   );
@@ -135,8 +135,9 @@ export default function HealthReelsPage() {
 
   return (
     <AppLayout>
-      <div className="flex flex-col h-[calc(100vh-4rem)]"> {/* Adjust height based on your AppLayout header */}
-        <header className="p-4 border-b sticky top-0 bg-background z-20">
+      <div className="flex flex-col h-full"> {/* Changed: h-[calc(100vh-4rem)] to h-full */}
+        {/* Removed sticky and top-0 from this header */}
+        <header className="p-4 border-b bg-background z-10"> {/* z-10 is likely fine, z-20 was also okay */}
           <CardTitle className="font-headline text-3xl flex items-center mb-2">
             <PlaySquare className="mr-3 h-8 w-8 text-primary" />
             Health Reels
