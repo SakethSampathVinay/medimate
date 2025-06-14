@@ -1,3 +1,4 @@
+
 'use client';
 
 import AppLayout from '@/components/layout/app-layout';
@@ -97,9 +98,8 @@ export default function MedicinesPage() {
                     <Image 
                       src={medicine.imageUrl} 
                       alt={medicine.name} 
-                      layout="fill" 
-                      objectFit="cover" 
-                      className="rounded-t-lg"
+                      fill
+                      className="rounded-t-lg object-cover"
                       data-ai-hint={medicine.dataAiHint || "medicine image"}
                     />
                   </div>
@@ -167,9 +167,8 @@ export default function MedicinesPage() {
                 <Image 
                   src={selectedMedicine.imageUrl} 
                   alt={selectedMedicine.name} 
-                  layout="fill" 
-                  objectFit="contain" 
-                  className="rounded-lg"
+                  fill
+                  className="rounded-lg object-contain"
                   data-ai-hint={selectedMedicine.dataAiHint || "medicine image"}
                 />
               </div>
@@ -199,3 +198,4 @@ export default function MedicinesPage() {
     </AppLayout>
   );
 }
+
