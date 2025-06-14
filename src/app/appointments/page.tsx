@@ -4,10 +4,11 @@
 import AppLayout from '@/components/layout/app-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { mockDoctors, Doctor, mockHealthCheckupPacks, HealthCheckupPack } from '@/lib/mock-data';
-import { CalendarDays, UserCircle, MapPinIcon, StarIcon, CheckCircle, Filter, Search } from 'lucide-react'; 
+import { CalendarDays, UserCircle, MapPinIcon, StarIcon, CheckCircle, Filter, Search, BriefcaseMedical, Circle } from 'lucide-react'; 
 import React, { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
 import { Calendar } from "@/components/ui/calendar";
@@ -23,9 +24,12 @@ export default function AppointmentsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSpecialty, setSelectedSpecialty] = useState<string>('All');
   const [selectedLocation, setSelectedLocation] = useState<string>('All');
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
-  const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
-  const [selectedTime, setSelectedTime] = useState<string | null>(null);
+  
+  const [selectedDoctorForModal, setSelectedDoctorForModal] = useState<Doctor | null>(null);
+  const [isTimeSlotModalOpen, setIsTimeSlotModalOpen] = useState(false);
+  const [modalSelectedDate, setModalSelectedDate] = useState<Date | undefined>(new Date());
+  const [modalSelectedTime, setModalSelectedTime] = useState<string | null>(null);
+
   const { toast } = useToast();
 
   const specialties = useMemo(() => ['All', ...new Set(mockDoctors.map(doc => doc.specialty))], []);
@@ -39,26 +43,49 @@ export default function AppointmentsPage() {
     );
   }, [searchTerm, selectedSpecialty, selectedLocation]);
 
-  const handleBooking = (doctor: Doctor, time: string) => {
-    setSelectedDoctor(doctor);
-    setSelectedTime(time);
-    // In a real app, this would open a confirmation modal or navigate to a booking summary page
-    toast({
-      title: "Appointment Slot Selected",
-      description: `You've selected ${time} with ${doctor.name} on ${selectedDate ? format(selectedDate, "PPP") : ""}. Confirm to book.`,
-    });
-    // Simulate booking confirmation for now
-    setTimeout(() => {
-      toast({
-        title: "Appointment Confirmed!",
-        description: `Your appointment with ${doctor.name} at ${time} on ${selectedDate ? format(selectedDate, "PPP") : ""} is booked.`,
-        variant: "default",
-        className: "bg-green-500 text-white",
-      });
-      setSelectedDoctor(null); // Reset after "booking"
-      setSelectedTime(null);
-    }, 2000);
+  const handleViewProfileBook = (doctor: Doctor) => {
+    setSelectedDoctorForModal(doctor);
+    setModalSelectedDate(new Date()); // Reset date for new doctor
+    setModalSelectedTime(null);
+    setIsTimeSlotModalOpen(true);
   };
+
+  const handleModalBookingConfirm = () => {
+    if (!selectedDoctorForModal || !modalSelectedTime || !modalSelectedDate) {
+      toast({
+        title: "Booking Error",
+        description: "Please select a doctor, date, and time slot.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    toast({
+      title: "Appointment Confirmed!",
+      description: `Your appointment with ${selectedDoctorForModal.name} at ${modalSelectedTime} on ${format(modalSelectedDate, "PPP")} is booked.`,
+      variant: "default",
+      className: "bg-green-500 text-white",
+    });
+    setIsTimeSlotModalOpen(false);
+    setSelectedDoctorForModal(null);
+    setModalSelectedTime(null);
+  };
+  
+  const handleBookPackage = (pack: HealthCheckupPack) => {
+    toast({
+        title: "Package Booking Initiated",
+        description: `You've selected the ${pack.name}. Proceed to payment (mock).`,
+      });
+      setTimeout(() => {
+        toast({
+          title: `Booked ${pack.name}!`,
+          description: `Your ${pack.name} booking is confirmed.`,
+          variant: "default",
+          className: "bg-green-500 text-white",
+        });
+      }, 1500);
+  };
+
 
   return (
     <AppLayout>
@@ -66,7 +93,7 @@ export default function AppointmentsPage() {
         <CardHeader className="px-0">
             <CardTitle className="font-headline text-3xl flex items-center">
               <CalendarDays className="mr-3 h-8 w-8 text-primary" />
-              Schedule Appointments
+              Book Doctor Appointments
             </CardTitle>
             <CardDescription>Find doctors, checkup packages, and book your appointments seamlessly.</CardDescription>
         </CardHeader>
@@ -79,11 +106,11 @@ export default function AppointmentsPage() {
         <TabsContent value="doctors" className="space-y-8">
           <Card>
             <CardHeader>
-              <CardTitle className="font-headline text-2xl flex items-center">
-                <Filter className="mr-2 h-6 w-6" /> Filter Doctors
+              <CardTitle className="font-headline text-xl flex items-center">
+                <Filter className="mr-2 h-5 w-5" /> Filter Doctors
               </CardTitle>
             </CardHeader>
-            <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input
@@ -102,17 +129,6 @@ export default function AppointmentsPage() {
                 <SelectTrigger><SelectValue placeholder="Location" /></SelectTrigger>
                 <SelectContent>{locations.map(l => <SelectItem key={l} value={l}>{l}</SelectItem>)}</SelectContent>
               </Select>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className="w-full justify-start text-left font-normal">
-                    <CalendarDays className="mr-2 h-4 w-4" />
-                    {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                  <Calendar mode="single" selected={selectedDate} onSelect={setSelectedDate} initialFocus />
-                </PopoverContent>
-              </Popover>
             </CardContent>
           </Card>
 
@@ -124,7 +140,10 @@ export default function AppointmentsPage() {
                     <Image src={doctor.imageUrl} alt={doctor.name} width={80} height={80} className="rounded-full border" data-ai-hint={doctor.dataAiHint || "doctor portrait"} />
                     <div>
                       <CardTitle className="font-headline text-xl">{doctor.name}</CardTitle>
-                      <CardDescription className="text-sm">{doctor.specialty}</CardDescription>
+                      <CardDescription className="text-sm text-primary">{doctor.specialty}</CardDescription>
+                      <div className="flex items-center text-xs text-muted-foreground mt-1">
+                        <BriefcaseMedical className="mr-1 h-3 w-3" /> {doctor.experience}
+                      </div>
                       <div className="flex items-center text-xs text-muted-foreground mt-1">
                         <MapPinIcon className="mr-1 h-3 w-3" /> {doctor.location}
                       </div>
@@ -133,20 +152,11 @@ export default function AppointmentsPage() {
                       </div>
                     </div>
                   </CardHeader>
-                  <CardContent className="flex-grow">
-                    <h4 className="font-semibold text-sm mb-2">Available Slots ({selectedDate ? format(selectedDate, "MMM dd") : "Selected Date"}):</h4>
-                    {selectedDate && doctor.availability[format(selectedDate, "yyyy-MM-dd")]?.length > 0 ? (
-                      <div className="grid grid-cols-2 gap-2">
-                        {doctor.availability[format(selectedDate, "yyyy-MM-dd")].map(slot => (
-                          <Button key={slot} variant="outline" size="sm" onClick={() => handleBooking(doctor, slot)}>
-                            {slot}
-                          </Button>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-sm text-muted-foreground">No slots available for this date.</p>
-                    )}
-                  </CardContent>
+                  <CardFooter className="mt-auto">
+                    <Button className="w-full" onClick={() => handleViewProfileBook(doctor)}>
+                      View Profile & Book
+                    </Button>
+                  </CardFooter>
                 </Card>
               ))}
             </div>
@@ -155,7 +165,7 @@ export default function AppointmentsPage() {
               <CardContent className="text-center py-12">
                 <DoctorIcon className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
                 <p className="text-lg font-medium">No doctors found</p>
-                <p className="text-muted-foreground">Try adjusting your filters or selected date.</p>
+                <p className="text-muted-foreground">Try adjusting your filters.</p>
               </CardContent>
             </Card>
           )}
@@ -167,10 +177,10 @@ export default function AppointmentsPage() {
               <CardTitle className="font-headline text-2xl">Predefined Health Checkup Packages</CardTitle>
               <CardDescription>Choose from our curated health checkup packages for comprehensive wellness.</CardDescription>
             </CardHeader>
-            <CardContent className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <CardContent className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
               {mockHealthCheckupPacks.map(pack => (
                 <Card key={pack.id} className="flex flex-col overflow-hidden shadow-md hover:shadow-xl transition-shadow">
-                   <div className="relative w-full h-48">
+                   <div className="relative w-full h-40 bg-muted flex items-center justify-center rounded-t-lg">
                      <Image 
                         src={pack.imageUrl} 
                         alt={pack.name} 
@@ -181,21 +191,23 @@ export default function AppointmentsPage() {
                       />
                    </div>
                   <CardHeader>
-                    <CardTitle className="font-headline text-xl">{pack.name}</CardTitle>
-                    <CardDescription className="text-sm h-16 overflow-hidden text-ellipsis">{pack.description}</CardDescription>
+                    <div className="flex items-center mb-2">
+                      <Circle className={`mr-2 h-5 w-5 ${pack.iconColor}`} />
+                      <CardTitle className="font-headline text-xl">{pack.name}</CardTitle>
+                    </div>
+                    <div className="flex items-baseline text-2xl font-bold text-primary mb-2">
+                      <span className="text-xl mr-0.5">₹</span>{pack.price.toFixed(0)}
+                    </div>
                   </CardHeader>
                   <CardContent className="flex-grow">
-                    <div className="flex items-center text-lg font-semibold text-primary mb-2">
-                      <span className="mr-1 text-lg font-semibold">₹</span>{pack.price.toFixed(2)}
-                    </div>
                     <h4 className="font-medium text-sm mb-1">Tests Included:</h4>
                     <ul className="list-disc list-inside text-xs text-muted-foreground space-y-0.5">
                       {pack.testsIncluded.map(test => <li key={test}>{test}</li>)}
                     </ul>
                   </CardContent>
                   <CardFooter>
-                    <Button className="w-full">
-                      <CheckCircle className="mr-2 h-4 w-4" /> Book Package
+                    <Button className="w-full" onClick={() => handleBookPackage(pack)}>
+                      <CheckCircle className="mr-2 h-4 w-4" /> Book This Pack
                     </Button>
                   </CardFooter>
                 </Card>
@@ -204,6 +216,50 @@ export default function AppointmentsPage() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Time Slot Selection Modal */}
+      {selectedDoctorForModal && (
+        <Dialog open={isTimeSlotModalOpen} onOpenChange={setIsTimeSlotModalOpen}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="font-headline text-xl">Book Appointment with {selectedDoctorForModal.name}</DialogTitle>
+              <DialogDescription>Select a date and time for your appointment.</DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <Calendar
+                mode="single"
+                selected={modalSelectedDate}
+                onSelect={(date) => { setModalSelectedDate(date); setModalSelectedTime(null); }}
+                initialFocus
+                className="rounded-md border"
+              />
+              {modalSelectedDate && selectedDoctorForModal.availability[format(modalSelectedDate, "yyyy-MM-dd")]?.length > 0 ? (
+                <div className="space-y-2">
+                  <h4 className="font-semibold text-sm">Available Slots for {format(modalSelectedDate, "PPP")}:</h4>
+                  <div className="grid grid-cols-3 gap-2">
+                    {selectedDoctorForModal.availability[format(modalSelectedDate, "yyyy-MM-dd")].map(slot => (
+                      <Button 
+                        key={slot} 
+                        variant={modalSelectedTime === slot ? "default" : "outline"} 
+                        size="sm" 
+                        onClick={() => setModalSelectedTime(slot)}
+                      >
+                        {slot}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              ) : modalSelectedDate ? (
+                 <p className="text-sm text-muted-foreground text-center py-2">No slots available for {selectedDoctorForModal.name} on {format(modalSelectedDate, "PPP")}.</p>
+              ) : null}
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsTimeSlotModalOpen(false)}>Cancel</Button>
+              <Button onClick={handleModalBookingConfirm} disabled={!modalSelectedTime}>Confirm Appointment</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
     </AppLayout>
   );
 }

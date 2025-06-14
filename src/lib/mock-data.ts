@@ -116,6 +116,7 @@ export interface Doctor {
   name: string;
   specialty: string;
   location: string;
+  experience: string;
   rating: number;
   availability: Record<string, string[]>; 
   imageUrl: string;
@@ -128,10 +129,13 @@ export const mockDoctors: Doctor[] = [
     name: 'Dr. Priya Sharma',
     specialty: 'Cardiology',
     location: 'Manipal Hospital, Bangalore',
+    experience: '12+ Yrs Exp.',
     rating: 4.8,
     availability: {
       '2024-08-15': ['09:00 AM', '10:00 AM', '02:00 PM'],
       '2024-08-16': ['11:00 AM', '03:00 PM'],
+      '2024-08-19': ['09:00 AM', '10:30 AM', '02:30 PM', '04:00 PM'],
+      '2024-08-20': ['10:00 AM', '11:00 AM', '03:00 PM'],
     },
     imageUrl: 'https://placehold.co/150x150.png',
     dataAiHint: 'indian doctor female',
@@ -141,10 +145,13 @@ export const mockDoctors: Doctor[] = [
     name: 'Dr. Rahul Verma',
     specialty: 'Pediatrics',
     location: 'Fortis Hospital, Bangalore',
+    experience: '8+ Yrs Exp.',
     rating: 4.5,
     availability: {
       '2024-08-15': ['09:30 AM', '11:30 AM'],
       '2024-08-17': ['01:00 PM', '04:00 PM'],
+      '2024-08-20': ['09:00 AM', '11:00 AM', '01:30 PM'],
+      '2024-08-21': ['10:30 AM', '12:30 PM', '03:30 PM'],
     },
     imageUrl: 'https://placehold.co/150x150.png',
     dataAiHint: 'indian doctor male',
@@ -154,10 +161,13 @@ export const mockDoctors: Doctor[] = [
     name: 'Dr. Anjali Bose',
     specialty: 'Dermatology',
     location: 'Apollo Gleneagles, Kolkata',
+    experience: '15+ Yrs Exp.',
     rating: 4.9,
     availability: {
       '2024-08-16': ['10:00 AM', '12:00 PM', '02:30 PM'],
       '2024-08-18': ['09:00 AM', '04:30 PM'],
+      '2024-08-22': ['10:00 AM', '11:30 AM', '02:00 PM', '03:30 PM'],
+      '2024-08-23': ['09:30 AM', '01:00 PM'],
     },
     imageUrl: 'https://placehold.co/150x150.png',
     dataAiHint: 'dermatologist indian',
@@ -166,34 +176,48 @@ export const mockDoctors: Doctor[] = [
 
 export interface HealthCheckupPack {
   id: string;
+  tier: 'Bronze' | 'Silver' | 'Gold';
   name: string;
-  description: string;
   price: number;
   testsIncluded: string[];
   imageUrl: string;
   dataAiHint?: string;
+  iconColor: string; 
 }
 
 export const mockHealthCheckupPacks: HealthCheckupPack[] = [
   {
     id: 'p1',
-    name: 'Basic Health Check',
-    description: 'A fundamental package covering essential health markers.',
-    price: 1499,
-    testsIncluded: ['Complete Blood Count (CBC)', 'Fasting Blood Sugar', 'Lipid Profile', 'Kidney Function Test'],
+    tier: 'Bronze',
+    name: 'Bronze Pack',
+    price: 299,
+    testsIncluded: ['BP Test', 'Sugar Test'],
     imageUrl: 'https://placehold.co/300x200.png',
-    dataAiHint: 'health checkup india',
+    dataAiHint: 'bronze health package',
+    iconColor: 'fill-yellow-700 text-yellow-700',
   },
   {
     id: 'p2',
-    name: 'Comprehensive Wellness Pack',
-    description: 'An extensive check-up for a thorough health assessment.',
-    price: 3999,
-    testsIncluded: ['Basic Health Check tests', 'Liver Function Test', 'Thyroid Profile', 'Vitamin D & B12', 'Urine Analysis'],
+    tier: 'Silver',
+    name: 'Silver Pack',
+    price: 699,
+    testsIncluded: ['BP Test', 'Sugar Test', 'Kidney Function', 'Thyroid'],
     imageUrl: 'https://placehold.co/300x200.png',
-    dataAiHint: 'wellness package offer',
+    dataAiHint: 'silver health package',
+    iconColor: 'fill-slate-400 text-slate-400',
+  },
+  {
+    id: 'p3',
+    tier: 'Gold',
+    name: 'Gold Pack',
+    price: 1299,
+    testsIncluded: ['BP Test', 'Sugar Test', 'Kidney Function', 'Liver Function', 'Thyroid', 'Vitamin D', 'ECG'],
+    imageUrl: 'https://placehold.co/300x200.png',
+    dataAiHint: 'gold health package',
+    iconColor: 'fill-amber-400 text-amber-400',
   },
 ];
+
 
 export interface HealthReel {
   id: string;
@@ -354,3 +378,4 @@ export const mockTabletReminders: TabletReminder[] = [
   { id: 'rem2', medicineName: 'Metformin 500mg', time: '08:00 PM', days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], isActive: true },
   { id: 'rem3', medicineName: 'Vitamin D', time: '10:00 AM', days: ['Mon', 'Wed', 'Fri'], isActive: false },
 ];
+
