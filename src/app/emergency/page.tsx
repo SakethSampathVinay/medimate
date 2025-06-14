@@ -1,3 +1,4 @@
+
 'use client';
 
 import AppLayout from '@/components/layout/app-layout';
@@ -74,13 +75,25 @@ export default function EmergencyPage() {
                         {guide.videoUrl ? (
                           <>
                             {/* Using image as video placeholder */}
-                            <Image src={guide.imageUrl || 'https://placehold.co/400x225.png'} alt={guide.title} layout="fill" objectFit="cover" data-ai-hint={guide.dataAiHint || "first aid"}/>
+                            <Image 
+                              src={guide.imageUrl || 'https://placehold.co/400x225.png'} 
+                              alt={guide.title} 
+                              fill
+                              className="object-cover"
+                              data-ai-hint={guide.dataAiHint || "first aid"}
+                            />
                             <div className="absolute inset-0 flex items-center justify-center bg-black/30">
                               <PlayCircle className="h-16 w-16 text-white/80" />
                             </div>
                           </>
                         ) : guide.imageUrl ? (
-                          <Image src={guide.imageUrl} alt={guide.title} layout="fill" objectFit="cover" data-ai-hint={guide.dataAiHint || "first aid"}/>
+                          <Image 
+                            src={guide.imageUrl} 
+                            alt={guide.title} 
+                            fill
+                            className="object-cover"
+                            data-ai-hint={guide.dataAiHint || "first aid"}
+                          />
                         ) : null}
                       </div>
                     )}

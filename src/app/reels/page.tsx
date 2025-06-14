@@ -87,8 +87,8 @@ const ReelCard: React.FC<{ reel: HealthReel; isVisible: boolean }> = ({ reel, is
         <Image 
             src={reel.thumbnailUrl} 
             alt={reel.title} 
-            layout="fill" 
-            objectFit="cover" 
+            fill
+            className="object-cover"
             data-ai-hint={reel.dataAiHint || "health video"}
             priority={isVisible} // Prioritize loading visible reel image
         />
@@ -248,4 +248,3 @@ export default function HealthReelsPage() {
     </AppLayout>
   );
 }
-

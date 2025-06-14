@@ -180,13 +180,12 @@ export default function AppointmentsPage() {
             <CardContent className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
               {mockHealthCheckupPacks.map(pack => (
                 <Card key={pack.id} className="flex flex-col overflow-hidden shadow-md hover:shadow-xl transition-shadow">
-                   <div className="relative w-full h-40 bg-muted flex items-center justify-center rounded-t-lg">
+                   <div className="relative w-full h-40 bg-muted rounded-t-lg">
                      <Image 
                         src={pack.imageUrl} 
                         alt={pack.name} 
-                        layout="fill" 
-                        objectFit="cover" 
-                        className="rounded-t-lg"
+                        fill
+                        className="rounded-t-lg object-cover"
                         data-ai-hint={pack.dataAiHint || "health package"}
                       />
                    </div>
@@ -263,4 +262,3 @@ export default function AppointmentsPage() {
     </AppLayout>
   );
 }
-

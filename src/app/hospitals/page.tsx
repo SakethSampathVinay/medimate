@@ -1,3 +1,4 @@
+
 'use client';
 
 import AppLayout from '@/components/layout/app-layout';
@@ -67,9 +68,8 @@ export default function HospitalsPage() {
                   <Image 
                     src={hospital.imageUrl} 
                     alt={hospital.name} 
-                    layout="fill" 
-                    objectFit="cover" 
-                    className="rounded-t-lg"
+                    fill
+                    className="rounded-t-lg object-cover"
                     data-ai-hint={hospital.dataAiHint || "hospital exterior"}
                   />
                 </div>
