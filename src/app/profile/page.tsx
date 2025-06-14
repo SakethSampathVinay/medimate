@@ -62,7 +62,7 @@ export default function ProfilePage() {
                   <Card key={p.id} className="shadow-sm">
                     <CardHeader className="flex flex-row justify-between items-start p-4">
                       <div>
-                        <CardTitle className="text-lg">{p.medicineName}</CardTitle>
+                        <CardTitle className="font-headline text-lg">{p.medicineName}</CardTitle>
                         <CardDescription className="text-xs">Dr. {p.doctorName} - Issued: {p.dateIssued}</CardDescription>
                       </div>
                       {p.imageUrl && <Download className="h-5 w-5 text-primary cursor-pointer" onClick={() => alert('Download prescription (mock)')} />}
@@ -92,7 +92,7 @@ export default function ProfilePage() {
                 {mockTestResults.length > 0 ? mockTestResults.map(r => (
                   <Card key={r.id} className="shadow-sm">
                     <CardHeader className="p-4">
-                      <CardTitle className="text-lg">{r.testName}</CardTitle>
+                      <CardTitle className="font-headline text-lg">{r.testName}</CardTitle>
                       <CardDescription className="text-xs">Date: {r.dateTaken}</CardDescription>
                     </CardHeader>
                     <CardContent className="p-4 pt-0">
@@ -119,7 +119,7 @@ export default function ProfilePage() {
                   <Card key={rem.id} className={`shadow-sm ${rem.isActive ? '' : 'opacity-60'}`}>
                     <CardContent className="p-4 flex items-center justify-between">
                       <div>
-                        <p className="font-semibold text-lg">{rem.medicineName}</p>
+                        <p className="font-headline text-lg">{rem.medicineName}</p>
                         <p className="text-sm text-muted-foreground flex items-center">
                           <CalendarClock className="h-4 w-4 mr-1.5" /> {rem.time} - {rem.days.join(', ')}
                         </p>
@@ -155,7 +155,7 @@ export default function ProfilePage() {
       <Dialog open={isAddPrescriptionModalOpen} onOpenChange={setIsAddPrescriptionModalOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle className="font-headline">Add New Prescription</DialogTitle>
+            <DialogTitle className="font-headline text-xl">Add New Prescription</DialogTitle>
             <DialogDescription>Enter the details of your new prescription.</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -176,7 +176,7 @@ export default function ProfilePage() {
        <Dialog open={isAddTestResultModalOpen} onOpenChange={setIsAddTestResultModalOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle className="font-headline">Add New Test Result</DialogTitle>
+            <DialogTitle className="font-headline text-xl">Add New Test Result</DialogTitle>
             <DialogDescription>Enter the details of your new test result.</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -197,7 +197,7 @@ export default function ProfilePage() {
        <Dialog open={isAddReminderModalOpen} onOpenChange={setIsAddReminderModalOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle className="font-headline">Add New Reminder</DialogTitle>
+            <DialogTitle className="font-headline text-xl">Add New Reminder</DialogTitle>
             <DialogDescription>Set up a new tablet reminder.</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">

@@ -43,8 +43,8 @@ export default function TopbarNav() {
                 className={cn(
                   "h-9 w-9",
                   (pathname === item.href || (pathname.startsWith(item.href) && item.href !== '/'))
-                    ? "bg-accent text-accent-foreground"
-                    : "text-muted-foreground hover:bg-accent/50 hover:text-accent-foreground"
+                    ? "bg-accent text-accent-foreground" // Active state uses accent color
+                    : "text-muted-foreground hover:bg-accent/50 hover:text-accent-foreground" // Hover uses accent
                 )}
                 asChild
               >
@@ -72,12 +72,13 @@ export function MobileNav() {
     <nav className="flex flex-col space-y-1 p-4">
       {navItems.map((item) => (
         <Link key={item.href} href={item.href} className="block">
-          <div
+          {/* Ensure SheetClose is applied here if items should close the sheet */}
+          <div 
             className={cn(
               "flex items-center space-x-3 p-3 rounded-md text-base font-medium transition-colors",
               (pathname === item.href || (pathname.startsWith(item.href) && item.href !== '/'))
-                ? "bg-primary text-primary-foreground"
-                : "text-foreground hover:bg-accent hover:text-accent-foreground"
+                ? "bg-sidebar-primary text-sidebar-primary-foreground" // Active state uses sidebar primary
+                : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground" // Hover uses sidebar accent
             )}
           >
             <item.icon className="h-5 w-5" />

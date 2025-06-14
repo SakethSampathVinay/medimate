@@ -63,7 +63,7 @@ export default function EmergencyPage() {
               <AccordionItem key={guide.id} value={guide.id} className="border bg-card rounded-lg shadow-md">
                 <AccordionTrigger className="p-6 text-lg font-semibold hover:no-underline">
                   <div className="flex items-center justify-between w-full">
-                    <span>{guide.title}</span>
+                    <span className='font-headline'>{guide.title}</span>
                     <Badge variant="outline">{guide.category}</Badge>
                   </div>
                 </AccordionTrigger>

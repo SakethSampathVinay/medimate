@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { mockMedicines, Medicine } from '@/lib/mock-data';
-import { Pill, Search, Info, ChevronDown, ChevronUp } from 'lucide-react';
+import { Pill, Search, Info, ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from 'lucide-react';
 import React, { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
@@ -93,8 +93,7 @@ export default function MedicinesPage() {
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {paginatedMedicines.map(medicine => (
               <Card key={medicine.id} className="flex flex-col overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300">
-                <CardHeader>
-                  <div className="relative w-full h-48 mb-4">
+                 <div className="relative w-full h-48">
                     <Image 
                       src={medicine.imageUrl} 
                       alt={medicine.name} 
@@ -104,6 +103,7 @@ export default function MedicinesPage() {
                       data-ai-hint={medicine.dataAiHint || "medicine image"}
                     />
                   </div>
+                <CardHeader className="pt-4">
                   <CardTitle className="font-headline text-xl">{medicine.name}</CardTitle>
                   <Badge variant="secondary" className="mt-1">{medicine.category}</Badge>
                   <CardDescription className="mt-1 text-sm h-12 overflow-hidden text-ellipsis">
@@ -136,7 +136,7 @@ export default function MedicinesPage() {
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
             >
-              <ChevronUp className="h-4 w-4 transform rotate-[-90deg]" />
+              <ChevronLeft className="h-4 w-4" />
             </Button>
             <span className="text-sm">
               Page {currentPage} of {totalPages}
@@ -147,7 +147,7 @@ export default function MedicinesPage() {
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
             >
-              <ChevronDown className="h-4 w-4 transform rotate-[-90deg]" />
+              <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
         )}
@@ -162,7 +162,7 @@ export default function MedicinesPage() {
               </DialogTitle>
               <DialogDescription>{selectedMedicine.useCase}</DialogDescription>
             </DialogHeader>
-            <div className="flex-grow overflow-y-auto pr-2 space-y-4">
+            <div className="flex-grow overflow-y-auto pr-2 space-y-4 py-4">
               <div className="relative w-full h-64">
                 <Image 
                   src={selectedMedicine.imageUrl} 

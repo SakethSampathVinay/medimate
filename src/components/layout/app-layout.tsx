@@ -24,11 +24,11 @@ export default function AppLayout({ children }: AppLayoutProps) {
                 <span className="sr-only">Toggle Menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-72 p-0 bg-background">
-                <div className="p-4 border-b">
+            <SheetContent side="left" className="w-72 p-0 bg-sidebar"> {/* Updated background */}
+                <div className="p-4 border-b border-sidebar-border"> {/* Use sidebar border */}
                   <Link href="/" className="flex items-center gap-2">
-                    <Stethoscope className="h-7 w-7 text-primary" />
-                    <h1 className="text-xl font-headline font-semibold text-primary">MediMate</h1>
+                    <Stethoscope className="h-7 w-7 text-sidebar-primary" /> {/* Use sidebar primary */}
+                    <h1 className="text-xl font-headline font-semibold text-sidebar-primary">MediMate</h1> {/* Use sidebar primary */}
                   </Link>
                 </div>
                 <MobileNav />

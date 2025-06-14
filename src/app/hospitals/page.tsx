@@ -51,7 +51,7 @@ export default function HospitalsPage() {
             <CardTitle className="font-headline text-2xl">Map View</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-64 w-full bg-muted rounded-lg flex items-center justify-center text-muted-foreground shadow-inner">
+            <div className="h-96 w-full bg-muted rounded-lg flex items-center justify-center text-muted-foreground shadow-inner">
               <MapPin className="h-12 w-12 mr-2" />
               <p>Interactive map will be displayed here.</p>
             </div>
