@@ -221,14 +221,14 @@ export const mockHealthCheckupPacks: HealthCheckupPack[] = [
 
 export interface HealthReel {
   id: string;
-  title: string; // Corresponds to 'caption' in Supabase
+  title: string; 
   videoUrl: string; 
   thumbnailUrl: string;
   dataAiHint?: string;
-  category: 'Fitness' | 'Nutrition' | 'Mental Wellness' | 'Yoga'; // Example categories
-  likes: number; // Corresponds to 'likes_count'
-  uploader: string; // Corresponds to 'creator_name'
-  uploaderAvatar: string; // For UI, not in Supabase schema directly but useful
+  category: 'Fitness' | 'Nutrition' | 'Mental Wellness' | 'Yoga'; 
+  likes: number; 
+  uploader: string; 
+  uploaderAvatar: string; 
 }
 
 export const mockHealthReels: HealthReel[] = [
@@ -236,7 +236,7 @@ export const mockHealthReels: HealthReel[] = [
     id: 'r1',
     title: '5 Minute Morning Yoga Flow for Beginners',
     videoUrl: 'https://placehold.co/1080x1920.mp4/1E1E1E/FFFFFF?text=Yoga+Reel',
-    thumbnailUrl: 'https://placehold.co/360x640.png', // Aspect ratio 9:16
+    thumbnailUrl: 'https://placehold.co/360x640.png', 
     dataAiHint: 'yoga fitness',
     category: 'Yoga',
     likes: 1256,
@@ -389,3 +389,6 @@ export const mockTabletReminders: TabletReminder[] = [
   { id: 'rem2', medicineName: 'Metformin 500mg', time: '08:00 PM', days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], isActive: true },
   { id: 'rem3', medicineName: 'Vitamin D', time: '10:00 AM', days: ['Mon', 'Wed', 'Fri'], isActive: false },
 ];
+
+
+    
