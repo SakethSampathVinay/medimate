@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { mockDoctors, Doctor, mockHealthCheckupPacks, HealthCheckupPack } from '@/lib/mock-data';
-import { CalendarDays, UserCircle, MapPinIcon, StarIcon, CheckCircle, Filter, Search, BriefcaseMedical, Circle } from 'lucide-react'; 
+import { CalendarDays, UserCircle, MapPinIcon, StarIcon, CheckCircle, Filter, Search, BriefcaseMedical, Circle, GraduationCap, Coins } from 'lucide-react'; 
 import React, { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
 import { Calendar } from "@/components/ui/calendar";
@@ -33,19 +33,20 @@ export default function AppointmentsPage() {
   const { toast } = useToast();
 
   const specialties = useMemo(() => ['All', ...new Set(mockDoctors.map(doc => doc.specialty))], []);
-  const locations = useMemo(() => ['All', ...new Set(mockDoctors.map(doc => doc.location))], []);
+  const locations = useMemo(() => ['All', ...new Set(mockDoctors.map(doc => doc.location.split(',').pop()?.trim() || doc.location ))], []);
+
 
   const filteredDoctors = useMemo(() => {
     return mockDoctors.filter(doctor =>
       (doctor.name.toLowerCase().includes(searchTerm.toLowerCase())) &&
       (selectedSpecialty === 'All' || doctor.specialty === selectedSpecialty) &&
-      (selectedLocation === 'All' || doctor.location === selectedLocation)
+      (selectedLocation === 'All' || doctor.location.toLowerCase().includes(selectedLocation.toLowerCase()))
     );
   }, [searchTerm, selectedSpecialty, selectedLocation]);
 
   const handleViewProfileBook = (doctor: Doctor) => {
     setSelectedDoctorForModal(doctor);
-    setModalSelectedDate(new Date()); // Reset date for new doctor
+    setModalSelectedDate(new Date()); 
     setModalSelectedTime(null);
     setIsTimeSlotModalOpen(true);
   };
@@ -137,10 +138,21 @@ export default function AppointmentsPage() {
               {filteredDoctors.map(doctor => (
                 <Card key={doctor.id} className="flex flex-col overflow-hidden shadow-md hover:shadow-xl transition-shadow">
                   <CardHeader className="flex-row items-start gap-4">
-                    <Image src={doctor.imageUrl} alt={doctor.name} width={80} height={80} className="rounded-full border" data-ai-hint={doctor.dataAiHint || "doctor portrait"} />
-                    <div>
+                    <div className="relative w-20 h-20 flex-shrink-0">
+                      <Image 
+                        src={doctor.imageUrl} 
+                        alt={doctor.name} 
+                        fill
+                        className="rounded-full border object-cover" 
+                        data-ai-hint={doctor.dataAiHint || "doctor portrait"}
+                      />
+                    </div>
+                    <div className="flex-grow">
                       <CardTitle className="font-headline text-xl">{doctor.name}</CardTitle>
                       <CardDescription className="text-sm text-primary">{doctor.specialty}</CardDescription>
+                      <p className="text-xs text-muted-foreground flex items-center mt-0.5">
+                        <GraduationCap className="mr-1 h-3 w-3" /> {doctor.degree}
+                      </p>
                       <div className="flex items-center text-xs text-muted-foreground mt-1">
                         <BriefcaseMedical className="mr-1 h-3 w-3" /> {doctor.experience}
                       </div>
@@ -149,6 +161,10 @@ export default function AppointmentsPage() {
                       </div>
                       <div className="flex items-center text-xs text-amber-500 mt-1">
                         <StarIcon className="mr-1 h-3 w-3 fill-amber-500" /> {doctor.rating.toFixed(1)}
+                      </div>
+                       <div className="flex items-center text-sm font-semibold text-primary mt-1">
+                        <Coins className="mr-1 h-4 w-4" /> ₹{doctor.fees}
+                        <span className="text-xs font-normal text-muted-foreground ml-1">Consultation</span>
                       </div>
                     </div>
                   </CardHeader>
@@ -216,13 +232,17 @@ export default function AppointmentsPage() {
         </TabsContent>
       </Tabs>
 
-      {/* Time Slot Selection Modal */}
       {selectedDoctorForModal && (
         <Dialog open={isTimeSlotModalOpen} onOpenChange={setIsTimeSlotModalOpen}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle className="font-headline text-xl">Book Appointment with {selectedDoctorForModal.name}</DialogTitle>
-              <DialogDescription>Select a date and time for your appointment.</DialogDescription>
+              <DialogDescription className="space-y-1">
+                <p>{selectedDoctorForModal.specialty} - {selectedDoctorForModal.degree}</p>
+                <p className="font-semibold">Consultation Fee: ₹{selectedDoctorForModal.fees}</p>
+                <p className="text-xs text-muted-foreground pt-1">{selectedDoctorForModal.about}</p>
+                <p className="pt-2">Select a date and time for your appointment.</p>
+              </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <Calendar
@@ -231,6 +251,7 @@ export default function AppointmentsPage() {
                 onSelect={(date) => { setModalSelectedDate(date); setModalSelectedTime(null); }}
                 initialFocus
                 className="rounded-md border"
+                disabled={(date) => date < new Date(new Date().setHours(0,0,0,0))} // Disable past dates
               />
               {modalSelectedDate && selectedDoctorForModal.availability[format(modalSelectedDate, "yyyy-MM-dd")]?.length > 0 ? (
                 <div className="space-y-2">

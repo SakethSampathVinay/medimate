@@ -19,10 +19,16 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'example.com', // Added to support direct URLs from user's JSON
+        hostname: 'example.com', 
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com', // Added for new doctor images
+        port: '',
+        pathname: '/**',
+      }
     ],
   },
 };

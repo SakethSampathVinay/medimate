@@ -195,12 +195,12 @@ export const mockMedicines: Medicine[] = medicinesData.map((med, index) => {
   return {
     id: `med${index + 1}`,
     name: med.medicine_name,
-    imageUrl: med.photo_url, // Using the photo_url directly as requested
+    imageUrl: med.photo_url, // Using the photo_url directly
     dataAiHint: dataAiHint || 'medicine',
     useCase: med.description, 
     description: `${med.medicine_name} is typically used for ${med.tags.join(', ')}. For detailed information, including specific uses, contraindications, and potential interactions, please consult a healthcare professional or refer to the patient information leaflet that comes with the medicine.`,
     dosage: 'Dosage varies depending on the condition being treated and individual patient factors. Always follow the dosage instructions provided by your doctor or pharmacist. Do not exceed the recommended dose.',
-    sideEffects: 'Like all medicines, this drug can cause side effects, although not everybody gets them. Common side effects may include [mention 1-2 very generic, mild side effects if appropriate, otherwise state "nausea or headache"]. If you experience any severe side effects or allergic reactions, seek medical attention immediately.',
+    sideEffects: 'Like all medicines, this drug can cause side effects, although not everybody gets them. Common side effects may include nausea or headache. If you experience any severe side effects or allergic reactions, seek medical attention immediately.',
     precautions: 'Before taking this medicine, inform your doctor or pharmacist if you have any allergies, pre-existing medical conditions (such as liver or kidney problems), or if you are pregnant, planning to become pregnant, or breastfeeding. Avoid consuming alcohol if advised against it with this medication. Keep out of reach of children.',
     category: firstTag,
   };
@@ -259,64 +259,260 @@ export interface Doctor {
   id: string;
   name: string;
   specialty: string;
+  degree: string; 
   location: string;
   experience: string;
   rating: number;
+  fees: number; 
+  about: string; 
   availability: Record<string, string[]>; 
   imageUrl: string;
   dataAiHint?: string;
 }
 
-export const mockDoctors: Doctor[] = [
-  {
-    id: 'd1',
-    name: 'Dr. Priya Sharma',
-    specialty: 'Cardiology',
-    location: 'Manipal Hospital, Bangalore',
-    experience: '12+ Yrs Exp.',
-    rating: 4.8,
-    availability: {
-      '2024-08-15': ['09:00 AM', '10:00 AM', '02:00 PM'],
-      '2024-08-16': ['11:00 AM', '03:00 PM'],
-      '2024-08-19': ['09:00 AM', '10:30 AM', '02:30 PM', '04:00 PM'],
-      '2024-08-20': ['10:00 AM', '11:00 AM', '03:00 PM'],
+const newDoctorsData = [
+    {
+        _id: 'doc1',
+        name: 'Dr. Richard James',
+        image: "https://res.cloudinary.com/dgtfgihga/image/upload/v1733685290/s43jgptx0mxqlgji1c5n.png",
+        speciality: 'General physician',
+        degree: 'MBBS',
+        experience: '4 Years',
+        about: 'Dr. James has a strong commitment to delivering comprehensive medical care, focusing on preventive medicine, early diagnosis, and effective treatment strategies. He is dedicated to patient well-being.',
+        fees: 500,
+        address: {
+            line1: '17th Cross, Richmond Town',
+            line2: 'London, UK'
+        }
     },
-    imageUrl: 'https://placehold.co/150x150.png',
-    dataAiHint: 'indian doctor female',
-  },
-  {
-    id: 'd2',
-    name: 'Dr. Rahul Verma',
-    specialty: 'Pediatrics',
-    location: 'Fortis Hospital, Bangalore',
-    experience: '8+ Yrs Exp.',
-    rating: 4.5,
-    availability: {
-      '2024-08-15': ['09:30 AM', '11:30 AM'],
-      '2024-08-17': ['01:00 PM', '04:00 PM'],
-      '2024-08-20': ['09:00 AM', '11:00 AM', '01:30 PM'],
-      '2024-08-21': ['10:30 AM', '12:30 PM', '03:30 PM'],
+    {
+        _id: 'doc2',
+        name: 'Dr. Emily Larson',
+        image: "https://res.cloudinary.com/dgtfgihga/image/upload/v1733599098/hhsm6glqvrshllhuksnd.png",
+        speciality: 'Gynecologist',
+        degree: 'MD, DGO',
+        experience: '3 Years',
+        about: 'Dr. Larson provides expert care in gynecology and obstetrics, with a focus on women\'s health and wellness throughout all stages of life.',
+        fees: 750,
+        address: {
+            line1: '27th Cross, Chelsea',
+            line2: 'London, UK'
+        }
     },
-    imageUrl: 'https://placehold.co/150x150.png',
-    dataAiHint: 'indian doctor male',
-  },
-  {
-    id: 'd3',
-    name: 'Dr. Anjali Bose',
-    specialty: 'Dermatology',
-    location: 'Apollo Gleneagles, Kolkata',
-    experience: '15+ Yrs Exp.',
-    rating: 4.9,
-    availability: {
-      '2024-08-16': ['10:00 AM', '12:00 PM', '02:30 PM'],
-      '2024-08-18': ['09:00 AM', '04:30 PM'],
-      '2024-08-22': ['10:00 AM', '11:30 AM', '02:00 PM', '03:30 PM'],
-      '2024-08-23': ['09:30 AM', '01:00 PM'],
+    {
+        _id: 'doc3',
+        name: 'Dr. Sarah Patel',
+        image: "https://res.cloudinary.com/dgtfgihga/image/upload/v1733599018/pus06puz0cfrtwyy1yfh.png",
+        speciality: 'Dermatologist',
+        degree: 'MBBS, DDVL',
+        experience: '1 Year',
+        about: 'Dr. Patel specializes in diagnosing and treating a wide range of skin conditions, offering both medical and cosmetic dermatology services.',
+        fees: 600,
+        address: {
+            line1: '37th Cross, Kensington',
+            line2: 'London, UK'
+        }
     },
-    imageUrl: 'https://placehold.co/150x150.png',
-    dataAiHint: 'dermatologist indian',
-  },
+    {
+        _id: 'doc4',
+        name: 'Dr. Christopher Lee',
+        image: "https://res.cloudinary.com/dgtfgihga/image/upload/v1733598938/yjuzqx1ksbydx2rrdg53.png",
+        speciality: 'Pediatrician',
+        degree: 'MBBS, DCH',
+        experience: '2 Years',
+        about: 'Dr. Lee is dedicated to the health and well-being of children, providing compassionate care from infancy through adolescence.',
+        fees: 450,
+        address: {
+            line1: '47th Cross, Notting Hill',
+            line2: 'London, UK'
+        }
+    },
+    {
+        _id: 'doc5',
+        name: 'Dr. Jennifer Garcia',
+        image: "https://res.cloudinary.com/dgtfgihga/image/upload/v1733598831/hhfm0x79zd6zshcymzdr.png",
+        speciality: 'Neurologist',
+        degree: 'MD, DM (Neurology)',
+        experience: '4 Years',
+        about: 'Dr. Garcia is an expert in diagnosing and treating disorders of the nervous system, including the brain, spinal cord, and nerves.',
+        fees: 800,
+        address: {
+            line1: '57th Cross, Mayfair',
+            line2: 'London, UK'
+        }
+    },
+    {
+        _id: 'doc6',
+        name: 'Dr. Andrew Williams',
+        image: "https://res.cloudinary.com/dgtfgihga/image/upload/v1733598566/kzqfdbuqrvcdvme2u6l9.png",
+        speciality: 'Cardiologist',
+        degree: 'MD, DM (Cardiology)',
+        experience: '5 Years',
+        about: 'Dr. Williams specializes in heart conditions, offering advanced diagnostic and treatment options for cardiovascular diseases.',
+        fees: 900,
+        address: {
+            line1: 'Prime Heart Clinic, Marylebone',
+            line2: 'London, UK'
+        }
+    },
+    {
+        _id: 'doc7',
+        name: 'Dr. Christopher Davis',
+        image: "https://res.cloudinary.com/dgtfgihga/image/upload/v1733598397/wfpw0uoqyoibiyc5qisi.png",
+        speciality: 'Orthopedic Surgeon',
+        degree: 'MS (Orthopedics)',
+        experience: '6 Years',
+        about: 'Dr. Davis focuses on conditions affecting the musculoskeletal system. He is skilled in both surgical and non-surgical treatments for bones and joints.',
+        fees: 850,
+        address: {
+            line1: 'Ortho Care Center, Westminster',
+            line2: 'London, UK'
+        }
+    },
+    {
+        _id: 'doc8',
+        name: 'Dr. Timothy White',
+        image: "https://res.cloudinary.com/dgtfgihga/image/upload/v1733598312/nzvnzueqro2lieggyrqs.png",
+        speciality: 'Psychiatrist',
+        degree: 'MD (Psychiatry)',
+        experience: '3 Years',
+        about: 'Dr. White offers comprehensive mental health care, including diagnosis and treatment for various psychiatric disorders in adults and adolescents.',
+        fees: 700,
+        address: {
+            line1: 'MindWell Clinic, Soho',
+            line2: 'London, UK'
+        }
+    },
+    {
+        _id: 'doc9',
+        name: 'Dr. Ava Mitchell',
+        image: "https://res.cloudinary.com/dgtfgihga/image/upload/v1733598189/ozxvmkhr14a44sxi8rf6.png",
+        speciality: 'Ophthalmologist',
+        degree: 'MS (Ophthalmology)',
+        experience: '2 Years',
+        about: 'Dr. Mitchell is an eye specialist providing comprehensive eye care, including vision testing, diagnosis and treatment of eye diseases.',
+        fees: 650,
+        address: {
+            line1: 'Clear Vision Eye Care, Shoreditch',
+            line2: 'London, UK'
+        }
+    },
+    {
+        _id: 'doc10',
+        name: 'Dr. Jeffrey King',
+        image: "https://res.cloudinary.com/dgtfgihga/image/upload/v1733597968/im8awlaoqalj4fjgc8sr.png",
+        speciality: 'ENT Specialist',
+        degree: 'MS (ENT)',
+        experience: '4 Years',
+        about: 'Dr. King specializes in disorders of the ear, nose, and throat. He provides medical and surgical solutions for a variety of ENT conditions.',
+        fees: 720,
+        address: {
+            line1: 'ENT Health Clinic, Covent Garden',
+            line2: 'London, UK'
+        }
+    },
+    {
+        _id: 'doc11',
+        name: 'Dr. Zoe Kelly',
+        image: "https://res.cloudinary.com/dgtfgihga/image/upload/v1733598090/cvgnv4fg08cxjkxxkezs.png",
+        speciality: 'Endocrinologist',
+        degree: 'MD, DM (Endocrinology)',
+        experience: '5 Years',
+        about: 'Dr. Kelly treats hormonal imbalances and diseases like diabetes, thyroid disorders, and metabolic conditions.',
+        fees: 880,
+        address: {
+            line1: 'Endocrine Wellness Center, Fitzrovia',
+            line2: 'London, UK'
+        }
+    },
+    {
+        _id: 'doc12',
+        name: 'Dr. Patrick Harris',
+        image: "https://res.cloudinary.com/dgtfgihga/image/upload/v1733597884/ekakzfmdr5zm9dgv66vh.png",
+        speciality: 'Pulmonologist',
+        degree: 'MD (Respiratory Medicine)',
+        experience: '3 Years',
+        about: 'Dr. Harris specializes in lung conditions such as asthma, COPD, pneumonia, and other respiratory illnesses.',
+        fees: 760,
+        address: {
+            line1: 'Lung Health Institute, Southwark',
+            line2: 'London, UK'
+        }
+    },
+    {
+        _id: 'doc13',
+        name: 'Dr. Chloe Evans',
+        image: "https://res.cloudinary.com/dgtfgihga/image/upload/v1733597649/a9he69oa6l3i4wmros6x.png",
+        speciality: 'General physician',
+        degree: 'MBBS, MRCGP',
+        experience: '5 Years',
+        about: 'Dr. Evans offers a wide range of primary care services, emphasizing patient education and preventive health measures.',
+        fees: 550,
+        address: {
+            line1: 'City Central Clinic, The City',
+            line2: 'London, UK'
+        }
+    },
+    {
+        _id: 'doc14',
+        name: 'Dr. Ryan Martinez',
+        image: "https://res.cloudinary.com/dgtfgihga/image/upload/v1733598736/sza0s6vuiecej7a7vvbm.png",
+        speciality: 'Urologist',
+        degree: 'MS, MCh (Urology)',
+        experience: '6 Years',
+        about: 'Dr. Martinez specializes in urinary tract and male reproductive system disorders, offering both medical and surgical treatments.',
+        fees: 950,
+        address: {
+            line1: 'Urology & Andrology Center, Harley Street',
+            line2: 'London, UK'
+        }
+    },
+    {
+        _id: 'doc15',
+        name: 'Dr. Amelia Hill',
+        image: "https://res.cloudinary.com/dgtfgihga/image/upload/v1733597763/vxvuttlzqay0q7wimw4r.png",
+        speciality: 'Rheumatologist',
+        degree: 'MD, DM (Rheumatology)',
+        experience: '4 Years',
+        about: 'Dr. Hill diagnoses and treats rheumatic diseases, including arthritis, autoimmune conditions, and musculoskeletal pain disorders.',
+        fees: 820,
+        address: {
+            line1: 'Joint & Connective Tissue Clinic, Bloomsbury',
+            line2: 'London, UK'
+        }
+    },
 ];
+
+export const mockDoctors: Doctor[] = newDoctorsData.map(doc => {
+  // Generate some mock availability for demonstration
+  const today = new Date();
+  const availability: Record<string, string[]> = {};
+  const timeSlots = ['09:00 AM', '10:00 AM', '11:00 AM', '02:00 PM', '03:00 PM', '04:00 PM'];
+  for (let i = 0; i < 5; i++) {
+    const date = new Date(today);
+    date.setDate(today.getDate() + i + 1); // Start from tomorrow
+    const dateString = date.toISOString().split('T')[0];
+    if (Math.random() > 0.2) { // ~80% chance of being available on a given day
+      availability[dateString] = timeSlots.filter(() => Math.random() > 0.5).slice(0, Math.floor(Math.random() * 4) + 1); // 1 to 4 random slots
+    }
+  }
+
+  return {
+    id: doc._id,
+    name: doc.name,
+    specialty: doc.speciality,
+    degree: doc.degree,
+    location: `${doc.address.line1}, ${doc.address.line2}`,
+    experience: doc.experience,
+    rating: Math.round((Math.random() * 0.8 + 4.1) * 10) / 10, // Random rating between 4.1 and 4.9
+    fees: doc.fees,
+    about: doc.about,
+    availability,
+    imageUrl: doc.image,
+    dataAiHint: `${doc.name.split(' ')[1].toLowerCase()} ${doc.speciality.split(' ')[0].toLowerCase()}`.substring(0, 20),
+  };
+});
+
 
 export interface HealthCheckupPack {
   id: string;
@@ -533,7 +729,3 @@ export const mockTabletReminders: TabletReminder[] = [
   { id: 'rem2', medicineName: 'Metformin 500mg', time: '08:00 PM', days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], isActive: true },
   { id: 'rem3', medicineName: 'Vitamin D', time: '10:00 AM', days: ['Mon', 'Wed', 'Fri'], isActive: false },
 ];
-
-
-    
-
