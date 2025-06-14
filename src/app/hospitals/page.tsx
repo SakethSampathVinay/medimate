@@ -9,20 +9,24 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import type { LatLngExpression, Map as LeafletMapType } from 'leaflet';
 import dynamic from 'next/dynamic';
 
-// ES Module imports for marker images
+// ES Module imports for marker images (ensure these paths are correct relative to your project structure)
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 
 // Dynamically import react-leaflet components
+// Only MapContainer needs to be the main dynamic boundary for SSR.
+// Children components will be imported normally as they are only used when MapContainer is rendered.
 const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), {
   ssr: false,
-  loading: () => null, 
+  loading: () => <MapPlaceholder />, 
 });
-const TileLayer = dynamic(() => import('react-leaflet').then(mod => mod.TileLayer), { ssr: false, loading: () => null });
-const Marker = dynamic(() => import('react-leaflet').then(mod => mod.Marker), { ssr: false, loading: () => null });
-const Popup = dynamic(() => import('react-leaflet').then(mod => mod.Popup), { ssr: false, loading: () => null });
-const useMap = dynamic(() => import('react-leaflet').then(mod => mod.useMap), { ssr: false, loading: () => null });
+// These are now imported normally below or directly used from 'react-leaflet'
+// const TileLayer = dynamic(() => import('react-leaflet').then(mod => mod.TileLayer), { ssr: false, loading: () => null });
+// const Marker = dynamic(() => import('react-leaflet').then(mod => mod.Marker), { ssr: false, loading: () => null });
+// const Popup = dynamic(() => import('react-leaflet').then(mod => mod.Popup), { ssr: false, loading: () => null });
+// const useMap = dynamic(() => import('react-leaflet').then(mod => mod.useMap), { ssr: false, loading: () => null });
+import { TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 
 
 interface OsmHospitalElement {
@@ -71,12 +75,12 @@ function MapPlaceholder() {
 }
 
 const ChangeView: React.FC<{ selectedHospital?: HospitalDisplayData | null }> = ({ selectedHospital }) => {
-  const mapHook = useMap ? useMap() : null; 
+  const map = useMap(); 
   useEffect(() => {
-    if (selectedHospital && mapHook) {
-      mapHook.flyTo([selectedHospital.latitude, selectedHospital.longitude], 15);
+    if (selectedHospital && map) {
+      map.flyTo([selectedHospital.latitude, selectedHospital.longitude], 15);
     }
-  }, [selectedHospital, mapHook]);
+  }, [selectedHospital, map]);
   return null;
 };
 
@@ -96,17 +100,21 @@ export default function HospitalsPage() {
     setIsClient(true);
   }, []);
 
+  // Leaflet Icon Fix - run only on client and only once
   useEffect(() => {
     if (!isClient) return;
 
-    // Dynamically import Leaflet for client-side operations
     import('leaflet').then(LModule => {
       const L = LModule.default;
       // Check if the fix is already applied to avoid issues with StrictMode double effects
-      if (!(L.Icon.Default as any)._iconFixed) {
+      // or if L.Icon.Default is not as expected (e.g. prototype missing)
+      if (!(L.Icon.Default as any)._iconFixed && L.Icon.Default.prototype) {
+        // Attempt to delete _getIconUrl if it exists, to prevent potential issues with some Leaflet versions/bundlers.
+        // This property might not always exist, so check before deleting.
         if ((L.Icon.Default.prototype as any)._getIconUrl) {
             delete (L.Icon.Default.prototype as any)._getIconUrl;
         }
+        
         L.Icon.Default.mergeOptions({
           iconRetinaUrl: markerIcon2x.src,
           iconUrl: markerIcon.src,
@@ -261,11 +269,11 @@ export default function HospitalsPage() {
         </Card>
 
         <div 
-          key={isClient ? "map-active-wrapper" : "map-placeholder-wrapper"}
+          key={isClient ? "map-active-wrapper" : "map-placeholder-wrapper"} // Key change forces remount
           ref={mapContainerRef} 
           className="h-[50vh] md:h-[60vh] w-full rounded-lg overflow-hidden shadow-lg border"
         >
-          {isClient && MapContainer && TileLayer && Marker && Popup && ChangeView ? (
+          {isClient && MapContainer ? ( // Ensure MapContainer is loaded
             <MapContainer
               center={mapCenter}
               zoom={DEFAULT_ZOOM}
@@ -382,3 +390,5 @@ export default function HospitalsPage() {
     </AppLayout>
   );
 }
+
+    
