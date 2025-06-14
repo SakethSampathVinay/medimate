@@ -71,7 +71,7 @@ function MapPlaceholder() {
 }
 
 const ChangeView: React.FC<{ selectedHospital?: HospitalDisplayData | null }> = ({ selectedHospital }) => {
-  const mapHook = useMap!(); 
+  const mapHook = useMap ? useMap() : null; 
   useEffect(() => {
     if (selectedHospital && mapHook) {
       mapHook.flyTo([selectedHospital.latitude, selectedHospital.longitude], 15);
@@ -99,6 +99,7 @@ export default function HospitalsPage() {
   useEffect(() => {
     if (!isClient) return;
 
+    // Dynamically import Leaflet for client-side operations
     import('leaflet').then(LModule => {
       const L = LModule.default;
       // Check if the fix is already applied to avoid issues with StrictMode double effects
@@ -260,11 +261,11 @@ export default function HospitalsPage() {
         </Card>
 
         <div 
-          key={isClient ? "map-active" : "map-placeholder-wrapper"}
+          key={isClient ? "map-active-wrapper" : "map-placeholder-wrapper"}
           ref={mapContainerRef} 
           className="h-[50vh] md:h-[60vh] w-full rounded-lg overflow-hidden shadow-lg border"
         >
-          {isClient ? (
+          {isClient && MapContainer && TileLayer && Marker && Popup && ChangeView ? (
             <MapContainer
               center={mapCenter}
               zoom={DEFAULT_ZOOM}
@@ -276,13 +277,13 @@ export default function HospitalsPage() {
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
-              {userCoordinates && typeof userCoordinates[0] === 'number' && typeof userCoordinates[1] === 'number' && Marker && Popup && (
+              {userCoordinates && typeof userCoordinates[0] === 'number' && typeof userCoordinates[1] === 'number' && (
                  <Marker position={userCoordinates as [number, number]}>
                   <Popup>Your current location</Popup>
                 </Marker>
               )}
               {hospitals.map(hospital => (
-                Marker && Popup && <Marker
+                <Marker
                   key={hospital.id}
                   position={[hospital.latitude, hospital.longitude]}
                   eventHandlers={{ click: () => handleMarkerClick(hospital.id) }}
@@ -381,4 +382,3 @@ export default function HospitalsPage() {
     </AppLayout>
   );
 }
-
