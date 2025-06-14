@@ -195,7 +195,7 @@ export const mockMedicines: Medicine[] = medicinesData.map((med, index) => {
   return {
     id: `med${index + 1}`,
     name: med.medicine_name,
-    imageUrl: med.photo_url, // Using the photo_url directly
+    imageUrl: med.photo_url, 
     dataAiHint: dataAiHint || 'medicine',
     useCase: med.description, 
     description: `${med.medicine_name} is typically used for ${med.tags.join(', ')}. For detailed information, including specific uses, contraindications, and potential interactions, please consult a healthcare professional or refer to the patient information leaflet that comes with the medicine.`,
@@ -483,7 +483,7 @@ const newDoctorsData = [
     },
 ];
 
-export const mockDoctors: Doctor[] = newDoctorsData.map(doc => {
+export const mockDoctors: Doctor[] = newDoctorsData.map((doc, index) => {
   // Generate some mock availability for demonstration
   const today = new Date();
   const availability: Record<string, string[]> = {};
@@ -504,12 +504,12 @@ export const mockDoctors: Doctor[] = newDoctorsData.map(doc => {
     degree: doc.degree,
     location: `${doc.address.line1}, ${doc.address.line2}`,
     experience: doc.experience,
-    rating: Math.round((Math.random() * 0.8 + 4.1) * 10) / 10, // Random rating between 4.1 and 4.9
+    rating: parseFloat((4.1 + (index % 9) * 0.1).toFixed(1)), // Deterministic rating
     fees: doc.fees,
     about: doc.about,
     availability,
     imageUrl: doc.image,
-    dataAiHint: `${doc.name.split(' ')[1].toLowerCase()} ${doc.speciality.split(' ')[0].toLowerCase()}`.substring(0, 20),
+    dataAiHint: `${doc.name.split(' ')[1]?.toLowerCase() || 'doctor'} ${doc.speciality.split(' ')[0].toLowerCase()}`.substring(0, 20),
   };
 });
 
@@ -729,3 +729,6 @@ export const mockTabletReminders: TabletReminder[] = [
   { id: 'rem2', medicineName: 'Metformin 500mg', time: '08:00 PM', days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], isActive: true },
   { id: 'rem3', medicineName: 'Vitamin D', time: '10:00 AM', days: ['Mon', 'Wed', 'Fri'], isActive: false },
 ];
+
+
+  
