@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { mockDoctors, Doctor, mockHealthCheckupPacks, HealthCheckupPack } from '@/lib/mock-data';
-import { CalendarDays, UserMdIcon, MapPinIcon, StarIcon, CheckCircle, DollarSign, Filter, Search } from 'lucide-react'; // Assuming UserMdIcon, replace if not in lucide
+import { CalendarDays, UserCircle, MapPinIcon, StarIcon, CheckCircle, DollarSign, Filter, Search } from 'lucide-react';
 import React, { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
 import { Calendar } from "@/components/ui/calendar";
@@ -16,8 +16,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from '@/components/ui/badge';
 
-// Placeholder for UserMdIcon if not available, using a generic user icon
-const DoctorIcon = UserMdIcon || UserCircle; 
+const DoctorIcon = UserCircle; 
 
 export default function AppointmentsPage() {
   const [searchTerm, setSearchTerm] = useState('');
