@@ -17,7 +17,6 @@ export default function HospitalsPage() {
   const filteredHospitals = useMemo(() => {
     return mockHospitals.filter(hospital =>
       hospital.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      hospital.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
       hospital.services.some(service => service.toLowerCase().includes(searchTerm.toLowerCase()))
     );
   }, [searchTerm]);
@@ -31,7 +30,7 @@ export default function HospitalsPage() {
               <HospitalIcon className="mr-3 h-8 w-8 text-primary" />
               Hospital Locator
             </CardTitle>
-            <CardDescription>Find hospitals near you. Search by name, address, or services offered.</CardDescription>
+            <CardDescription>Find hospitals near you. Search by name or services offered.</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="relative">
@@ -77,9 +76,6 @@ export default function HospitalsPage() {
                   <CardTitle className="font-headline text-xl flex items-center">
                     <Building2 className="mr-2 h-5 w-5 text-primary" /> {hospital.name}
                   </CardTitle>
-                  <CardDescription className="flex items-center text-sm mt-1">
-                    <MapPin className="mr-2 h-4 w-4 text-muted-foreground flex-shrink-0" /> {hospital.address}
-                  </CardDescription>
                   <div className="flex items-center text-sm mt-1">
                     <Phone className="mr-2 h-4 w-4 text-muted-foreground flex-shrink-0" /> {hospital.contact}
                   </div>
@@ -95,7 +91,7 @@ export default function HospitalsPage() {
                 <CardFooter>
                   <Button variant="outline" className="w-full" asChild>
                     <a 
-                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(hospital.name + ", " + hospital.address)}`} 
+                      href={hospital.googleMapsUrl} 
                       target="_blank" 
                       rel="noopener noreferrer"
                     >

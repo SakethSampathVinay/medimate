@@ -25,7 +25,19 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'res.cloudinary.com', // Added for new doctor images
+        hostname: 'res.cloudinary.com', 
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'th.bing.com', 
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.visboo.com',
         port: '',
         pathname: '/**',
       }

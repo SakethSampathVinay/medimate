@@ -210,50 +210,208 @@ export const mockMedicines: Medicine[] = medicinesData.map((med, index) => {
 export interface Hospital {
   id: string;
   name: string;
-  address: string;
   contact: string;
-  lat: number;
-  lng: number;
   services: string[];
   imageUrl: string;
+  googleMapsUrl: string;
   dataAiHint?: string;
 }
 
-export const mockHospitals: Hospital[] = [
+const hospitalsData = [
   {
-    id: 'h1',
-    name: 'Manipal Hospital, Old Airport Road',
-    address: '98, HAL Old Airport Rd, Kodihalli, Bengaluru, Karnataka 560017, India',
-    contact: '+91 80 2502 3636',
-    lat: 12.9605, 
-    lng: 77.6623, 
-    services: ['Emergency', 'Cardiology', 'Oncology', 'Pediatrics', 'Multi-specialty'],
-    imageUrl: 'https://placehold.co/400x300.png',
-    dataAiHint: 'hospital building bangalore',
+    hospital_name: "Apollo Hospitals",
+    google_map_location: "https://maps.google.com/?q=Apollo+Hospitals",
+    phone_number: "+91 9876543210",
+    services: [
+      "Cardiology",
+      "Neurology",
+      "Emergency Care",
+      "Orthopedics",
+      "Cancer Treatment",
+    ],
+    photo_url:
+      "https://th.bing.com/th/id/OIP.qpYSLQ7qSsHL6tM-pzU72AHaEJ?rs=1&pid=ImgDetMain",
   },
   {
-    id: 'h2',
-    name: 'Fortis Hospital, Bannerghatta Road',
-    address: '154/9, Bannerghatta Main Rd, Opposite IIM-B, Sahyadri Layout, Panduranga Nagar, Bengaluru, Karnataka 560076, India',
-    contact: '+91 80 6621 4444',
-    lat: 12.8904, 
-    lng: 77.5971, 
-    services: ['General Practice', 'Orthopedics', 'Neurology', 'Urology'],
-    imageUrl: 'https://placehold.co/400x300.png',
-    dataAiHint: 'clinic building modern',
+    hospital_name: "Fortis Hospital",
+    google_map_location: "https://maps.google.com/?q=Fortis+Hospital",
+    phone_number: "+91 8765432109",
+    services: [
+      "Cardiology",
+      "ENT",
+      "Dermatology",
+      "Dialysis",
+      "General Surgery",
+    ],
+    photo_url:
+      "https://www.visboo.com/wp-content/uploads/2017/04/ALL-ABOUT-FORTIS-HOSPITAL-DELHI.jpg",
   },
   {
-    id: 'h3',
-    name: 'Apollo Gleneagles Hospitals, Kolkata',
-    address: '58, Canal Circular Rd, Kadapara, Phool Bagan, Kankurgachi, Kolkata, West Bengal 700054, India',
-    contact: '+91 33 2320 3040',
-    lat: 22.5700, 
-    lng: 88.3948, 
-    services: ['Specialist Consultations', 'Diagnostics', 'Physiotherapy', 'Cardiac Sciences'],
-    imageUrl: 'https://placehold.co/400x300.png',
-    dataAiHint: 'health center kolkata',
+    hospital_name: "Max Healthcare",
+    google_map_location: "https://maps.google.com/?q=Max+Healthcare",
+    phone_number: "+91 7654321098",
+    services: [
+      "Oncology",
+      "Cardiology",
+      "Nephrology",
+      "Pediatrics",
+      "Endocrinology",
+    ],
+    photo_url:
+      "https://th.bing.com/th/id/OIP.S1N4CS425IJ1fT-6ZtLjyQHaD4?rs=1&pid=ImgDetMain",
+  },
+  {
+    hospital_name: "AIIMS",
+    google_map_location: "https://maps.google.com/?q=AIIMS",
+    phone_number: "+91 6543210987",
+    services: [
+      "Trauma Care",
+      "Surgery",
+      "General Medicine",
+      "Pulmonology",
+      "Critical Care",
+    ],
+    photo_url:
+      "https://th.bing.com/th/id/OIP.dngTlzbmP4dNDx6SdLP2lAHaDQ?w=349&h=153&c=8&rs=1&qlt=90&o=6&dpr=1.3&pid=3.1&rm=2",
+  },
+  {
+    hospital_name: "Manipal Hospital",
+    google_map_location: "https://maps.google.com/?q=Manipal+Hospital",
+    phone_number: "+91 5432109876",
+    services: [
+      "Urology",
+      "Neurosurgery",
+      "Physiotherapy",
+      "Dental Care",
+      "Mental Health",
+    ],
+    photo_url:
+      "https://th.bing.com/th/id/OIP.OzAJj4RxTNOHFZJPPEBpnwHaEc?w=322&h=193&c=8&rs=1&qlt=90&o=6&dpr=1.3&pid=3.1&rm=2",
+  },
+  {
+    hospital_name: "Narayana Health",
+    google_map_location: "https://maps.google.com/?q=Narayana+Health",
+    phone_number: "+91 4321098765",
+    services: [
+      "Orthopedic Surgery",
+      "Cardiac Surgery",
+      "Pediatrics",
+      "Critical Care",
+      "Dermatology",
+    ],
+    photo_url:
+      "https://th.bing.com/th/id/OIP.1WNCtBuBjY8LSlly_tIuSAHaEK?w=295&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3",
+  },
+  {
+    hospital_name: "Rainbow Children's Hospital",
+    google_map_location:
+      "https://maps.google.com/?q=Rainbow+Children%27s+Hospital",
+    phone_number: "+91 3210987654",
+    services: [
+      "Pediatrics",
+      "Neonatal Care",
+      "Child Surgery",
+      "Vaccination",
+      "Genetic Disorders",
+    ],
+    photo_url:
+      "https://th.bing.com/th/id/OIP.EJ2Cfk6tP6Vu8G7Amc6nfAHaF_?w=278&h=224&c=8&rs=1&qlt=90&o=6&dpr=1.3&pid=3.1&rm=2",
+  },
+  {
+    hospital_name: "Continental Hospitals",
+    google_map_location: "https://maps.google.com/?q=Continental+Hospitals",
+    phone_number: "+91 2109876543",
+    services: [
+      "Cardiology",
+      "Pulmonology",
+      "Gastroenterology",
+      "Neurology",
+      "ENT",
+    ],
+    photo_url:
+      "https://th.bing.com/th/id/OIP.qqvU7rJOTH3NWwUAjCS8pQAAAA?w=190&h=261&c=8&rs=1&qlt=90&o=6&dpr=1.3&pid=3.1&rm=2",
+  },
+  {
+    hospital_name: "KIMS Hospital",
+    google_map_location: "https://maps.google.com/?q=KIMS+Hospital",
+    phone_number: "+91 1098765432",
+    services: [
+      "Emergency Care",
+      "General Medicine",
+      "Orthopedics",
+      "Nephrology",
+      "Neurology",
+    ],
+    photo_url:
+      "https://th.bing.com/th/id/OIP.vAwLFBWK5_6mYB8ks3gN_wHaD9?w=342&h=182&c=8&rs=1&qlt=90&o=6&dpr=1.3&pid=3.1&rm=2",
+  },
+  {
+    hospital_name: "Medicover Hospitals",
+    google_map_location: "https://maps.google.com/?q=Medicover+Hospitals",
+    phone_number: "+91 9988776655",
+    services: [
+      "Multi-Specialty",
+      "Diagnostics",
+      "Cardiology",
+      "Physiotherapy",
+      "General Surgery",
+    ],
+    photo_url:
+      "https://th.bing.com/th/id/OIP.4T3FRwkNdCE1QaBD9HK8VQHaFB?w=303&h=206&c=8&rs=1&qlt=90&o=6&dpr=1.3&pid=3.1&rm=2",
+  },
+  {
+    hospital_name: "Yashoda Hospitals",
+    google_map_location: "https://maps.google.com/?q=Yashoda+Hospitals",
+    phone_number: "+91 8877665544",
+    services: [
+      "Cancer Treatment",
+      "Cardiology",
+      "Pulmonology",
+      "Neurology",
+      "Gynecology",
+    ],
+    photo_url:
+      "https://th.bing.com/th/id/OIP.2p4hri6kXzRbc9iZ71ji8AHaE8?w=306&h=204&c=8&rs=1&qlt=90&o=6&dpr=1.3&pid=3.1&rm=2",
+  },
+  {
+    hospital_name: "Care Hospitals",
+    google_map_location: "https://maps.google.com/?q=Care+Hospitals",
+    phone_number: "+91 7766554433",
+    services: [
+      "Heart Care",
+      "Neurosurgery",
+      "Orthopedics",
+      "General Surgery",
+      "Pediatrics",
+    ],
+    photo_url:
+      "https://th.bing.com/th/id/OIP.MHLhycz0_JPnE1SpXOikZgHaDy?w=298&h=178&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3",
+  },
+  {
+    hospital_name: "HCG Cancer Hospital",
+    google_map_location: "https://maps.google.com/?q=HCG+Cancer+Hospital",
+    phone_number: "+91 6655443322",
+    services: [
+      "Oncology",
+      "Radiation Therapy",
+      "Chemotherapy",
+      "Palliative Care",
+    ],
+    photo_url:
+      "https://th.bing.com/th/id/OIP.Scfh0f6zu-yV0RHTmSvr5QHaE6?w=245&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3",
   },
 ];
+
+export const mockHospitals: Hospital[] = hospitalsData.map((hospital, index) => ({
+  id: `h${index + 1}`,
+  name: hospital.hospital_name,
+  contact: hospital.phone_number,
+  services: hospital.services,
+  imageUrl: hospital.photo_url,
+  googleMapsUrl: hospital.google_map_location,
+  dataAiHint: `${hospital.hospital_name.split(' ')[0].toLowerCase()} building`
+}));
+
 
 export interface Doctor {
   id: string;
@@ -484,16 +642,15 @@ const newDoctorsData = [
 ];
 
 export const mockDoctors: Doctor[] = newDoctorsData.map((doc, index) => {
-  // Generate some mock availability for demonstration
   const today = new Date();
   const availability: Record<string, string[]> = {};
   const timeSlots = ['09:00 AM', '10:00 AM', '11:00 AM', '02:00 PM', '03:00 PM', '04:00 PM'];
   for (let i = 0; i < 5; i++) {
     const date = new Date(today);
-    date.setDate(today.getDate() + i + 1); // Start from tomorrow
+    date.setDate(today.getDate() + i + 1); 
     const dateString = date.toISOString().split('T')[0];
-    if (Math.random() > 0.2) { // ~80% chance of being available on a given day
-      availability[dateString] = timeSlots.filter(() => Math.random() > 0.5).slice(0, Math.floor(Math.random() * 4) + 1); // 1 to 4 random slots
+    if (Math.random() > 0.2) { 
+      availability[dateString] = timeSlots.filter(() => Math.random() > 0.5).slice(0, Math.floor(Math.random() * 4) + 1);
     }
   }
 
@@ -504,7 +661,7 @@ export const mockDoctors: Doctor[] = newDoctorsData.map((doc, index) => {
     degree: doc.degree,
     location: `${doc.address.line1}, ${doc.address.line2}`,
     experience: doc.experience,
-    rating: parseFloat((4.1 + (index % 9) * 0.1).toFixed(1)), // Deterministic rating
+    rating: parseFloat((4.1 + (index % 9) * 0.1).toFixed(1)), 
     fees: doc.fees,
     about: doc.about,
     availability,
