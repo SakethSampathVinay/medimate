@@ -13,14 +13,16 @@ import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 
-// Simpler loading for dynamic imports
-const simpleMapLoading = () => <div className="h-full w-full bg-muted flex items-center justify-center text-sm"><Loader2 className="h-4 w-4 animate-spin mr-2" /> Initializing Map Library...</div>;
-
-const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false, loading: simpleMapLoading });
+// Dynamically import react-leaflet components
+const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), {
+  ssr: false,
+  loading: () => null, // Render nothing while the dynamic component itself loads
+});
 const TileLayer = dynamic(() => import('react-leaflet').then(mod => mod.TileLayer), { ssr: false });
 const Marker = dynamic(() => import('react-leaflet').then(mod => mod.Marker), { ssr: false });
 const Popup = dynamic(() => import('react-leaflet').then(mod => mod.Popup), { ssr: false });
 const useMap = dynamic(() => import('react-leaflet').then(mod => mod.useMap), { ssr: false });
+
 
 interface OsmHospitalElement {
   id: number;
@@ -68,12 +70,12 @@ function MapPlaceholder() {
 }
 
 const ChangeView: React.FC<{ selectedHospital?: HospitalDisplayData | null }> = ({ selectedHospital }) => {
-  const map = useMap!();
+  const mapHook = useMap!(); // Dynamically imported useMap
   useEffect(() => {
-    if (selectedHospital && map) {
-      map.flyTo([selectedHospital.latitude, selectedHospital.longitude], 15);
+    if (selectedHospital && mapHook) {
+      mapHook.flyTo([selectedHospital.latitude, selectedHospital.longitude], 15);
     }
-  }, [selectedHospital, map]);
+  }, [selectedHospital, mapHook]);
   return null;
 };
 
@@ -95,6 +97,7 @@ export default function HospitalsPage() {
 
   useEffect(() => {
     if (isClient) {
+      // Dynamically import Leaflet and set up icons only on the client
       import('leaflet').then(LModule => {
         const L = LModule.default;
         // @ts-ignore
@@ -110,6 +113,8 @@ export default function HospitalsPage() {
 
 
   useEffect(() => {
+    if (!isClient) return; // Don't run geolocation logic if not on client yet
+
     setIsLoading(true);
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -129,12 +134,12 @@ export default function HospitalsPage() {
       setError('Geolocation is not supported by your browser. Showing hospitals for default area.');
       fetchNearbyHospitals(DEFAULT_LOCATION[0] as number, DEFAULT_LOCATION[1] as number);
     }
-  }, []);
+  }, [isClient]); // Rerun if isClient changes (though it only changes once)
 
   const fetchNearbyHospitals = async (lat: number, lon: number) => {
     setIsLoading(true);
     setError(null);
-    setHospitals([]);
+    setHospitals([]); // Clear previous hospitals
     const overpassQuery = `
       [out:json][timeout:30];
       (
@@ -147,11 +152,17 @@ export default function HospitalsPage() {
     try {
       const response = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(overpassQuery)}`);
       if (!response.ok) {
-        throw new Error(`Overpass API request failed: ${response.statusText}`);
+        throw new Error(`Overpass API request failed: ${response.statusText} (Status: ${response.status})`);
       }
       const data = await response.json();
+      
+      if (!data.elements) {
+        console.warn("Overpass API returned no 'elements' array:", data);
+        throw new Error("Invalid data structure from Overpass API.");
+      }
+
       const fetchedHospitals: HospitalDisplayData[] = data.elements
-        .filter((el: OsmHospitalElement) => el.tags?.name)
+        .filter((el: OsmHospitalElement) => el.tags?.name && (el.lat || el.center?.lat)) // Ensure name and coordinates exist
         .map((el: OsmHospitalElement) => {
           let Rlat, Rlon;
           if (el.lat && el.lon) {
@@ -161,7 +172,7 @@ export default function HospitalsPage() {
             Rlat = el.center.lat;
             Rlon = el.center.lon;
           } else {
-            return null;
+            return null; // Should be filtered out by the condition above
           }
 
           let address = el.tags['addr:full'] || '';
@@ -170,16 +181,16 @@ export default function HospitalsPage() {
             const housenumber = el.tags['addr:housenumber'] || '';
             const city = el.tags['addr:city'] || '';
             const postcode = el.tags['addr:postcode'] || '';
-            address = `${housenumber} ${street}, ${city} ${postcode}`.replace(/^ +|, +$/, '').replace(/ ,/g, ',');
+            address = `${housenumber} ${street}, ${city} ${postcode}`.replace(/^ +|, +$/, '').replace(/ ,/g, ',').trim();
           }
-          if (!address.trim() && el.tags.name) address = el.tags.name; // Fallback to name if address is still empty
+          if (!address.trim() && el.tags.name) address = el.tags.name; 
 
           return {
             id: el.id,
             name: el.tags.name!,
             latitude: Rlat,
             longitude: Rlon,
-            address: address.trim() || "Address not available",
+            address: address || "Address not available",
             phone: el.tags.phone || el.tags['contact:phone'],
             website: el.tags.website || el.tags['contact:website'],
             openingHours: el.tags.opening_hours,
@@ -190,7 +201,7 @@ export default function HospitalsPage() {
       setHospitals(fetchedHospitals);
     } catch (err) {
       console.error("Error fetching hospitals:", err);
-      setError(err instanceof Error ? err.message : "Failed to fetch hospital data.");
+      setError(err instanceof Error ? err.message : "Failed to fetch hospital data. The Overpass API might be temporarily unavailable or the query might be too complex.");
     } finally {
       setIsLoading(false);
     }
@@ -217,10 +228,10 @@ export default function HospitalsPage() {
 
   const centerMapOnUser = () => {
     if (userCoordinates) {
-      setMapCenter(userCoordinates); // This will trigger ChangeView via MapContainer prop
-      setSelectedHospitalId(null); // Clear selection to focus on user
+      setMapCenter(userCoordinates); 
+      setSelectedHospitalId(null); 
     } else {
-        setError("Your location is not available to re-center the map.");
+        setError("Your location is not available to re-center the map. Please enable location services.");
     }
   };
 
@@ -237,7 +248,7 @@ export default function HospitalsPage() {
             <CardDescription>Real-time hospital data from OpenStreetMap based on your location (or a default area).</CardDescription>
           </CardHeader>
           <CardContent>
-             <Button onClick={centerMapOnUser} variant="outline" size="sm" disabled={!userCoordinates && !error}>
+             <Button onClick={centerMapOnUser} variant="outline" size="sm" disabled={!userCoordinates && !error && isLoading}>
                 <LocateFixed className="mr-2 h-4 w-4" /> Center on My Location
             </Button>
           </CardContent>
@@ -257,22 +268,20 @@ export default function HospitalsPage() {
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
-              {userCoordinates && typeof userCoordinates[0] === 'number' && typeof userCoordinates[1] === 'number' && (
-                 // Ensure useMap hook is available for Marker if it uses it internally
-                 useMap ? <Marker position={userCoordinates as [number, number]}>
+              {userCoordinates && typeof userCoordinates[0] === 'number' && typeof userCoordinates[1] === 'number' && Marker && Popup && (
+                 <Marker position={userCoordinates as [number, number]}>
                   <Popup>Your current location</Popup>
-                </Marker> : null
+                </Marker>
               )}
               {hospitals.map(hospital => (
-                // Ensure useMap hook is available for Marker if it uses it internally
-                useMap ? <Marker
+                Marker && Popup && <Marker
                   key={hospital.id}
                   position={[hospital.latitude, hospital.longitude]}
                   eventHandlers={{ click: () => handleMarkerClick(hospital.id) }}
                   opacity={selectedHospitalId === hospital.id ? 1 : 0.7}
                 >
                   <Popup>{hospital.name}</Popup>
-                </Marker> : null
+                </Marker>
               ))}
             </MapContainer>
           ) : (
@@ -318,7 +327,7 @@ export default function HospitalsPage() {
                   key={hospital.id}
                   ref={el => hospitalCardsRef.current[hospital.id] = el}
                   className={`flex flex-col overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border-2 ${selectedHospitalId === hospital.id ? 'border-primary scale-105' : 'border-transparent'}`}
-                  onClick={() => handleViewOnMapClick(hospital)}
+                  onClick={() => handleViewOnMapClick(hospital)} // Allow clicking card to select on map
                 >
                   <CardHeader>
                     <CardTitle className="font-headline text-lg">{hospital.name}</CardTitle>
@@ -337,7 +346,15 @@ export default function HospitalsPage() {
                     {hospital.website && (
                       <div className="flex items-center">
                         <Globe className="mr-2 h-4 w-4 text-muted-foreground flex-shrink-0" />
-                        <a href={hospital.website.startsWith('http') ? hospital.website : `//${hospital.website}`} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-primary hover:underline truncate">{hospital.website}</a>
+                        <a 
+                           href={hospital.website.startsWith('http') ? hospital.website : `//${hospital.website}`} 
+                           target="_blank" 
+                           rel="noopener noreferrer" 
+                           onClick={(e) => e.stopPropagation()} 
+                           className="text-primary hover:underline truncate block max-w-full"
+                        >
+                            {hospital.website}
+                        </a>
                       </div>
                     )}
                      {hospital.openingHours && <p className="text-xs text-muted-foreground">Hours: {hospital.openingHours}</p>}
@@ -356,5 +373,3 @@ export default function HospitalsPage() {
     </AppLayout>
   );
 }
-
-    
