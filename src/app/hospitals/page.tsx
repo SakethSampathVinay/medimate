@@ -9,6 +9,7 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import type { LatLngExpression, Map as LeafletMapType } from 'leaflet';
 import dynamic from 'next/dynamic';
 
+// ES Module imports for marker images
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
@@ -16,7 +17,7 @@ import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 // Dynamically import react-leaflet components
 const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), {
   ssr: false,
-  loading: () => <MapPlaceholder />, // Use MapPlaceholder while MapContainer code loads
+  loading: () => <MapPlaceholder />, 
 });
 const TileLayer = dynamic(() => import('react-leaflet').then(mod => mod.TileLayer), { ssr: false, loading: () => null });
 const Marker = dynamic(() => import('react-leaflet').then(mod => mod.Marker), { ssr: false, loading: () => null });
@@ -96,19 +97,27 @@ export default function HospitalsPage() {
   }, []);
 
   useEffect(() => {
-    if (isClient) {
-      // Dynamically import Leaflet and set up icons only on the client
-      import('leaflet').then(LModule => {
-        const L = LModule.default;
+    if (!isClient) return;
+
+    // Dynamically import Leaflet and set up icons only on the client
+    import('leaflet').then(LModule => {
+      const L = LModule.default;
+      // Check if the fix is already applied to avoid issues with StrictMode double effects
+      // or multiple imports if this component were to re-render significantly.
+      if (!(L.Icon.Default as any)._iconFixed) {
         // @ts-ignore
-        delete L.Icon.Default.prototype._getIconUrl;
+        if (L.Icon.Default.prototype._getIconUrl) { // Check if property exists before deleting
+             // @ts-ignore
+            delete L.Icon.Default.prototype._getIconUrl;
+        }
         L.Icon.Default.mergeOptions({
           iconRetinaUrl: markerIcon2x.src,
           iconUrl: markerIcon.src,
           shadowUrl: markerShadow.src,
         });
-      }).catch(err => console.error("Failed to load Leaflet for icon fix:", err));
-    }
+        (L.Icon.Default as any)._iconFixed = true; // Mark as fixed
+      }
+    }).catch(err => console.error("Failed to load Leaflet for icon fix:", err));
   }, [isClient]);
 
 
@@ -257,7 +266,6 @@ export default function HospitalsPage() {
         <div ref={mapContainerRef} className="h-[50vh] md:h-[60vh] w-full rounded-lg overflow-hidden shadow-lg border">
           {isClient ? (
             <MapContainer
-              key="hospital-map-container" 
               center={mapCenter}
               zoom={DEFAULT_ZOOM}
               scrollWheelZoom={true}
@@ -373,5 +381,3 @@ export default function HospitalsPage() {
     </AppLayout>
   );
 }
-
-    
