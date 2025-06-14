@@ -1,30 +1,29 @@
+
 'use client';
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { 
-  LayoutDashboard, 
   Bot, 
   Pill, 
   Hospital, 
   CalendarDays, 
   PlaySquare, 
-  Siren, 
-  UserCircle 
+  Siren,
+  LayoutDashboard, // Keep for explicit mobile link if ever needed, but not in main navItems
+  UserCircle // Keep for explicit mobile link if ever needed
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 
+// Main navigation items, excluding Dashboard and Profile
 const navItems = [
-  { href: '/', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/health-analysis', label: 'AI Health Analysis', icon: Bot },
-  { href: '/medicines', label: 'Medicine Info', icon: Pill },
-  { href: '/hospitals', label: 'Hospital Locator', icon: Hospital },
+  { href: '/health-analysis', label: 'AI Analysis', icon: Bot },
+  { href: '/medicines', label: 'Medicines', icon: Pill },
+  { href: '/hospitals', label: 'Hospitals', icon: Hospital },
   { href: '/appointments', label: 'Appointments', icon: CalendarDays },
-  { href: '/reels', label: 'Health Reels', icon: PlaySquare },
-  { href: '/emergency', label: 'Emergency Aid', icon: Siren },
-  { href: '/profile', label: 'My Profile', icon: UserCircle },
+  { href: '/reels', label: 'Reels', icon: PlaySquare },
+  { href: '/emergency', label: 'Emergency', icon: Siren },
 ];
 
 // Desktop Navigation
@@ -32,34 +31,25 @@ export default function TopbarNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="hidden md:flex items-center space-x-1">
-      <TooltipProvider delayDuration={100}>
-        {navItems.map((item) => (
-          <Tooltip key={item.href}>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className={cn(
-                  "h-9 w-9",
-                  (pathname === item.href || (pathname.startsWith(item.href) && item.href !== '/'))
-                    ? "bg-accent text-accent-foreground" // Active state uses accent color
-                    : "text-muted-foreground hover:bg-accent/50 hover:text-accent-foreground" // Hover uses accent
-                )}
-                asChild
-              >
-                <Link href={item.href}>
-                  <item.icon className="h-5 w-5" />
-                  <span className="sr-only">{item.label}</span>
-                </Link>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="bottom">
-              <p>{item.label}</p>
-            </TooltipContent>
-          </Tooltip>
-        ))}
-      </TooltipProvider>
+    <nav className="hidden md:flex items-center space-x-1 lg:space-x-1.5"> {/* Adjusted spacing for text */}
+      {navItems.map((item) => (
+        <Button
+          key={item.href}
+          asChild
+          variant="ghost"
+          className={cn(
+            "px-3 py-2 text-sm font-medium h-auto", // Ensure button height accommodates text
+            (pathname === item.href || (pathname.startsWith(item.href) && item.href !== '/'))
+              ? "bg-accent text-accent-foreground"
+              : "text-foreground hover:bg-accent/10 hover:text-primary"
+          )}
+        >
+          <Link href={item.href} className="flex items-center gap-1.5"> {/* Reduced gap slightly */}
+            <item.icon className="h-4 w-4 flex-shrink-0" /> {/* Slightly smaller icon for balance */}
+            <span>{item.label}</span>
+          </Link>
+        </Button>
+      ))}
     </nav>
   );
 }
@@ -70,22 +60,52 @@ export function MobileNav() {
 
   return (
     <nav className="flex flex-col space-y-1 p-4">
+      {/* Explicit Dashboard link for mobile convenience */}
+      <Link href="/" className="block">
+          <div 
+            className={cn(
+              "flex items-center space-x-3 p-3 rounded-md text-base font-medium transition-colors",
+              (pathname === '/')
+                ? "bg-sidebar-primary text-sidebar-primary-foreground"
+                : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+            )}
+          >
+            <LayoutDashboard className="h-5 w-5" />
+            <span>Dashboard</span>
+          </div>
+        </Link>
+
       {navItems.map((item) => (
         <Link key={item.href} href={item.href} className="block">
-          {/* Ensure SheetClose is applied here if items should close the sheet */}
           <div 
             className={cn(
               "flex items-center space-x-3 p-3 rounded-md text-base font-medium transition-colors",
               (pathname === item.href || (pathname.startsWith(item.href) && item.href !== '/'))
-                ? "bg-sidebar-primary text-sidebar-primary-foreground" // Active state uses sidebar primary
-                : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground" // Hover uses sidebar accent
+                ? "bg-sidebar-primary text-sidebar-primary-foreground"
+                : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
             )}
           >
             <item.icon className="h-5 w-5" />
-            <span>{item.label}</span>
+            {/* Mobile nav can use the full label from navItems if desired, or a more descriptive one */}
+            <span>{item.label === 'AI Analysis' ? 'AI Health Analysis' : item.label === 'Reels' ? 'Health Reels' : item.label === 'Emergency' ? 'Emergency Aid' : item.label}</span>
           </div>
         </Link>
       ))}
+      
+      {/* Explicit Profile link for mobile convenience */}
+      <Link href="/profile" className="block">
+        <div
+          className={cn(
+            "flex items-center space-x-3 p-3 rounded-md text-base font-medium transition-colors",
+            (pathname === '/profile')
+              ? "bg-sidebar-primary text-sidebar-primary-foreground"
+              : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+          )}
+        >
+          <UserCircle className="h-5 w-5" />
+          <span>My Profile</span>
+        </div>
+      </Link>
     </nav>
   );
 }
