@@ -1,32 +1,75 @@
+
 'use client';
 
 import AppLayout from '@/components/layout/app-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { mockPrescriptions, Prescription, mockTestResults, TestResult, mockTabletReminders, TabletReminder } from '@/lib/mock-data';
-import { UserCircle, FileText, Beaker, Bell, PlusCircle, Download, ChevronRight, CalendarClock, Edit2 } from 'lucide-react';
-import React, { useState } from 'react';
+import { FileText, Beaker, Bell, PlusCircle, Download, ChevronRight, CalendarClock, Edit2, LogIn, Loader2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
-import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import Link from 'next/link';
+import { useAuth } from '@/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
 
 
 export default function ProfilePage() {
+  const { user, isLoading: authLoading, session } = useAuth();
+  const router = useRouter();
+
   const [isAddPrescriptionModalOpen, setIsAddPrescriptionModalOpen] = useState(false);
   const [isAddTestResultModalOpen, setIsAddTestResultModalOpen] = useState(false);
   const [isAddReminderModalOpen, setIsAddReminderModalOpen] = useState(false);
 
-  // Simplified state for reminders
   const [reminders, setReminders] = useState(mockTabletReminders);
   const toggleReminder = (id: string) => {
     setReminders(prev => prev.map(r => r.id === id ? { ...r, isActive: !r.isActive } : r));
   };
+  
+  // Effect to redirect if not logged in and auth loading is complete
+  useEffect(() => {
+    if (!authLoading && !user) {
+      // Instead of direct redirect, we show a message as per requirements
+      // router.push('/login?redirect=/profile');
+    }
+  }, [user, authLoading, router]);
 
+  if (authLoading) {
+    return (
+      <AppLayout>
+        <div className="flex flex-col items-center justify-center h-[calc(100vh-10rem)]">
+          <Loader2 className="h-12 w-12 animate-spin text-primary" />
+          <p className="mt-4 text-lg text-muted-foreground">Loading your profile...</p>
+        </div>
+      </AppLayout>
+    );
+  }
+
+  if (!user) {
+    return (
+      <AppLayout>
+        <div className="flex flex-col items-center justify-center h-[calc(100vh-10rem)] text-center p-4">
+          <Card className="max-w-md w-full p-8 shadow-lg">
+            <UserCircle className="h-16 w-16 text-primary mx-auto mb-6" />
+            <h2 className="font-headline text-2xl mb-3">Access Denied</h2>
+            <p className="text-muted-foreground mb-6">
+              Please log in to access your personal health profile and medical records.
+            </p>
+            <Button asChild className="w-full">
+              <Link href="/login?redirect=/profile">
+                <LogIn className="mr-2 h-4 w-4" /> Log In or Sign Up
+              </Link>
+            </Button>
+          </Card>
+        </div>
+      </AppLayout>
+    );
+  }
 
   return (
     <AppLayout>
@@ -36,7 +79,7 @@ export default function ProfilePage() {
             <Image src="https://placehold.co/100x100.png" alt="User Avatar" width={80} height={80} className="rounded-full border shadow" data-ai-hint="profile avatar" />
             <div>
               <CardTitle className="font-headline text-3xl">MediMate User</CardTitle>
-              <CardDescription>user@medimate.com | Manage your health information securely.</CardDescription>
+              <CardDescription>{user.email || 'Manage your health information securely.'}</CardDescription>
                <Button variant="outline" size="sm" className="mt-2">
                 <Edit2 className="mr-2 h-3 w-3" /> Edit Profile
               </Button>
