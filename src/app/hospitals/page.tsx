@@ -9,14 +9,19 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import L, { LatLngExpression, Map as LeafletMap } from 'leaflet';
 import dynamic from 'next/dynamic';
 
+// Import marker images using ES module imports
+import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+
 // Leaflet CSS is imported in globals.css
 // Leaflet icon fix for Next.js
 if (typeof window !== 'undefined') {
   delete (L.Icon.Default.prototype as any)._getIconUrl;
   L.Icon.Default.mergeOptions({
-    iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png').default.src,
-    iconUrl: require('leaflet/dist/images/marker-icon.png').default.src,
-    shadowUrl: require('leaflet/dist/images/marker-shadow.png').default.src,
+    iconRetinaUrl: markerIcon2x.src,
+    iconUrl: markerIcon.src,
+    shadowUrl: markerShadow.src,
   });
 }
 
@@ -72,7 +77,7 @@ function MapPlaceholder() {
 }
 
 const ChangeView: React.FC<{ center: LatLngExpression; zoom: number; selectedHospital?: HospitalDisplayData | null }> = ({ center, zoom, selectedHospital }) => {
-  const map = useMap!(); // useMap is dynamically imported, so it should be available
+  const map = useMap!(); 
   useEffect(() => {
     if (selectedHospital) {
       map.setView([selectedHospital.latitude, selectedHospital.longitude], 15);
@@ -107,12 +112,12 @@ export default function HospitalsPage() {
         (err) => {
           console.warn(`Geolocation error: ${err.message}`);
           setError('Could not get your location. Showing hospitals for default area. Please enable location services and refresh.');
-          fetchNearbyHospitals(DEFAULT_LOCATION[0], DEFAULT_LOCATION[1]);
+          fetchNearbyHospitals(DEFAULT_LOCATION[0] as number, DEFAULT_LOCATION[1] as number);
         }
       );
     } else {
       setError('Geolocation is not supported by your browser. Showing hospitals for default area.');
-      fetchNearbyHospitals(DEFAULT_LOCATION[0], DEFAULT_LOCATION[1]);
+      fetchNearbyHospitals(DEFAULT_LOCATION[0] as number, DEFAULT_LOCATION[1] as number);
     }
   }, []);
 
@@ -136,7 +141,7 @@ export default function HospitalsPage() {
       }
       const data = await response.json();
       const fetchedHospitals: HospitalDisplayData[] = data.elements
-        .filter((el: OsmHospitalElement) => el.tags?.name) // Ensure hospital has a name
+        .filter((el: OsmHospitalElement) => el.tags?.name) 
         .map((el: OsmHospitalElement) => {
           let Rlat, Rlon;
           if (el.lat && el.lon) {
@@ -146,7 +151,7 @@ export default function HospitalsPage() {
             Rlat = el.center.lat;
             Rlon = el.center.lon;
           } else {
-            return null; // Skip if no coordinates
+            return null; 
           }
 
           let address = el.tags['addr:full'] || '';
@@ -157,7 +162,7 @@ export default function HospitalsPage() {
             const postcode = el.tags['addr:postcode'] || '';
             address = `${housenumber} ${street}, ${city} ${postcode}`.replace(/^ +|, +$/, '').replace(/ ,/g, ',');
           }
-          if (!address.trim() && el.tags.name) address = el.tags.name; // Fallback to name if address is empty
+          if (!address.trim() && el.tags.name) address = el.tags.name; 
 
           return {
             id: el.id,
@@ -194,7 +199,6 @@ export default function HospitalsPage() {
     if (mapContainerRef.current) {
         mapContainerRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-    // The ChangeView component will handle panning the map
   };
 
   const selectedHospital = useMemo(() => {
@@ -204,12 +208,11 @@ export default function HospitalsPage() {
   const centerMapOnUser = () => {
     if (userCoordinates) {
       setMapCenter(userCoordinates);
-      setSelectedHospitalId(null); // Deselect any hospital
+      setSelectedHospitalId(null); 
       if (mapRef.current) {
         mapRef.current.setView(userCoordinates, DEFAULT_ZOOM + 2);
       }
     } else {
-       // Try to geolocate again or inform user
         setError("Your location is not available to re-center the map.");
     }
   };
@@ -247,8 +250,8 @@ export default function HospitalsPage() {
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
-              {userCoordinates && (
-                <Marker position={userCoordinates}>
+              {userCoordinates && typeof userCoordinates[0] === 'number' && typeof userCoordinates[1] === 'number' && (
+                <Marker position={userCoordinates as [number, number]}>
                   <Popup>Your current location</Popup>
                 </Marker>
               )}
@@ -257,6 +260,8 @@ export default function HospitalsPage() {
                   key={hospital.id}
                   position={[hospital.latitude, hospital.longitude]}
                   eventHandlers={{ click: () => handleMarkerClick(hospital.id) }}
+                  // Cast to an L.Icon manually if Leaflet's default type inference is problematic
+                  // icon={L.icon({ iconUrl: markerIcon.src, iconRetinaUrl: markerIcon2x.src, shadowUrl: markerShadow.src, iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41] })}
                   opacity={selectedHospitalId === hospital.id ? 1 : 0.7}
                 >
                   <Popup>{hospital.name}</Popup>
@@ -325,7 +330,6 @@ export default function HospitalsPage() {
                         <a href={hospital.website.startsWith('http') ? hospital.website : `//${hospital.website}`} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline truncate">{hospital.website}</a>
                       </div>
                     )}
-                    {/* Mini-map preview removed for simplicity, can be added later */}
                      {hospital.openingHours && <p className="text-xs text-muted-foreground">Hours: {hospital.openingHours}</p>}
                   </CardContent>
                   <CardFooter>
@@ -342,3 +346,4 @@ export default function HospitalsPage() {
     </AppLayout>
   );
 }
+
