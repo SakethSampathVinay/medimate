@@ -17,169 +17,169 @@ const medicinesData = [
     "medicine_name": "Paracetamol",
     "tags": ["Pain Relief", "Fever"],
     "description": "Used to reduce fever and relieve mild to moderate pain.",
-    "photo_url": "https://placehold.co/300x200.png"
+    "photo_url": "https://example.com/paracetamol.jpg"
   },
   {
     "medicine_name": "Ibuprofen",
     "tags": ["Anti-inflammatory", "Pain Relief"],
     "description": "Non-steroidal anti-inflammatory drug for pain and inflammation.",
-    "photo_url": "https://placehold.co/300x200.png"
+    "photo_url": "https://example.com/ibuprofen.jpg"
   },
   {
     "medicine_name": "Amoxicillin",
     "tags": ["Antibiotic", "Bacterial Infections"],
     "description": "Penicillin-based antibiotic used for bacterial infections.",
-    "photo_url": "https://placehold.co/300x200.png"
+    "photo_url": "https://example.com/amoxicillin.jpg"
   },
   {
     "medicine_name": "Cetirizine",
     "tags": ["Antihistamine", "Allergies"],
     "description": "Used to relieve allergy symptoms such as runny nose and itching.",
-    "photo_url": "https://placehold.co/300x200.png"
+    "photo_url": "https://example.com/cetirizine.jpg"
   },
   {
     "medicine_name": "Aspirin",
     "tags": ["Blood Thinner", "Pain Relief"],
     "description": "Used for pain relief and reducing the risk of heart attacks.",
-    "photo_url": "https://placehold.co/300x200.png"
+    "photo_url": "https://example.com/aspirin.jpg"
   },
   {
     "medicine_name": "Metformin",
     "tags": ["Diabetes", "Blood Sugar Control"],
     "description": "Helps control blood sugar levels in people with type 2 diabetes.",
-    "photo_url": "https://placehold.co/300x200.png"
+    "photo_url": "https://example.com/metformin.jpg"
   },
   {
     "medicine_name": "Omeprazole",
     "tags": ["Acid Reflux", "Stomach Ulcers"],
     "description": "Reduces stomach acid for treating GERD and ulcers.",
-    "photo_url": "https://placehold.co/300x200.png"
+    "photo_url": "https://example.com/omeprazole.jpg"
   },
   {
     "medicine_name": "Ciprofloxacin",
     "tags": ["Antibiotic", "Bacterial Infections"],
     "description": "Broad-spectrum antibiotic used for bacterial infections.",
-    "photo_url": "https://placehold.co/300x200.png"
+    "photo_url": "https://example.com/ciprofloxacin.jpg"
   },
   {
     "medicine_name": "Atorvastatin",
     "tags": ["Cholesterol", "Heart Health"],
     "description": "Used to lower cholesterol and reduce risk of heart disease.",
-    "photo_url": "https://placehold.co/300x200.png"
+    "photo_url": "https://example.com/atorvastatin.jpg"
   },
   {
     "medicine_name": "Salbutamol",
     "tags": ["Asthma", "Bronchodilator"],
     "description": "Relieves breathing difficulties in asthma and COPD.",
-    "photo_url": "https://placehold.co/300x200.png"
+    "photo_url": "https://example.com/salbutamol.jpg"
   },
   {
     "medicine_name": "Ranitidine",
     "tags": ["Heartburn", "Acid Reduction"],
     "description": "Reduces stomach acid to relieve heartburn and indigestion.",
-    "photo_url": "https://placehold.co/300x200.png"
+    "photo_url": "https://example.com/ranitidine.jpg"
   },
   {
     "medicine_name": "Doxycycline",
     "tags": ["Antibiotic", "Bacterial Infections"],
     "description": "Used to treat bacterial infections and acne.",
-    "photo_url": "https://placehold.co/300x200.png"
+    "photo_url": "https://example.com/doxycycline.jpg"
   },
   {
     "medicine_name": "Loratadine",
     "tags": ["Antihistamine", "Allergies"],
     "description": "Non-drowsy antihistamine for allergy relief.",
-    "photo_url": "https://placehold.co/300x200.png"
+    "photo_url": "https://example.com/loratadine.jpg"
   },
   {
     "medicine_name": "Clopidogrel",
     "tags": ["Blood Thinner", "Heart Health"],
     "description": "Prevents blood clots and reduces risk of heart attacks.",
-    "photo_url": "https://placehold.co/300x200.png"
+    "photo_url": "https://example.com/clopidogrel.jpg"
   },
   {
     "medicine_name": "Hydrochlorothiazide",
     "tags": ["Diuretic", "Blood Pressure"],
     "description": "Helps control high blood pressure by reducing fluid retention.",
-    "photo_url": "https://placehold.co/300x200.png"
+    "photo_url": "https://example.com/hydrochlorothiazide.jpg"
   },
   {
     "medicine_name": "Levothyroxine",
     "tags": ["Thyroid Hormone", "Hypothyroidism"],
     "description": "Used to treat underactive thyroid conditions.",
-    "photo_url": "https://placehold.co/300x200.png"
+    "photo_url": "https://example.com/levothyroxine.jpg"
   },
   {
     "medicine_name": "Simvastatin",
     "tags": ["Cholesterol", "Heart Health"],
     "description": "Lowers cholesterol and reduces risk of heart disease.",
-    "photo_url": "https://placehold.co/300x200.png"
+    "photo_url": "https://example.com/simvastatin.jpg"
   },
   {
     "medicine_name": "Prednisolone",
     "tags": ["Steroid", "Anti-inflammatory"],
     "description": "Used to reduce inflammation and suppress the immune system.",
-    "photo_url": "https://placehold.co/300x200.png"
+    "photo_url": "https://example.com/prednisolone.jpg"
   },
   {
     "medicine_name": "Acetaminophen",
     "tags": ["Pain Relief", "Fever"],
     "description": "Alternative to Paracetamol for pain and fever relief.",
-    "photo_url": "https://placehold.co/300x200.png"
+    "photo_url": "https://example.com/acetaminophen.jpg"
   },
   {
     "medicine_name": "Losartan",
     "tags": ["Blood Pressure", "Heart Health"],
     "description": "Used to treat high blood pressure and protect kidney function.",
-    "photo_url": "https://placehold.co/300x200.png"
+    "photo_url": "https://example.com/losartan.jpg"
   },
   {
     "medicine_name": "Gabapentin",
     "tags": ["Nerve Pain", "Seizures"],
     "description": "Helps manage nerve pain and epilepsy.",
-    "photo_url": "https://placehold.co/300x200.png"
+    "photo_url": "https://example.com/gabapentin.jpg"
   },
   {
     "medicine_name": "Fluoxetine",
     "tags": ["Antidepressant", "Mental Health"],
     "description": "Used to treat depression and anxiety disorders.",
-    "photo_url": "https://placehold.co/300x200.png"
+    "photo_url": "https://example.com/fluoxetine.jpg"
   },
   {
     "medicine_name": "Warfarin",
     "tags": ["Blood Thinner", "Clot Prevention"],
     "description": "Reduces the risk of blood clots and strokes.",
-    "photo_url": "https://placehold.co/300x200.png"
+    "photo_url": "https://example.com/warfarin.jpg"
   },
   {
     "medicine_name": "Azithromycin",
     "tags": ["Antibiotic", "Bacterial Infections"],
     "description": "Common antibiotic for treating bacterial infections.",
-    "photo_url": "https://placehold.co/300x200.png"
+    "photo_url": "https://example.com/azithromycin.jpg"
   },
   {
     "medicine_name": "Diphenhydramine",
     "tags": ["Antihistamine", "Sleep Aid"],
     "description": "Used for allergies and as a sleep aid.",
-    "photo_url": "https://placehold.co/300x200.png"
+    "photo_url": "https://example.com/diphenhydramine.jpg"
   },
   {
     "medicine_name": "Montelukast",
     "tags": ["Asthma", "Allergy Control"],
     "description": "Helps control asthma and allergic rhinitis.",
-    "photo_url": "https://placehold.co/300x200.png"
+    "photo_url": "https://example.com/montelukast.jpg"
   },
   {
     "medicine_name": "Naproxen",
     "tags": ["Pain Relief", "Anti-inflammatory"],
     "description": "Long-lasting pain relief for arthritis and muscle pain.",
-    "photo_url": "https://placehold.co/300x200.png"
+    "photo_url": "https://example.com/naproxen.jpg"
   },
   {
     "medicine_name": "Furosemide",
     "tags": ["Diuretic", "Heart Failure"],
     "description": "Used to reduce fluid buildup in conditions like heart failure.",
-    "photo_url": "https://placehold.co/300x200.png"
+    "photo_url": "https://example.com/furosemide.jpg"
   }
 ];
 
@@ -190,16 +190,14 @@ export const mockMedicines: Medicine[] = medicinesData.map((med, index) => {
   if (secondTag) {
     dataAiHint += ` ${secondTag.toLowerCase()}`;
   }
-  // Ensure dataAiHint is max two words
   dataAiHint = dataAiHint.split(' ').slice(0, 2).join(' ');
-
 
   return {
     id: `med${index + 1}`,
     name: med.medicine_name,
-    imageUrl: med.photo_url.replace("https://example.com/", "https://placehold.co/").replace(".jpg", ".png"), // Use .png for placeholders
+    imageUrl: med.photo_url, // Using the photo_url directly as requested
     dataAiHint: dataAiHint || 'medicine',
-    useCase: med.description, // Using the provided description as the main use case/summary
+    useCase: med.description, 
     description: `${med.medicine_name} is typically used for ${med.tags.join(', ')}. For detailed information, including specific uses, contraindications, and potential interactions, please consult a healthcare professional or refer to the patient information leaflet that comes with the medicine.`,
     dosage: 'Dosage varies depending on the condition being treated and individual patient factors. Always follow the dosage instructions provided by your doctor or pharmacist. Do not exceed the recommended dose.',
     sideEffects: 'Like all medicines, this drug can cause side effects, although not everybody gets them. Common side effects may include [mention 1-2 very generic, mild side effects if appropriate, otherwise state "nausea or headache"]. If you experience any severe side effects or allergic reactions, seek medical attention immediately.',
@@ -538,3 +536,4 @@ export const mockTabletReminders: TabletReminder[] = [
 
 
     
+
