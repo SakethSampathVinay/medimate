@@ -17,7 +17,7 @@ import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 // Dynamically import react-leaflet components
 const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), {
   ssr: false,
-  loading: () => <MapPlaceholder />, 
+  loading: () => null, 
 });
 const TileLayer = dynamic(() => import('react-leaflet').then(mod => mod.TileLayer), { ssr: false, loading: () => null });
 const Marker = dynamic(() => import('react-leaflet').then(mod => mod.Marker), { ssr: false, loading: () => null });
@@ -99,16 +99,12 @@ export default function HospitalsPage() {
   useEffect(() => {
     if (!isClient) return;
 
-    // Dynamically import Leaflet and set up icons only on the client
     import('leaflet').then(LModule => {
       const L = LModule.default;
       // Check if the fix is already applied to avoid issues with StrictMode double effects
-      // or multiple imports if this component were to re-render significantly.
       if (!(L.Icon.Default as any)._iconFixed) {
-        // @ts-ignore
-        if (L.Icon.Default.prototype._getIconUrl) { // Check if property exists before deleting
-             // @ts-ignore
-            delete L.Icon.Default.prototype._getIconUrl;
+        if ((L.Icon.Default.prototype as any)._getIconUrl) {
+            delete (L.Icon.Default.prototype as any)._getIconUrl;
         }
         L.Icon.Default.mergeOptions({
           iconRetinaUrl: markerIcon2x.src,
@@ -263,7 +259,11 @@ export default function HospitalsPage() {
           </CardContent>
         </Card>
 
-        <div ref={mapContainerRef} className="h-[50vh] md:h-[60vh] w-full rounded-lg overflow-hidden shadow-lg border">
+        <div 
+          key={isClient ? "map-active" : "map-placeholder-wrapper"}
+          ref={mapContainerRef} 
+          className="h-[50vh] md:h-[60vh] w-full rounded-lg overflow-hidden shadow-lg border"
+        >
           {isClient ? (
             <MapContainer
               center={mapCenter}
@@ -381,3 +381,4 @@ export default function HospitalsPage() {
     </AppLayout>
   );
 }
+
