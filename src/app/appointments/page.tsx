@@ -33,14 +33,17 @@ export default function AppointmentsPage() {
   const { toast } = useToast();
 
   const specialties = useMemo(() => ['All', ...new Set(mockDoctors.map(doc => doc.specialty))], []);
-  const locations = useMemo(() => ['All', ...new Set(mockDoctors.map(doc => doc.location.split(',').pop()?.trim() || doc.location ))], []);
+  const locations = useMemo(() => {
+    const allLocations = mockDoctors.map(doc => doc.location.split(',').pop()?.trim() || doc.location);
+    return ['All', ...new Set(allLocations.filter(Boolean))]; // Filter out any undefined/empty strings
+  }, []);
 
 
   const filteredDoctors = useMemo(() => {
     return mockDoctors.filter(doctor =>
       (doctor.name.toLowerCase().includes(searchTerm.toLowerCase())) &&
       (selectedSpecialty === 'All' || doctor.specialty === selectedSpecialty) &&
-      (selectedLocation === 'All' || doctor.location.toLowerCase().includes(selectedLocation.toLowerCase()))
+      (selectedLocation === 'All' || (doctor.location.split(',').pop()?.trim() || doctor.location).toLowerCase() === selectedLocation.toLowerCase())
     );
   }, [searchTerm, selectedSpecialty, selectedLocation]);
 
@@ -150,9 +153,9 @@ export default function AppointmentsPage() {
                     <div className="flex-grow">
                       <CardTitle className="font-headline text-xl">{doctor.name}</CardTitle>
                       <CardDescription className="text-sm text-primary">{doctor.specialty}</CardDescription>
-                      <p className="text-xs text-muted-foreground flex items-center mt-0.5">
+                      <div className="text-xs text-muted-foreground flex items-center mt-0.5">
                         <GraduationCap className="mr-1 h-3 w-3" /> {doctor.degree}
-                      </p>
+                      </div>
                       <div className="flex items-center text-xs text-muted-foreground mt-1">
                         <BriefcaseMedical className="mr-1 h-3 w-3" /> {doctor.experience}
                       </div>
@@ -238,10 +241,10 @@ export default function AppointmentsPage() {
             <DialogHeader>
               <DialogTitle className="font-headline text-xl">Book Appointment with {selectedDoctorForModal.name}</DialogTitle>
               <DialogDescription className="space-y-1">
-                <p>{selectedDoctorForModal.specialty} - {selectedDoctorForModal.degree}</p>
-                <p className="font-semibold">Consultation Fee: ₹{selectedDoctorForModal.fees}</p>
-                <p className="text-xs text-muted-foreground pt-1">{selectedDoctorForModal.about}</p>
-                <p className="pt-2">Select a date and time for your appointment.</p>
+                <div>{selectedDoctorForModal.specialty} - {selectedDoctorForModal.degree}</div>
+                <div className="font-semibold">Consultation Fee: ₹{selectedDoctorForModal.fees}</div>
+                <div className="text-xs text-muted-foreground pt-1">{selectedDoctorForModal.about}</div>
+                <div className="pt-2">Select a date and time for your appointment.</div>
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
@@ -270,7 +273,7 @@ export default function AppointmentsPage() {
                   </div>
                 </div>
               ) : modalSelectedDate ? (
-                 <p className="text-sm text-muted-foreground text-center py-2">No slots available for {selectedDoctorForModal.name} on {format(modalSelectedDate, "PPP")}.</p>
+                 <div className="text-sm text-muted-foreground text-center py-2">No slots available for {selectedDoctorForModal.name} on {format(modalSelectedDate, "PPP")}.</div>
               ) : null}
             </div>
             <DialogFooter>
