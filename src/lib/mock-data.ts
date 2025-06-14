@@ -221,59 +221,70 @@ export const mockHealthCheckupPacks: HealthCheckupPack[] = [
 
 export interface HealthReel {
   id: string;
-  title: string;
+  title: string; // Corresponds to 'caption' in Supabase
   videoUrl: string; 
   thumbnailUrl: string;
   dataAiHint?: string;
-  category: 'Fitness' | 'Nutrition' | 'Mental Wellness' | 'Yoga';
-  likes: number;
-  uploader: string;
-  uploaderAvatar: string;
+  category: 'Fitness' | 'Nutrition' | 'Mental Wellness' | 'Yoga'; // Example categories
+  likes: number; // Corresponds to 'likes_count'
+  uploader: string; // Corresponds to 'creator_name'
+  uploaderAvatar: string; // For UI, not in Supabase schema directly but useful
 }
 
 export const mockHealthReels: HealthReel[] = [
   {
     id: 'r1',
-    title: '5 Minute Morning Yoga',
-    videoUrl: 'https://placehold.co/1080x1920.mp4/000000/FFFFFF?text=Yoga+Reel',
-    thumbnailUrl: 'https://placehold.co/300x500.png',
+    title: '5 Minute Morning Yoga Flow for Beginners',
+    videoUrl: 'https://placehold.co/1080x1920.mp4/1E1E1E/FFFFFF?text=Yoga+Reel',
+    thumbnailUrl: 'https://placehold.co/360x640.png', // Aspect ratio 9:16
     dataAiHint: 'yoga fitness',
     category: 'Yoga',
-    likes: 1200,
+    likes: 1256,
     uploader: 'YogaWithDivya',
     uploaderAvatar: 'https://placehold.co/50x50.png'
   },
   {
     id: 'r2',
-    title: 'Quick HIIT Workout',
-    videoUrl: 'https://placehold.co/1080x1920.mp4/000000/FFFFFF?text=HIIT+Reel',
-    thumbnailUrl: 'https://placehold.co/300x500.png',
+    title: 'Quick HIIT Workout - No Equipment Needed!',
+    videoUrl: 'https://placehold.co/1080x1920.mp4/1E1E1E/FFFFFF?text=HIIT+Reel',
+    thumbnailUrl: 'https://placehold.co/360x640.png',
     dataAiHint: 'workout exercise',
     category: 'Fitness',
-    likes: 2500,
-    uploader: 'FitBharat',
+    likes: 2530,
+    uploader: 'FitBharatFitness',
     uploaderAvatar: 'https://placehold.co/50x50.png'
   },
   {
     id: 'r3',
-    title: 'Healthy Smoothie Recipe',
-    videoUrl: 'https://placehold.co/1080x1920.mp4/000000/FFFFFF?text=Recipe+Reel',
-    thumbnailUrl: 'https://placehold.co/300x500.png',
+    title: 'Healthy Green Smoothie Recipe for Energy',
+    videoUrl: 'https://placehold.co/1080x1920.mp4/1E1E1E/FFFFFF?text=Recipe+Reel',
+    thumbnailUrl: 'https://placehold.co/360x640.png',
     dataAiHint: 'smoothie recipe',
     category: 'Nutrition',
     likes: 980,
-    uploader: 'SwasthRecipes',
+    uploader: 'SwasthRecipesIndia',
     uploaderAvatar: 'https://placehold.co/50x50.png'
   },
   {
     id: 'r4',
-    title: 'Mindfulness Meditation Guide',
-    videoUrl: 'https://placehold.co/1080x1920.mp4/000000/FFFFFF?text=Meditation+Reel',
-    thumbnailUrl: 'https://placehold.co/300x500.png',
+    title: 'Mindfulness Meditation: 3 Minute Guide',
+    videoUrl: 'https://placehold.co/1080x1920.mp4/1E1E1E/FFFFFF?text=Meditation+Reel',
+    thumbnailUrl: 'https://placehold.co/360x640.png',
     dataAiHint: 'meditation wellness',
     category: 'Mental Wellness',
-    likes: 1800,
-    uploader: 'ShaantMann',
+    likes: 1802,
+    uploader: 'ShaantMannWellness',
+    uploaderAvatar: 'https://placehold.co/50x50.png'
+  },
+    {
+    id: 'r5',
+    title: 'Stretching Routine for Desk Workers',
+    videoUrl: 'https://placehold.co/1080x1920.mp4/1E1E1E/FFFFFF?text=Stretching+Reel',
+    thumbnailUrl: 'https://placehold.co/360x640.png',
+    dataAiHint: 'office stretches',
+    category: 'Fitness',
+    likes: 750,
+    uploader: 'ActiveOffice',
     uploaderAvatar: 'https://placehold.co/50x50.png'
   },
 ];
@@ -378,4 +389,3 @@ export const mockTabletReminders: TabletReminder[] = [
   { id: 'rem2', medicineName: 'Metformin 500mg', time: '08:00 PM', days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], isActive: true },
   { id: 'rem3', medicineName: 'Vitamin D', time: '10:00 AM', days: ['Mon', 'Wed', 'Fri'], isActive: false },
 ];
-
