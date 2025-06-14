@@ -1,3 +1,4 @@
+
 'use client';
 
 import AppLayout from '@/components/layout/app-layout';
@@ -6,7 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { mockDoctors, Doctor, mockHealthCheckupPacks, HealthCheckupPack } from '@/lib/mock-data';
-import { CalendarDays, UserCircle, MapPinIcon, StarIcon, CheckCircle, DollarSign, Filter, Search } from 'lucide-react';
+import { CalendarDays, UserCircle, MapPinIcon, StarIcon, CheckCircle, Filter, Search } from 'lucide-react'; 
 import React, { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
 import { Calendar } from "@/components/ui/calendar";
@@ -185,7 +186,7 @@ export default function AppointmentsPage() {
                   </CardHeader>
                   <CardContent className="flex-grow">
                     <div className="flex items-center text-lg font-semibold text-primary mb-2">
-                      <DollarSign className="mr-1 h-5 w-5" /> {pack.price.toFixed(2)}
+                      <span className="mr-1 text-lg font-semibold">₹</span>{pack.price.toFixed(2)}
                     </div>
                     <h4 className="font-medium text-sm mb-1">Tests Included:</h4>
                     <ul className="list-disc list-inside text-xs text-muted-foreground space-y-0.5">
@@ -206,3 +207,4 @@ export default function AppointmentsPage() {
     </AppLayout>
   );
 }
+

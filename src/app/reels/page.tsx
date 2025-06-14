@@ -1,10 +1,11 @@
+
 'use client';
 
 import AppLayout from '@/components/layout/app-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { mockHealthReels, HealthReel } from '@/lib/mock-data';
-import { PlaySquare, Heart, Bookmark, Share2, ThumbsUp, Eye } from 'lucide-react';
+import { PlaySquare, Heart, Bookmark, Share2, Eye } from 'lucide-react';
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -88,7 +89,7 @@ const ReelCard: React.FC<{ reel: HealthReel; isVisible: boolean }> = ({ reel, is
       </CardFooter>
        <div className="absolute bottom-4 left-4 z-10 text-white text-sm">
           <p className="font-semibold">{reel.uploader}</p>
-          <p className="text-xs flex items-center"><Eye className="w-3 h-3 mr-1"/>{reel.likes} views</p>
+          <p className="text-xs flex items-center"><Eye className="w-4 h-4 mr-1"/>{reel.likes} views</p>
         </div>
     </Card>
   );
@@ -119,12 +120,13 @@ export default function HealthReelsPage() {
       { threshold: 0.7 } // 70% of the item must be visible
     );
 
-    reelRefs.current.forEach(reel => {
+    const currentRefs = reelRefs.current;
+    currentRefs.forEach(reel => {
       if (reel) observer.current?.observe(reel);
     });
 
     return () => {
-      reelRefs.current.forEach(reel => {
+      currentRefs.forEach(reel => {
         if (reel) observer.current?.unobserve(reel);
       });
     };
@@ -188,3 +190,4 @@ export default function HealthReelsPage() {
     </AppLayout>
   );
 }
+

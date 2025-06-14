@@ -1,7 +1,9 @@
+
 export interface Medicine {
   id: string;
   name: string;
   imageUrl: string;
+  dataAiHint?: string;
   useCase: string;
   description: string;
   dosage: string;
@@ -70,41 +72,42 @@ export interface Hospital {
   lng: number;
   services: string[];
   imageUrl: string;
+  dataAiHint?: string;
 }
 
 export const mockHospitals: Hospital[] = [
   {
     id: 'h1',
-    name: 'City General Hospital',
-    address: '123 Main St, Anytown, USA',
-    contact: '(555) 123-4567',
-    lat: 34.0522,
-    lng: -118.2437,
-    services: ['Emergency', 'Cardiology', 'Oncology', 'Pediatrics'],
+    name: 'Manipal Hospital, Old Airport Road',
+    address: '98, HAL Old Airport Rd, Kodihalli, Bengaluru, Karnataka 560017, India',
+    contact: '+91 80 2502 3636',
+    lat: 12.9605, 
+    lng: 77.6623, 
+    services: ['Emergency', 'Cardiology', 'Oncology', 'Pediatrics', 'Multi-specialty'],
     imageUrl: 'https://placehold.co/400x300.png',
-    dataAiHint: 'hospital building',
+    dataAiHint: 'hospital building bangalore',
   },
   {
     id: 'h2',
-    name: 'Suburb Community Clinic',
-    address: '456 Oak Ave, Suburbia, USA',
-    contact: '(555) 987-6543',
-    lat: 34.0722,
-    lng: -118.2637,
-    services: ['General Practice', 'Vaccinations', 'Minor Injuries'],
+    name: 'Fortis Hospital, Bannerghatta Road',
+    address: '154/9, Bannerghatta Main Rd, Opposite IIM-B, Sahyadri Layout, Panduranga Nagar, Bengaluru, Karnataka 560076, India',
+    contact: '+91 80 6621 4444',
+    lat: 12.8904, 
+    lng: 77.5971, 
+    services: ['General Practice', 'Orthopedics', 'Neurology', 'Urology'],
     imageUrl: 'https://placehold.co/400x300.png',
-    dataAiHint: 'clinic building',
+    dataAiHint: 'clinic building modern',
   },
   {
     id: 'h3',
-    name: 'Metro Health Center',
-    address: '789 Pine Rd, Metropolis, USA',
-    contact: '(555) 234-5678',
-    lat: 34.0322,
-    lng: -118.2037,
-    services: ['Specialist Consultations', 'Diagnostics', 'Physiotherapy'],
+    name: 'Apollo Gleneagles Hospitals, Kolkata',
+    address: '58, Canal Circular Rd, Kadapara, Phool Bagan, Kankurgachi, Kolkata, West Bengal 700054, India',
+    contact: '+91 33 2320 3040',
+    lat: 22.5700, 
+    lng: 88.3948, 
+    services: ['Specialist Consultations', 'Diagnostics', 'Physiotherapy', 'Cardiac Sciences'],
     imageUrl: 'https://placehold.co/400x300.png',
-    dataAiHint: 'health center',
+    dataAiHint: 'health center kolkata',
   },
 ];
 
@@ -114,49 +117,50 @@ export interface Doctor {
   specialty: string;
   location: string;
   rating: number;
-  availability: Record<string, string[]>; // Date -> array of time slots
+  availability: Record<string, string[]>; 
   imageUrl: string;
+  dataAiHint?: string;
 }
 
 export const mockDoctors: Doctor[] = [
   {
     id: 'd1',
-    name: 'Dr. Alice Smith',
+    name: 'Dr. Priya Sharma',
     specialty: 'Cardiology',
-    location: 'City General Hospital',
+    location: 'Manipal Hospital, Bangalore',
     rating: 4.8,
     availability: {
       '2024-08-15': ['09:00 AM', '10:00 AM', '02:00 PM'],
       '2024-08-16': ['11:00 AM', '03:00 PM'],
     },
     imageUrl: 'https://placehold.co/150x150.png',
-    dataAiHint: 'doctor profile',
+    dataAiHint: 'indian doctor female',
   },
   {
     id: 'd2',
-    name: 'Dr. Bob Johnson',
+    name: 'Dr. Rahul Verma',
     specialty: 'Pediatrics',
-    location: 'Suburb Community Clinic',
+    location: 'Fortis Hospital, Bangalore',
     rating: 4.5,
     availability: {
       '2024-08-15': ['09:30 AM', '11:30 AM'],
       '2024-08-17': ['01:00 PM', '04:00 PM'],
     },
     imageUrl: 'https://placehold.co/150x150.png',
-    dataAiHint: 'pediatrician profile',
+    dataAiHint: 'indian doctor male',
   },
   {
     id: 'd3',
-    name: 'Dr. Carol Williams',
+    name: 'Dr. Anjali Bose',
     specialty: 'Dermatology',
-    location: 'Metro Health Center',
+    location: 'Apollo Gleneagles, Kolkata',
     rating: 4.9,
     availability: {
       '2024-08-16': ['10:00 AM', '12:00 PM', '02:30 PM'],
       '2024-08-18': ['09:00 AM', '04:30 PM'],
     },
     imageUrl: 'https://placehold.co/150x150.png',
-    dataAiHint: 'dermatologist profile',
+    dataAiHint: 'dermatologist indian',
   },
 ];
 
@@ -167,6 +171,7 @@ export interface HealthCheckupPack {
   price: number;
   testsIncluded: string[];
   imageUrl: string;
+  dataAiHint?: string;
 }
 
 export const mockHealthCheckupPacks: HealthCheckupPack[] = [
@@ -174,27 +179,28 @@ export const mockHealthCheckupPacks: HealthCheckupPack[] = [
     id: 'p1',
     name: 'Basic Health Check',
     description: 'A fundamental package covering essential health markers.',
-    price: 499,
+    price: 1499,
     testsIncluded: ['Complete Blood Count (CBC)', 'Fasting Blood Sugar', 'Lipid Profile', 'Kidney Function Test'],
     imageUrl: 'https://placehold.co/300x200.png',
-    dataAiHint: 'health checkup',
+    dataAiHint: 'health checkup india',
   },
   {
     id: 'p2',
     name: 'Comprehensive Wellness Pack',
     description: 'An extensive check-up for a thorough health assessment.',
-    price: 1299,
+    price: 3999,
     testsIncluded: ['Basic Health Check tests', 'Liver Function Test', 'Thyroid Profile', 'Vitamin D & B12', 'Urine Analysis'],
     imageUrl: 'https://placehold.co/300x200.png',
-    dataAiHint: 'wellness package',
+    dataAiHint: 'wellness package offer',
   },
 ];
 
 export interface HealthReel {
   id: string;
   title: string;
-  videoUrl: string; // placeholder, actual video URLs would be used
+  videoUrl: string; 
   thumbnailUrl: string;
+  dataAiHint?: string;
   category: 'Fitness' | 'Nutrition' | 'Mental Wellness' | 'Yoga';
   likes: number;
   uploader: string;
@@ -210,7 +216,7 @@ export const mockHealthReels: HealthReel[] = [
     dataAiHint: 'yoga fitness',
     category: 'Yoga',
     likes: 1200,
-    uploader: 'YogaWithAdriene',
+    uploader: 'YogaWithDivya',
     uploaderAvatar: 'https://placehold.co/50x50.png'
   },
   {
@@ -221,7 +227,7 @@ export const mockHealthReels: HealthReel[] = [
     dataAiHint: 'workout exercise',
     category: 'Fitness',
     likes: 2500,
-    uploader: 'FitnessBlender',
+    uploader: 'FitBharat',
     uploaderAvatar: 'https://placehold.co/50x50.png'
   },
   {
@@ -232,7 +238,7 @@ export const mockHealthReels: HealthReel[] = [
     dataAiHint: 'smoothie recipe',
     category: 'Nutrition',
     likes: 980,
-    uploader: 'HealthyEats',
+    uploader: 'SwasthRecipes',
     uploaderAvatar: 'https://placehold.co/50x50.png'
   },
   {
@@ -243,7 +249,7 @@ export const mockHealthReels: HealthReel[] = [
     dataAiHint: 'meditation wellness',
     category: 'Mental Wellness',
     likes: 1800,
-    uploader: 'CalmMind',
+    uploader: 'ShaantMann',
     uploaderAvatar: 'https://placehold.co/50x50.png'
   },
 ];
@@ -256,10 +262,10 @@ export interface EmergencyContact {
 }
 
 export const mockEmergencyContacts: EmergencyContact[] = [
-  { id: 'ec1', name: 'National Ambulance', number: '102', type: 'Ambulance' },
-  { id: 'ec2', name: 'National Police', number: '100', type: 'Police' },
-  { id: 'ec3', name: 'National Fire Service', number: '101', type: 'Fire' },
-  { id: 'ec4', name: 'General Emergency Helpline', number: '112', type: 'General Emergency' },
+  { id: 'ec1', name: 'Medical Emergency / Ambulance', number: '102', type: 'Ambulance' },
+  { id: 'ec2', name: 'Police Control Room', number: '100', type: 'Police' },
+  { id: 'ec3', name: 'Fire Control Room', number: '101', type: 'Fire' },
+  { id: 'ec4', name: 'National Emergency Helpline', number: '112', type: 'General Emergency' },
 ];
 
 export interface FirstAidGuide {
@@ -267,6 +273,7 @@ export interface FirstAidGuide {
   title: string;
   videoUrl?: string;
   imageUrl?: string;
+  dataAiHint?: string;
   steps: string[];
   category: 'Common Injuries' | 'Life Support' | 'Poisoning';
 }
@@ -280,9 +287,9 @@ export const mockFirstAidGuides: FirstAidGuide[] = [
     dataAiHint: 'cpr firstaid',
     steps: [
       'Check for responsiveness. Shout "Are you OK?" and gently shake the person\'s shoulder.',
-      'Call for emergency help (e.g., 102 or local emergency number).',
-      'Begin chest compressions: Place the heel of one hand in the center of the chest. Place your other hand on top. Push hard and fast (100-120 compressions per minute), about 2 inches deep.',
-      'If trained, give rescue breaths: Tilt head, lift chin, pinch nose. Give 2 breaths, each lasting 1 second.',
+      'Call for emergency help (e.g., 102 or your local emergency number).',
+      'Begin chest compressions: Place the heel of one hand in the center of the chest. Place your other hand on top. Push hard and fast (100-120 compressions per minute), about 2 inches (5 cm) deep.',
+      'If trained, give rescue breaths: Tilt head, lift chin, pinch nose. Give 2 breaths, each lasting 1 second, ensuring the chest rises.',
       'Continue 30 compressions and 2 breaths until help arrives or the person starts breathing.'
     ],
     category: 'Life Support',
@@ -293,11 +300,11 @@ export const mockFirstAidGuides: FirstAidGuide[] = [
     imageUrl: 'https://placehold.co/400x225.png',
     dataAiHint: 'burn treatment',
     steps: [
-      'Cool the burn. Hold under cool (not cold) running water for 10-15 minutes.',
-      'Remove rings or other tight items from the burned area.',
-      'Do not break blisters. If a blister breaks, clean the area with mild soap and water.',
-      'Apply an antibiotic ointment and cover with a sterile bandage.',
-      'Consider a pain reliever like ibuprofen or paracetamol.'
+      'Cool the burn. Hold under cool (not cold) running water for 10-15 minutes or until pain subsides.',
+      'Remove rings or other tight items from the burned area gently and quickly, before the area swells.',
+      'Do not break blisters. If a blister breaks, clean the area with mild soap and water, and apply an antibiotic ointment.',
+      'Apply an antibiotic ointment and cover with a sterile non-stick bandage or clean cloth.',
+      'Consider a pain reliever like ibuprofen or paracetamol if needed.'
     ],
     category: 'Common Injuries',
   },
@@ -310,12 +317,13 @@ export interface Prescription {
   frequency: string;
   doctorName: string;
   dateIssued: string;
-  imageUrl?: string; // Optional image of the prescription
+  imageUrl?: string; 
+  dataAiHint?: string;
 }
 
 export const mockPrescriptions: Prescription[] = [
-  { id: 'pres1', medicineName: 'Metformin 500mg', dosage: '1 tablet', frequency: 'Twice daily', doctorName: 'Dr. Davis', dateIssued: '2024-07-01', imageUrl: 'https://placehold.co/300x400.png', dataAiHint: 'prescription document' },
-  { id: 'pres2', medicineName: 'Atorvastatin 20mg', dosage: '1 tablet', frequency: 'Once daily at night', doctorName: 'Dr. Evans', dateIssued: '2024-06-15' },
+  { id: 'pres1', medicineName: 'Metformin 500mg', dosage: '1 tablet', frequency: 'Twice daily', doctorName: 'Dr. Alok Gupta', dateIssued: '2024-07-01', imageUrl: 'https://placehold.co/300x400.png', dataAiHint: 'prescription document' },
+  { id: 'pres2', medicineName: 'Atorvastatin 20mg', dosage: '1 tablet', frequency: 'Once daily at night', doctorName: 'Dr. Sunita Reddy', dateIssued: '2024-06-15' },
 ];
 
 export interface TestResult {
@@ -323,8 +331,9 @@ export interface TestResult {
   testName: string;
   dateTaken: string;
   resultSummary: string;
-  reportUrl?: string; // Link to full PDF report
-  imageUrl?: string; // Optional image of the result
+  reportUrl?: string; 
+  imageUrl?: string; 
+  dataAiHint?: string;
 }
 
 export const mockTestResults: TestResult[] = [
@@ -335,7 +344,7 @@ export const mockTestResults: TestResult[] = [
 export interface TabletReminder {
   id: string;
   medicineName: string;
-  time: string; // e.g., "08:00 AM"
+  time: string; 
   days: ('Mon' | 'Tue' | 'Wed' | 'Thu' | 'Fri' | 'Sat' | 'Sun')[];
   isActive: boolean;
 }
