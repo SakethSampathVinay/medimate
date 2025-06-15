@@ -23,14 +23,14 @@ export type AnalyzeMedicalImageInput = z.infer<typeof AnalyzeMedicalImageInputSc
 
 const AnalyzeMedicalImageOutputSchema = z.object({
   imageInterpretation: z.string().describe('A general interpretation of the provided medical image. Focus on observable features without diagnosing.'),
-  possibleConditions: z.array(z.string()).describe('A list of possible, general health conditions that might relate to the image findings. This is not a diagnosis.'),
-  commonCausesForFindings: z.array(z.string()).describe('Common causes or factors that could lead to the observed image features.'),
+  possibleConditions: z.array(z.string()).describe('A concise list of only 2-3 of the most common or relevant general health conditions that might relate to the image findings. This is not a diagnosis.'),
+  commonCausesForFindings: z.array(z.string()).describe('A concise list of only 2-3 of the most common causes or factors that could lead to the observed image features.'),
   simpleHomeRemedies: z.array(z.string()).describe('Simple, general home care advice. State "Not applicable based on image analysis alone" or if professional advice is needed.'),
   otcMedicationSuggestions: z.array(z.object({
     medication: z.string().describe("General type of over-the-counter medication (e.g., 'Antiseptic wipe'). State 'Not applicable based on image analysis alone' if so. Do not suggest specific brand names."),
     usageCautions: z.string().describe('Important cautions for using this type of OTC medication.')
   })).describe('Suggestions for general types of over-the-counter medications. State "Not applicable based on image analysis alone" or if professional advice is needed before taking any medication.'),
-  warningSignsBasedOnImage: z.array(z.string()).describe('Warning signs or red flags evident from the image or description that indicate the user should seek emergency medical attention.'),
+  warningSignsBasedOnImage: z.array(z.string()).describe('A concise list of only 2-3 key warning signs or red flags evident from the image or description that indicate the user should seek emergency medical attention.'),
   doctorConsultationRecommendation: z.string().describe('A clear recommendation on whether a doctor should be consulted based on the image (e.g., "Consult a doctor for proper evaluation of these findings.", "Seek medical review to discuss this image.").'),
   specialistReferral: z.string().optional().describe('Optionally, the type of medical specialist to consider seeing (e.g., "Radiologist for further image review", "Dermatologist if skin related").')
 });
@@ -54,11 +54,11 @@ Image: {{media url=photoDataUri}}
 
 Your information should cover:
 - imageInterpretation: General interpretation of observable features from the image. This is not a diagnosis.
-- possibleConditions: General health conditions related to image findings. This is not a diagnosis.
-- commonCausesForFindings: Common factors that could lead to the observed image features.
+- possibleConditions: A concise list of only 2-3 of the most common or relevant general health conditions related to image findings. This is not a diagnosis.
+- commonCausesForFindings: A concise list of only 2-3 of the most common factors that could lead to the observed image features.
 - simpleHomeRemedies: General home care advice. State "Not applicable based on image analysis alone" or if professional advice is needed.
 - otcMedicationSuggestions: General types of OTC medications (e.g., 'Antiseptic wipe') with crucial usage cautions. Do not suggest specific brand names. State "Not applicable based on image analysis alone" or if professional advice is needed.
-- warningSignsBasedOnImage: Red flags from the image/description requiring emergency attention.
+- warningSignsBasedOnImage: A concise list of only 2-3 key red flags from the image/description requiring emergency attention.
 - doctorConsultationRecommendation: Clear advice on consulting a doctor. If the image is unclear, or suggests a vague, chronic, life-threatening, or complex condition, state that this situation is beyond your scope as a virtual assistant and strongly recommend doctor consultation, explaining why. In such cases, for fields like home remedies or OTC, you may state "Requires professional medical evaluation."
 - specialistReferral (optional): Type of specialist if applicable.
 
