@@ -18,13 +18,16 @@ const AnalyzeSymptomsInputSchema = z.object({
 export type AnalyzeSymptomsInput = z.infer<typeof AnalyzeSymptomsInputSchema>;
 
 const AnalyzeSymptomsOutputSchema = z.object({
-  possibleConditions: z.array(z.string()).describe('A list of possible medical conditions that could be causing the symptoms.'),
-  nextSteps: z.array(z.string()).describe('Recommended next steps for the user to take, such as consulting a doctor or getting specific tests.'),
-  confidenceLevel: z
-    .number()
-    .min(0)
-    .max(1)
-    .describe('A number between 0 and 1 indicating the confidence level of the analysis.'),
+  possibleConditions: z.array(z.string()).describe('A list of possible, general health conditions based on the symptoms. This is not a diagnosis.'),
+  commonCauses: z.array(z.string()).describe('Common causes or factors related to the described symptoms.'),
+  simpleHomeRemedies: z.array(z.string()).describe('Simple, general home care advice or remedies that might help alleviate discomfort. State if not applicable or if symptoms warrant professional advice instead.'),
+  otcMedicationSuggestions: z.array(z.object({
+    medication: z.string().describe("General type of over-the-counter medication (e.g., 'Antacid', 'Pain reliever'). Do not suggest specific brand names."),
+    usageCautions: z.string().describe('Important cautions for using this type of OTC medication (e.g., "Follow package instructions", "Do not exceed recommended dosage", "Consult pharmacist if you have other conditions or take other medications."_')
+  })).describe('Suggestions for general types of over-the-counter medications, including usage cautions. State if not applicable or if professional advice is needed before taking any medication.'),
+  warningSigns: z.array(z.string()).describe('Warning signs or red flags that indicate the user should seek emergency medical attention.'),
+  doctorConsultationRecommendation: z.string().describe('A clear recommendation on whether a doctor should be consulted (e.g., "Consult a doctor for proper diagnosis and treatment.", "Monitor symptoms; consult a doctor if they worsen or persist.", "Emergency medical attention is advised if warning signs are present.").'),
+  specialistReferral: z.string().optional().describe('Optionally, the type of medical specialist to consider seeing (e.g., "General Practitioner", "Dermatologist", "Gastroenterologist").')
 });
 export type AnalyzeSymptomsOutput = z.infer<typeof AnalyzeSymptomsOutputSchema>;
 
@@ -36,11 +39,22 @@ const prompt = ai.definePrompt({
   name: 'analyzeSymptomsPrompt',
   input: {schema: AnalyzeSymptomsInputSchema},
   output: {schema: AnalyzeSymptomsOutputSchema},
-  prompt: `You are an AI health assistant. A user will describe their symptoms, and you will provide a preliminary analysis.
+  prompt: `You are MediMate AI, a virtual medical assistant trained to provide structured, general health information and not medical diagnoses.
+Your responses must help populate the structured output fields as defined.
+Based on the user's symptoms: {{{symptoms}}}, provide information for each field.
 
-  Based on the symptoms, suggest possible medical conditions (possibleConditions) that could be the cause. Also, suggest recommended next steps (nextSteps) for the user, such as consulting a doctor or getting specific tests.  Include a confidenceLevel representing the likelihood of your assessment being correct.  The lower the level, the more uncertain the assessment is.
+Your information should cover:
+- possibleConditions: General health conditions related to the symptoms. This is not a diagnosis.
+- commonCauses: Common factors for these symptoms.
+- simpleHomeRemedies: General home care advice. State if not applicable or if symptoms warrant professional advice instead.
+- otcMedicationSuggestions: General types of OTC medications (e.g., 'Antacid', 'Pain reliever') with crucial usage cautions. Do not suggest specific brand names. State if not applicable or professional advice is needed.
+- warningSigns: Red flags requiring emergency attention.
+- doctorConsultationRecommendation: Clear advice on consulting a doctor. If symptoms are vague, chronic, life-threatening, or complex, state that this situation is beyond your scope as a virtual assistant and strongly recommend doctor consultation, explaining why. In such cases, for fields like home remedies or OTC, you may state "Requires professional medical evaluation."
+- specialistReferral (optional): Type of specialist if applicable.
 
-  Symptoms: {{{symptoms}}}`,
+Never guess or make bold claims. Maintain a friendly, helpful, concise, safe, and educational tone.
+It is crucial to remember that your advice is not a substitute for professional medical care.
+`,
 });
 
 const analyzeSymptomsFlow = ai.defineFlow(
