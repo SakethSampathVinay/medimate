@@ -1,17 +1,17 @@
 
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import TopbarNav, { MobileNav } from './topbar-nav';
 import Link from 'next/link';
-import { Stethoscope, LogOut, Settings, UserCircle, PanelLeft, LogIn, ShoppingCart } from 'lucide-react'; // Added ShoppingCart
+import { Stethoscope, LogOut, Settings, UserCircle, PanelLeft, LogIn, ShoppingCart } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useAuth } from '@/contexts/AuthContext'; 
-import { useCart } from '@/contexts/CartContext'; // Added useCart
-import { Badge } from '@/components/ui/badge'; // Added Badge
+import { useCart } from '@/contexts/CartContext';
+import { Badge } from '@/components/ui/badge';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -62,12 +62,17 @@ export default function AppLayout({ children }: AppLayoutProps) {
 function CartButton() {
   const { getTotalItems } = useCart();
   const totalItems = getTotalItems();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   return (
     <Button variant="ghost" size="icon" asChild className="relative flex-shrink-0">
       <Link href="/profile/cart">
         <ShoppingCart className="h-5 w-5" />
-        {totalItems > 0 && (
+        {isMounted && totalItems > 0 && (
           <Badge 
             variant="destructive" 
             className="absolute -top-1 -right-1 h-5 w-5 min-w-[1.25rem] p-0 flex items-center justify-center rounded-full text-xs"
@@ -163,3 +168,4 @@ function UserMenu() {
     </DropdownMenu>
   );
 }
+
