@@ -23,7 +23,6 @@ const DoctorIcon = UserCircle;
 export default function AppointmentsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSpecialty, setSelectedSpecialty] = useState<string>('All');
-  const [selectedLocation, setSelectedLocation] = useState<string>('All');
   
   const [selectedDoctorForModal, setSelectedDoctorForModal] = useState<Doctor | null>(null);
   const [isTimeSlotModalOpen, setIsTimeSlotModalOpen] = useState(false);
@@ -33,19 +32,13 @@ export default function AppointmentsPage() {
   const { toast } = useToast();
 
   const specialties = useMemo(() => ['All', ...new Set(mockDoctors.map(doc => doc.specialty))], []);
-  const locations = useMemo(() => {
-    const allLocations = mockDoctors.map(doc => doc.location.split(',').pop()?.trim() || doc.location);
-    return ['All', ...new Set(allLocations.filter(Boolean))]; // Filter out any undefined/empty strings
-  }, []);
-
 
   const filteredDoctors = useMemo(() => {
     return mockDoctors.filter(doctor =>
       (doctor.name.toLowerCase().includes(searchTerm.toLowerCase())) &&
-      (selectedSpecialty === 'All' || doctor.specialty === selectedSpecialty) &&
-      (selectedLocation === 'All' || (doctor.location.split(',').pop()?.trim() || doctor.location).toLowerCase() === selectedLocation.toLowerCase())
+      (selectedSpecialty === 'All' || doctor.specialty === selectedSpecialty)
     );
-  }, [searchTerm, selectedSpecialty, selectedLocation]);
+  }, [searchTerm, selectedSpecialty]);
 
   const handleViewProfileBook = (doctor: Doctor) => {
     setSelectedDoctorForModal(doctor);
@@ -114,7 +107,7 @@ export default function AppointmentsPage() {
                 <Filter className="mr-2 h-5 w-5" /> Filter Doctors
               </CardTitle>
             </CardHeader>
-            <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input
@@ -128,10 +121,6 @@ export default function AppointmentsPage() {
               <Select value={selectedSpecialty} onValueChange={setSelectedSpecialty}>
                 <SelectTrigger><SelectValue placeholder="Specialty" /></SelectTrigger>
                 <SelectContent>{specialties.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
-              </Select>
-              <Select value={selectedLocation} onValueChange={setSelectedLocation}>
-                <SelectTrigger><SelectValue placeholder="Location" /></SelectTrigger>
-                <SelectContent>{locations.map(l => <SelectItem key={l} value={l}>{l}</SelectItem>)}</SelectContent>
               </Select>
             </CardContent>
           </Card>
