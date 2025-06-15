@@ -8,7 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { analyzeMedicalImage, AnalyzeMedicalImageOutput } from '@/ai/flows/analyze-medical-image';
 import { analyzeSymptoms, AnalyzeSymptomsOutput } from '@/ai/flows/analyze-symptoms';
-import { Bot, ImageIcon, Send, User, AlertTriangle, CheckCircle, Loader2, Info, Sparkles, ShieldAlert, PillIcon, Stethoscope, HelpCircle } from 'lucide-react';
+import { translateText, TranslateTextOutput } from '@/ai/flows/translate-text'; 
+import { Bot, ImageIcon, Send, User, AlertTriangle, CheckCircle, Loader2, Info, Sparkles, ShieldAlert, PillIcon, Stethoscope, HelpCircle, Languages } from 'lucide-react';
 import React, { useState, useRef, ChangeEvent } from 'react';
 import { useToast } from "@/hooks/use-toast";
 import Image from 'next/image';
@@ -18,6 +19,7 @@ interface Message {
   type: 'user' | 'ai' | 'error';
   content: string | React.ReactNode;
   imagePreview?: string;
+  aiData?: AnalyzeMedicalImageOutput | AnalyzeSymptomsOutput; // To hold raw AI data for translation
 }
 
 export default function HealthAnalysisPage() {
@@ -78,10 +80,20 @@ export default function HealthAnalysisPage() {
           photoDataUri,
           description: userMessageContent || 'Analyze this medical image.',
         });
-        setMessages(prev => [...prev, { id: Date.now().toString() + '-ai', type: 'ai', content: <AIImageAnalysisResponse data={result} /> }]);
+        setMessages(prev => [...prev, { 
+            id: Date.now().toString() + '-ai', 
+            type: 'ai', 
+            content: <AIImageAnalysisResponse data={result} />,
+            aiData: result 
+        }]);
       } else if (userMessageContent) {
         const result = await analyzeSymptoms({ symptoms: userMessageContent });
-        setMessages(prev => [...prev, { id: Date.now().toString() + '-ai', type: 'ai', content: <AISymptomAnalysisResponse data={result} /> }]);
+        setMessages(prev => [...prev, { 
+            id: Date.now().toString() + '-ai', 
+            type: 'ai', 
+            content: <AISymptomAnalysisResponse data={result} />,
+            aiData: result
+        }]);
       }
     } catch (error) {
       console.error("AI Analysis Error:", error);
@@ -131,6 +143,9 @@ export default function HealthAnalysisPage() {
                 {typeof msg.content === 'string' ? <p className="text-sm whitespace-pre-wrap">{msg.content}</p> : msg.content}
                 {msg.imagePreview && (
                   <Image src={msg.imagePreview} alt="Uploaded preview" width={200} height={200} className="mt-2 rounded-md max-w-xs" />
+                )}
+                 {msg.type === 'ai' && msg.aiData && (
+                  <TranslationSection aiData={msg.aiData} />
                 )}
               </div>
             </div>
@@ -310,5 +325,81 @@ const AISymptomAnalysisResponse: React.FC<{ data: AnalyzeSymptomsOutput }> = ({ 
   </div>
 );
 
+const TranslationSection: React.FC<{ aiData: AnalyzeMedicalImageOutput | AnalyzeSymptomsOutput }> = ({ aiData }) => {
+  const [translatedContent, setTranslatedContent] = useState<string | null>(null);
+  const [isTranslating, setIsTranslating] = useState(false);
+  const [targetLang, setTargetLang] = useState<'Hindi' | 'Telugu' | null>(null);
+  const { toast } = useToast();
 
-    
+  const extractTextForTranslation = (data: any): string => {
+    let text = "";
+    if (data.imageInterpretation) text += `Image Interpretation: ${data.imageInterpretation}\n\n`;
+    if (data.possibleConditions && data.possibleConditions.length > 0) text += `Possible Conditions: ${data.possibleConditions.join(', ')}\n\n`;
+    if (data.commonCausesForFindings && data.commonCausesForFindings.length > 0) text += `Common Causes for Findings: ${data.commonCausesForFindings.join(', ')}\n\n`;
+    if (data.commonCauses && data.commonCauses.length > 0) text += `Common Causes: ${data.commonCauses.join(', ')}\n\n`;
+    if (data.simpleHomeRemedies && data.simpleHomeRemedies.length > 0) text += `Simple Home Remedies: ${data.simpleHomeRemedies.join(', ')}\n\n`;
+    if (data.otcMedicationSuggestions && data.otcMedicationSuggestions.length > 0) {
+      text += `Over-the-Counter Suggestions:\n${data.otcMedicationSuggestions.map((s:any) => `- ${s.medication}: ${s.usageCautions}`).join('\n')}\n\n`;
+    }
+    if (data.warningSignsBasedOnImage && data.warningSignsBasedOnImage.length > 0) text += `Warning Signs (from image): ${data.warningSignsBasedOnImage.join(', ')}\n\n`;
+    if (data.warningSigns && data.warningSigns.length > 0) text += `Warning Signs: ${data.warningSigns.join(', ')}\n\n`;
+    if (data.doctorConsultationRecommendation) text += `Doctor Consultation Recommendation: ${data.doctorConsultationRecommendation}\n\n`;
+    if (data.specialistReferral) text += `Specialist Referral Suggestion: ${data.specialistReferral}\n\n`;
+    return text.trim();
+  };
+
+  const handleTranslate = async (language: 'Hindi' | 'Telugu') => {
+    setIsTranslating(true);
+    setTargetLang(language);
+    setTranslatedContent(null); 
+    const textToTranslate = extractTextForTranslation(aiData);
+
+    if (!textToTranslate) {
+      toast({ title: "Nothing to translate", description: "No text content found in the AI response.", variant: "default" });
+      setIsTranslating(false);
+      return;
+    }
+
+    try {
+      const result: TranslateTextOutput = await translateText({ textToTranslate, targetLanguage: language });
+      setTranslatedContent(result.translatedText);
+    } catch (error) {
+      console.error(`Translation to ${language} failed:`, error);
+      toast({
+        title: `Translation to ${language} Failed`,
+        description: error instanceof Error ? error.message : "An unknown error occurred.",
+        variant: "destructive",
+      });
+      setTranslatedContent(`Failed to translate to ${language}.`);
+    } finally {
+      setIsTranslating(false);
+    }
+  };
+
+  return (
+    <div className="mt-3 pt-3 border-t">
+      <div className="flex items-center gap-2 mb-2">
+         <Languages className="h-4 w-4 text-muted-foreground" />
+        <Button variant="outline" size="sm" onClick={() => handleTranslate('Hindi')} disabled={isTranslating && targetLang === 'Hindi'}>
+          {isTranslating && targetLang === 'Hindi' ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
+          Translate to Hindi
+        </Button>
+        <Button variant="outline" size="sm" onClick={() => handleTranslate('Telugu')} disabled={isTranslating && targetLang === 'Telugu'}>
+          {isTranslating && targetLang === 'Telugu' ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
+          Translate to Telugu
+        </Button>
+      </div>
+      {isTranslating && <p className="text-xs text-muted-foreground">Translating to {targetLang}...</p>}
+      {translatedContent && !isTranslating && (
+        <Card className="mt-2 bg-muted/50">
+          <CardHeader className="pb-2 pt-3">
+            <CardTitle className="text-sm font-semibold">Translation ({targetLang})</CardTitle>
+          </CardHeader>
+          <CardContent className="text-xs whitespace-pre-wrap">
+            {translatedContent}
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+};
