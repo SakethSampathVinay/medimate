@@ -37,19 +37,18 @@ export default function HealthAnalysisPage() {
 
     if (!SpeechRecognitionAPI) {
       console.warn("Speech Recognition API not supported by this browser.");
-      // speechRecognitionRef remains null, button will show error on click or be disabled
       return;
     }
 
     const recognitionInstance = new SpeechRecognitionAPI();
-    recognitionInstance.continuous = false; // Process speech once then stop
-    recognitionInstance.interimResults = false; // We only want final results
-    recognitionInstance.lang = 'en-US'; // Default language
+    recognitionInstance.continuous = false; 
+    recognitionInstance.interimResults = false; 
+    recognitionInstance.lang = 'hi-IN'; // Changed to Hindi
 
     recognitionInstance.onresult = (event) => {
       const transcript = event.results[0][0].transcript;
-      setInputText(prev => prev ? prev.trim() + ' ' + transcript : transcript); // Append transcript
-      setIsListening(false); // Stop listening after getting a result
+      setInputText(prev => prev ? prev.trim() + ' ' + transcript : transcript); 
+      setIsListening(false); 
     };
 
     recognitionInstance.onerror = (event) => {
@@ -67,18 +66,17 @@ export default function HealthAnalysisPage() {
     };
 
     recognitionInstance.onend = () => {
-      setIsListening(false); // Ensure listening state is reset
+      setIsListening(false); 
     };
 
     speechRecognitionRef.current = recognitionInstance;
 
     return () => {
-      // Cleanup: stop recognition if component unmounts while listening
       if (speechRecognitionRef.current) {
         speechRecognitionRef.current.stop();
       }
     };
-  }, [toast]); // toast is included because it's used in the error handler
+  }, [toast]);
 
   const handleToggleListening = async () => {
     if (!speechRecognitionRef.current) {
@@ -93,9 +91,7 @@ export default function HealthAnalysisPage() {
       setIsListening(false);
     } else {
       try {
-        // Check/request microphone permission
         await navigator.mediaDevices.getUserMedia({ audio: true });
-        // Permission granted
         recognition.start();
         setIsListening(true);
       } catch (err) {
@@ -111,7 +107,7 @@ export default function HealthAnalysisPage() {
           description: description,
           variant: "destructive",
         });
-        setIsListening(false); // Ensure listening state is false if permission denied or error
+        setIsListening(false); 
       }
     }
   };
@@ -201,7 +197,7 @@ export default function HealthAnalysisPage() {
         <CardHeader className="pb-4">
           <CardTitle className="font-headline text-3xl">AI Health Analysis</CardTitle>
           <CardDescription>
-            Describe your symptoms, upload a medical image, or use voice input for a preliminary AI-powered analysis.
+            Describe your symptoms, upload a medical image, or use voice input (Hindi supported) for a preliminary AI-powered analysis.
             <br />
             <span className="font-semibold text-destructive-foreground bg-destructive/80 px-2 py-1 rounded-md inline-flex items-center mt-2">
               <AlertTriangle className="h-4 w-4 mr-2" />
@@ -256,7 +252,7 @@ export default function HealthAnalysisPage() {
             </div>
           )}
           <div className="flex items-center gap-2">
-            <div className="flex gap-2"> {/* Wrapper for icon buttons */}
+            <div className="flex gap-2"> 
               <Button variant="outline" size="icon" onClick={() => fileInputRef.current?.click()} title="Upload Image">
                 <ImageIcon className="h-5 w-5" />
                 <span className="sr-only">Upload Image</span>
@@ -267,11 +263,11 @@ export default function HealthAnalysisPage() {
                 variant="outline" 
                 size="icon" 
                 onClick={handleToggleListening} 
-                title={isListening ? "Stop Listening" : "Start Voice Input"}
-                disabled={!speechRecognitionRef.current && typeof window !== 'undefined' && !(window.SpeechRecognition || window.webkitSpeechRecognition)} // Disable if API not supported
+                title={isListening ? "Stop Listening" : "Start Voice Input (Hindi)"}
+                disabled={!speechRecognitionRef.current && typeof window !== 'undefined' && !(window.SpeechRecognition || window.webkitSpeechRecognition)} 
               >
                 {isListening ? <MicOff className="h-5 w-5 text-destructive animate-pulse" /> : <Mic className="h-5 w-5" />}
-                <span className="sr-only">{isListening ? "Stop Listening" : "Start Voice Input"}</span>
+                <span className="sr-only">{isListening ? "Stop Listening" : "Start Voice Input (Hindi)"}</span>
               </Button>
             </div>
             <Textarea
@@ -503,3 +499,6 @@ const TranslationSection: React.FC<{ aiData: AnalyzeMedicalImageOutput | Analyze
     </div>
   );
 };
+
+
+    
