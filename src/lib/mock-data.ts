@@ -530,10 +530,11 @@ export interface HealthReel {
 
 // Helper to extract YouTube video ID from various URL formats
 const getYouTubeVideoId = (url: string): string | null => {
+  if (!url) return null;
   try {
       const parsedUrl = new URL(url);
       if (parsedUrl.hostname === 'youtu.be') { // For short URLs like youtu.be/VIDEO_ID
-          return parsedUrl.pathname.substring(1);
+          return parsedUrl.pathname.substring(1).split('?')[0];
       }
       if (parsedUrl.hostname === 'www.youtube.com' || parsedUrl.hostname === 'youtube.com') {
           if (parsedUrl.pathname === '/watch') { // For watch?v=VIDEO_ID
@@ -543,7 +544,7 @@ const getYouTubeVideoId = (url: string): string | null => {
             return parsedUrl.pathname.substring('/embed/'.length).split('?')[0];
           }
           if (parsedUrl.pathname.startsWith('/shorts/')) { // For /shorts/VIDEO_ID
-            return parsedUrl.pathname.substring('/shorts/'.length);
+            return parsedUrl.pathname.substring('/shorts/'.length).split('?')[0];
           }
       }
   } catch (e) {
@@ -560,21 +561,21 @@ const rawInstagramReelsData = [
       {
         "title": "Beginner Calisthenics Workout",
         "description": "Quick calisthenics routine for beginners—perfect for home workouts.",
-        "url": "https://www.youtube.com/shorts/gC_L9qAHVJ8", // Example YouTube Short
+        "url": "https://www.youtube.com/shorts/gC_L9qAHVJ8", 
         "account": "@learn_calisthenics",
         "details": "Demonstrates basic movements and progressions for newbies."
       },
       {
         "title": "5-Minute Full Body Workout",
         "description": "Fast and effective full body workout for all fitness levels.",
-        "url": "https://www.youtube.com/shorts/41n9K3TRTY4", // Example YouTube Short
+        "url": "https://www.youtube.com/shorts/41n9K3TRTY4", 
         "account": "@docjenfit",
         "details": "Short, dynamic routine with clear instructions."
       },
       {
         "title": "Fun Workout Challenge",
         "description": "Try this challenge to spice up your fitness routine!",
-        "url": "https://www.youtube.com/shorts/VfVdJAUh2Yw", // Example YouTube Short
+        "url": "https://www.youtube.com/shorts/VfVdJAUh2Yw", 
         "account": "@michalynnrivas",
         "details": "Encourages participation and community engagement."
       }
@@ -586,21 +587,21 @@ const rawInstagramReelsData = [
       {
         "title": "Healthy Meal Prep Ideas",
         "description": "Simple, nutritious meal prep for busy weekdays.",
-        "url": "https://www.youtube.com/shorts/rG3xXQdyuPM", // Example YouTube Short
+        "url": "https://www.youtube.com/shorts/rG3xXQdyuPM", 
         "account": "@nutritionstripped",
         "details": "Step-by-step guide to healthy eating."
       },
       {
         "title": "Balanced Breakfast Recipes",
         "description": "Easy breakfast ideas to start your day right.",
-        "url": "https://www.youtube.com/shorts/t0Y2GIR-L2I", // Example YouTube Short
+        "url": "https://www.youtube.com/shorts/t0Y2GIR-L2I", 
         "account": "@healthyfoodguide",
         "details": "Quick recipes with nutritional breakdowns."
       },
       {
         "title": "Snack Hacks for Energy",
         "description": "Healthy snack ideas to keep you energized.",
-        "url": "https://www.youtube.com/shorts/2VvK5t7Q9qU", // Example YouTube Short
+        "url": "https://www.youtube.com/shorts/2VvK5t7Q9qU", 
         "account": "@mindfulnutritionist",
         "details": "Smart snack choices for sustained energy."
       }
@@ -619,14 +620,14 @@ const rawInstagramReelsData = [
       {
         "title": "Daily Gratitude Practice",
         "description": "Quick gratitude journaling tips for positivity.",
-        "url": "https://www.youtube.com/shorts/XQ3o_4V0YJw", // Example YouTube Short
+        "url": "https://www.youtube.com/shorts/XQ3o_4V0YJw", 
         "account": "@fiveminutejournal",
         "details": "Encourages daily reflection and happiness[5]."
       },
       {
         "title": "Mindfulness Meditation",
         "description": "Short guided meditation for stress relief.",
-        "url": "https://www.youtube.com/shorts/zSkFFW--Ma0", // Example YouTube Short
+        "url": "https://www.youtube.com/shorts/zSkFFW--Ma0", 
         "account": "@selfcareisapriority",
         "details": "Helps center and calm the mind[5]."
       }
@@ -645,14 +646,14 @@ const rawInstagramReelsData = [
       {
         "title": "Yoga for Stress Relief",
         "description": "Yoga sequence to reduce anxiety and stress.",
-        "url": "https://www.youtube.com/shorts/NjjK2n27J0s", // Example YouTube Short
+        "url": "https://www.youtube.com/shorts/NjjK2n27J0s", 
         "account": "@yogawithadriene",
         "details": "Focuses on relaxation and breathing."
       },
       {
         "title": "5-Minute Yoga Break",
         "description": "Quick yoga break for work or study.",
-        "url": "https://www.youtube.com/shorts/0pBu_n0_vIA", // Example YouTube Short
+        "url": "https://www.youtube.com/shorts/0pBu_n0_vIA", 
         "account": "@yogawithkassandra",
         "details": "Short, effective routine for busy schedules."
       }
@@ -664,21 +665,21 @@ const rawInstagramReelsData = [
       {
         "title": "Doctor’s Health Tips",
         "description": "Quick health advice from a medical professional.",
-        "url": "https://www.youtube.com/shorts/TkomAY9aRjM", // Example YouTube Short
+        "url": "https://www.youtube.com/shorts/TkomAY9aRjM", 
         "account": "@doctor.mike",
         "details": "Explains medical concepts in simple terms[3]."
       },
       {
         "title": "Healthy Lifestyle Hacks",
         "description": "Tips for maintaining a healthy lifestyle.",
-        "url": "https://www.youtube.com/shorts/h_3xY_z3T8M", // Example YouTube Short
+        "url": "https://www.youtube.com/shorts/h_3xY_z3T8M", 
         "account": "@healthline",
         "details": "Evidence-based health information."
       },
       {
         "title": "Debunking Health Myths",
         "description": "Separating fact from fiction in health trends.",
-        "url": "https://www.youtube.com/shorts/70nISrI24gM", // Example YouTube Short
+        "url": "https://www.youtube.com/shorts/70nISrI24gM", 
         "account": "@clevelandclinic",
         "details": "Reliable info from trusted medical sources."
       },
@@ -700,29 +701,19 @@ const rawInstagramReelsData = [
   }
 ];
 
-// Example YouTube Video IDs to be used for substitution
-const exampleYouTubeVideoIdsByTopic: Record<string, string[]> = {
-  "Fitness": ["gC_L9qAHVJ8", "41n9K3TRTY4", "VfVdJAUh2Yw"],
-  "Nutrition": ["rG3xXQdyuPM", "t0Y2GIR-L2I", "2VvK5t7Q9qU"],
-  "Mental Wellness": ["inpok4MKVLM", "XQ3o_4V0YJw", "zSkFFW--Ma0"],
-  "Yoga": ["s2NQhpFGIOg", "NjjK2n27J0s", "0pBu_n0_vIA"],
-  "Health Info": ["TkomAY9aRjM", "h_3xY_z3T8M", "70nISrI24gM", "DUaxt8OlT3o", "vc9OF64H4sE"],
-};
 
-export const mockHealthReels: HealthReel[] = rawInstagramReelsData.flatMap((topicData, topicIndex) => 
+const allReelsFromSource: HealthReel[] = rawInstagramReelsData.flatMap((topicData, topicIndex) => 
   topicData.reels.map((reel, reelIndex): HealthReel => {
-    const exampleVideoIds = exampleYouTubeVideoIdsByTopic[topicData.topic] || [];
-    const videoId = exampleVideoIds[reelIndex % exampleVideoIds.length] || 'dQw4w9WgXcQ'; // Fallback to a known video if not enough examples
-
-    const embedUrl = `https://www.youtube.com/embed/${videoId}`; // Base embed URL
+    const videoId = getYouTubeVideoId(reel.url);
+    const embedUrl = videoId ? `https://www.youtube.com/embed/${videoId}` : 'https://www.youtube.com/embed/dQw4w9WgXcQ'; // Fallback
     
     return {
       id: `reel_${topicData.topic.toLowerCase().replace(/\s+/g, '-')}_${reelIndex + 1}`,
       topic: topicData.topic,
       title: reel.title,
       description: reel.description,
-      videoUrl: embedUrl, // Use the constructed embed URL
-      thumbnailUrl: `https://img.youtube.com/vi/${videoId}/0.jpg`,
+      videoUrl: embedUrl, 
+      thumbnailUrl: videoId ? `https://img.youtube.com/vi/${videoId}/0.jpg` : 'https://placehold.co/480x270.png',
       dataAiHint: reel.description ? reel.description.toLowerCase().split(' ').slice(0,2).join(' ') : topicData.topic.toLowerCase(),
       uploader: reel.account,
       uploaderAvatar: 'https://placehold.co/50x50.png', 
@@ -730,6 +721,10 @@ export const mockHealthReels: HealthReel[] = rawInstagramReelsData.flatMap((topi
     };
   })
 );
+
+// Keep only the 1st, 7th, and 9th reels from the generated list
+const indicesToKeep = [0, 6, 8]; // 0-indexed for 1st, 7th, 9th
+export const mockHealthReels: HealthReel[] = allReelsFromSource.filter((_, index) => indicesToKeep.includes(index));
 
 
 export interface EmergencyContact {
@@ -833,3 +828,5 @@ export const mockTabletReminders: TabletReminder[] = [
   { id: 'rem3', medicineName: 'Vitamin D', time: '10:00 AM', days: ['Mon', 'Wed', 'Fri'], isActive: false },
 ];
   
+
+```
