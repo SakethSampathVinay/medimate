@@ -48,7 +48,15 @@ export default function ProfilePage() {
     if (typeof window !== 'undefined') {
       const storedReminders = localStorage.getItem(LOCAL_STORAGE_REMINDERS_KEY);
       if (storedReminders) {
-        setReminders(JSON.parse(storedReminders));
+        try {
+            const parsedReminders = JSON.parse(storedReminders);
+            if (Array.isArray(parsedReminders)) {
+                 setReminders(parsedReminders);
+            }
+        } catch (e) {
+            console.error("Failed to parse reminders from localStorage", e);
+            setReminders([]); 
+        }
       }
     }
   }, []);
@@ -73,51 +81,53 @@ export default function ProfilePage() {
     }
   }, [toast]);
 
-  useEffect(() => {
-    const checkReminders = () => {
-      if (Notification.permission !== 'granted') return;
+  const checkReminders = useCallback(() => {
+    if (typeof window === 'undefined' || !('Notification' in window) || Notification.permission !== 'granted') {
+      return;
+    }
 
-      const now = new Date();
-      const currentDay = DAYS_OF_WEEK[now.getDay()];
-      const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-      
-      const newNotifiedForThisMinute = new Set<string>();
+    const now = new Date();
+    const currentDay = DAYS_OF_WEEK[now.getDay()];
+    const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 
-      reminders.forEach(reminder => {
-        if (reminder.isActive && reminder.days.includes(currentDay) && reminder.time === currentTime) {
-          const notificationKey = `${reminder.id}-${currentTime}`;
-          if (!notifiedMinute.has(notificationKey)) {
+    reminders.forEach(reminder => {
+      if (reminder.isActive && reminder.days.includes(currentDay) && reminder.time === currentTime) {
+        const notificationKey = `${reminder.id}-${currentTime}`;
+        
+        setNotifiedMinute(prevNotifiedMinute => {
+          if (!prevNotifiedMinute.has(notificationKey)) {
             new Notification("MediMate Pill Reminder", {
               body: `Time to take your ${reminder.medicineName} at ${reminder.time}.`,
-              icon: '/logo.png', 
+              icon: '/logo.png', // Ensure this logo.png is in your public folder
             });
             toast({
               title: `Reminder: ${reminder.medicineName}`,
               description: `It's time to take your medication at ${reminder.time}.`,
               className: "bg-primary text-primary-foreground"
             });
-            newNotifiedForThisMinute.add(notificationKey);
-          } else {
-             newNotifiedForThisMinute.add(notificationKey); 
+            const newSet = new Set(prevNotifiedMinute);
+            newSet.add(notificationKey);
+            return newSet;
           }
-        }
-      });
-      setNotifiedMinute(newNotifiedForThisMinute);
-    };
+          return prevNotifiedMinute;
+        });
+      }
+    });
+  }, [reminders, toast, setNotifiedMinute]);
 
-    const minuteChangeInterval = setInterval(() => {
-      setNotifiedMinute(new Set()); 
-    }, 60 * 1000);
+  useEffect(() => {
+    checkReminders(); // Initial check
+    const reminderIntervalId = setInterval(checkReminders, 30000); // Check every 30 seconds
 
-
-    const intervalId = setInterval(checkReminders, 30000); 
-    checkReminders(); 
+    const minuteResetIntervalId = setInterval(() => {
+      setNotifiedMinute(new Set()); // Reset the set of notified reminders for the current minute
+    }, 60 * 1000); // Reset every minute
 
     return () => {
-      clearInterval(intervalId);
-      clearInterval(minuteChangeInterval);
+      clearInterval(reminderIntervalId);
+      clearInterval(minuteResetIntervalId);
     };
-  }, [reminders, toast, notifiedMinute]);
+  }, [checkReminders, setNotifiedMinute]);
 
 
   useEffect(() => {
@@ -214,7 +224,7 @@ export default function ProfilePage() {
   if (authLoading) {
     return (
       <AppLayout>
-        <div className="flex flex-col items-center justify-center h-[calc(100vh-8rem)]">
+        <div className="flex flex-col items-center justify-center h-full">
           <Loader2 className="h-12 w-12 animate-spin text-primary" />
           <p className="mt-4 text-lg text-muted-foreground">Loading your profile...</p>
         </div>
@@ -225,7 +235,7 @@ export default function ProfilePage() {
   if (!user) {
     return (
       <AppLayout>
-        <div className="flex flex-col items-center justify-center h-[calc(100vh-8rem)] text-center p-4">
+        <div className="flex flex-col items-center justify-center h-full text-center p-4">
           <Card className="max-w-md w-full p-8 shadow-lg dark:bg-card">
             <UserProfileIcon className="h-16 w-16 text-primary mx-auto mb-6" />
             <h2 className="font-headline text-2xl mb-3 text-card-foreground">Access Denied</h2>
@@ -354,7 +364,7 @@ export default function ProfilePage() {
                  <Button onClick={openAddReminderModal} className="bg-primary hover:bg-primary/90 text-primary-foreground"><PlusCircle className="mr-2 h-4 w-4" /> Add New Reminder</Button>
               </CardHeader>
               <CardContent className="space-y-4">
-                {Notification.permission !== 'granted' && (
+                {typeof window !== 'undefined' && 'Notification' in window && Notification.permission !== 'granted' && (
                     <div className="p-3 bg-yellow-100 border border-yellow-300 dark:bg-yellow-900/30 dark:border-yellow-700 rounded-md text-yellow-700 dark:text-yellow-300 text-sm flex items-center gap-2">
                         <AlertTriangle className="h-5 w-5" />
                         <span>Browser notifications are currently disabled. Please enable them in your browser settings to receive reminders.</span>
