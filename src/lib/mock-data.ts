@@ -10,8 +10,8 @@ export interface Medicine {
   sideEffects: string;
   precautions: string;
   category: string;
-  price: number; 
-  tags: string[]; 
+  price: number;
+  tags: string[];
 }
 
 const medicinesData = [
@@ -198,15 +198,15 @@ export const mockMedicines: Medicine[] = medicinesData.map((med, index) => {
   return {
     id: `med${index + 1}`,
     name: med.medicine_name,
-    imageUrl: med.photo_url, 
+    imageUrl: med.photo_url,
     dataAiHint: dataAiHint || 'medicine',
-    useCase: med.description, 
+    useCase: med.description,
     description: `${med.medicine_name} is typically used for ${med.tags.join(', ')}. ${med.description} For detailed information, including specific uses, contraindications, and potential interactions, please consult a healthcare professional or refer to the patient information leaflet that comes with the medicine.`,
     dosage: 'Dosage varies depending on the condition being treated and individual patient factors. Always follow the dosage instructions provided by your doctor or pharmacist. Do not exceed the recommended dose.',
     sideEffects: 'Like all medicines, this drug can cause side effects, although not everybody gets them. Common side effects may include nausea or headache. If you experience any severe side effects or allergic reactions, seek medical attention immediately.',
     precautions: 'Before taking this medicine, inform your doctor or pharmacist if you have any allergies, pre-existing medical conditions (such as liver or kidney problems), or if you are pregnant, planning to become pregnant, or breastfeeding. Avoid consuming alcohol if advised against it with this medication. Keep out of reach of children.',
     category: firstTag,
-    price: 50, 
+    price: 50,
     tags: med.tags,
   };
 });
@@ -216,13 +216,13 @@ export interface Doctor {
   id: string;
   name: string;
   specialty: string;
-  degree: string; 
+  degree: string;
   location: string;
   experience: string;
   rating: number;
-  fees: number; 
-  about: string; 
-  availability: Record<string, string[]>; 
+  fees: number;
+  about: string;
+  availability: Record<string, string[]>;
   imageUrl: string;
   dataAiHint?: string;
 }
@@ -446,9 +446,9 @@ export const mockDoctors: Doctor[] = newDoctorsData.map((doc, index) => {
   const timeSlots = ['09:00 AM', '10:00 AM', '11:00 AM', '02:00 PM', '03:00 PM', '04:00 PM'];
   for (let i = 0; i < 5; i++) {
     const date = new Date(today);
-    date.setDate(today.getDate() + i + 1); 
+    date.setDate(today.getDate() + i + 1);
     const dateString = date.toISOString().split('T')[0];
-    if (Math.random() > 0.2) { 
+    if (Math.random() > 0.2) {
       availability[dateString] = timeSlots.filter(() => Math.random() > 0.5).slice(0, Math.floor(Math.random() * 4) + 1);
     }
   }
@@ -460,7 +460,7 @@ export const mockDoctors: Doctor[] = newDoctorsData.map((doc, index) => {
     degree: doc.degree,
     location: `${doc.address.line1}, ${doc.address.line2}`,
     experience: doc.experience,
-    rating: parseFloat((4.1 + (index % 9) * 0.1).toFixed(1)), 
+    rating: parseFloat((4.1 + (index % 9) * 0.1).toFixed(1)),
     fees: doc.fees,
     about: doc.about,
     availability,
@@ -478,7 +478,7 @@ export interface HealthCheckupPack {
   testsIncluded: string[];
   imageUrl: string;
   dataAiHint?: string;
-  iconColor: string; 
+  iconColor: string;
 }
 
 export const mockHealthCheckupPacks: HealthCheckupPack[] = [
@@ -517,33 +517,32 @@ export const mockHealthCheckupPacks: HealthCheckupPack[] = [
 
 export interface HealthReel {
   id: string;
-  topic: string; 
+  topic: string;
   title: string;
-  description?: string; 
+  description?: string;
   videoUrl: string; // This will be the YouTube embed URL
-  thumbnailUrl: string; 
+  thumbnailUrl: string;
   dataAiHint?: string;
-  uploader: string; 
-  uploaderAvatar: string; 
-  likes: number; 
+  uploader: string;
+  uploaderAvatar: string;
+  likes: number;
 }
 
-// Helper to extract YouTube video ID from various URL formats
 const getYouTubeVideoId = (url: string): string | null => {
   if (!url) return null;
   try {
       const parsedUrl = new URL(url);
-      if (parsedUrl.hostname === 'youtu.be') { // For short URLs like youtu.be/VIDEO_ID
+      if (parsedUrl.hostname === 'youtu.be') {
           return parsedUrl.pathname.substring(1).split('?')[0];
       }
       if (parsedUrl.hostname === 'www.youtube.com' || parsedUrl.hostname === 'youtube.com') {
-          if (parsedUrl.pathname === '/watch') { // For watch?v=VIDEO_ID
+          if (parsedUrl.pathname === '/watch') {
             return parsedUrl.searchParams.get('v');
           }
-          if (parsedUrl.pathname.startsWith('/embed/')) { // For /embed/VIDEO_ID
+          if (parsedUrl.pathname.startsWith('/embed/')) {
             return parsedUrl.pathname.substring('/embed/'.length).split('?')[0];
           }
-          if (parsedUrl.pathname.startsWith('/shorts/')) { // For /shorts/VIDEO_ID
+          if (parsedUrl.pathname.startsWith('/shorts/')) {
             return parsedUrl.pathname.substring('/shorts/'.length).split('?')[0];
           }
       }
@@ -553,31 +552,28 @@ const getYouTubeVideoId = (url: string): string | null => {
   return null;
 };
 
-
-const rawInstagramReelsData = [
+// Updated rawReelsData with unique example YouTube URLs based on topic and titles
+const rawReelsData = [
   {
     "topic": "Fitness",
     "reels": [
       {
         "title": "Beginner Calisthenics Workout",
         "description": "Quick calisthenics routine for beginners—perfect for home workouts.",
-        "url": "https://www.youtube.com/shorts/gC_L9qAHVJ8", 
+        "url": "https://www.youtube.com/shorts/gC_L9qAHVJ8", // Example: Fitness Short
         "account": "@learn_calisthenics",
-        "details": "Demonstrates basic movements and progressions for newbies."
       },
       {
         "title": "5-Minute Full Body Workout",
         "description": "Fast and effective full body workout for all fitness levels.",
-        "url": "https://www.youtube.com/shorts/41n9K3TRTY4", 
+        "url": "https://www.youtube.com/shorts/41n9K3TRTY4", // Example: Fitness Short
         "account": "@docjenfit",
-        "details": "Short, dynamic routine with clear instructions."
       },
       {
         "title": "Fun Workout Challenge",
         "description": "Try this challenge to spice up your fitness routine!",
-        "url": "https://www.youtube.com/shorts/VfVdJAUh2Yw", 
+        "url": "https://www.youtube.com/shorts/VfVdJAUh2Yw", // Example: Fitness Short
         "account": "@michalynnrivas",
-        "details": "Encourages participation and community engagement."
       }
     ]
   },
@@ -587,23 +583,20 @@ const rawInstagramReelsData = [
       {
         "title": "Healthy Meal Prep Ideas",
         "description": "Simple, nutritious meal prep for busy weekdays.",
-        "url": "https://www.youtube.com/shorts/rG3xXQdyuPM", 
+        "url": "https://www.youtube.com/shorts/rG3xXQdyuPM", // Example: Nutrition Short
         "account": "@nutritionstripped",
-        "details": "Step-by-step guide to healthy eating."
       },
       {
         "title": "Balanced Breakfast Recipes",
         "description": "Easy breakfast ideas to start your day right.",
-        "url": "https://www.youtube.com/shorts/t0Y2GIR-L2I", 
+        "url": "https://www.youtube.com/shorts/t0Y2GIR-L2I", // Example: Nutrition Short
         "account": "@healthyfoodguide",
-        "details": "Quick recipes with nutritional breakdowns."
       },
       {
         "title": "Snack Hacks for Energy",
         "description": "Healthy snack ideas to keep you energized.",
-        "url": "https://www.youtube.com/shorts/2VvK5t7Q9qU", 
+        "url": "https://www.youtube.com/shorts/2VvK5t7Q9qU", // Example: Nutrition Short
         "account": "@mindfulnutritionist",
-        "details": "Smart snack choices for sustained energy."
       }
     ]
   },
@@ -613,23 +606,20 @@ const rawInstagramReelsData = [
       {
         "title": "Simple Mental Health Reminder",
         "description": "Gentle reminders to prioritize self-care and mental health.",
-        "url": "https://www.youtube.com/shorts/inpok4MKVLM",
+        "url": "https://www.youtube.com/shorts/inpok4MKVLM", // Example: Mental Wellness Short
         "account": "@howmental",
-        "details": "Soothing visuals and powerful quotes for mindfulness[2][5]."
       },
       {
         "title": "Daily Gratitude Practice",
         "description": "Quick gratitude journaling tips for positivity.",
-        "url": "https://www.youtube.com/shorts/XQ3o_4V0YJw", 
+        "url": "https://www.youtube.com/shorts/XQ3o_4V0YJw", // Example: Mental Wellness Short
         "account": "@fiveminutejournal",
-        "details": "Encourages daily reflection and happiness[5]."
       },
       {
         "title": "Mindfulness Meditation",
         "description": "Short guided meditation for stress relief.",
-        "url": "https://www.youtube.com/shorts/zSkFFW--Ma0", 
+        "url": "https://www.youtube.com/shorts/zSkFFW--Ma0", // Example: Mental Wellness Short
         "account": "@selfcareisapriority",
-        "details": "Helps center and calm the mind[5]."
       }
     ]
   },
@@ -639,23 +629,20 @@ const rawInstagramReelsData = [
       {
         "title": "Morning Yoga Flow",
         "description": "Gentle yoga routine to start your day.",
-        "url": "https://www.youtube.com/shorts/s2NQhpFGIOg",
+        "url": "https://www.youtube.com/shorts/s2NQhpFGIOg", // Example: Yoga Short
         "account": "@yoga_girl",
-        "details": "Easy-to-follow poses for all levels."
       },
       {
         "title": "Yoga for Stress Relief",
         "description": "Yoga sequence to reduce anxiety and stress.",
-        "url": "https://www.youtube.com/shorts/NjjK2n27J0s", 
+        "url": "https://www.youtube.com/shorts/NjjK2n27J0s", // Example: Yoga Short
         "account": "@yogawithadriene",
-        "details": "Focuses on relaxation and breathing."
       },
       {
         "title": "5-Minute Yoga Break",
         "description": "Quick yoga break for work or study.",
-        "url": "https://www.youtube.com/shorts/0pBu_n0_vIA", 
+        "url": "https://www.youtube.com/shorts/0pBu_n0_vIA", // Example: Yoga Short
         "account": "@yogawithkassandra",
-        "details": "Short, effective routine for busy schedules."
       }
     ]
   },
@@ -665,64 +652,51 @@ const rawInstagramReelsData = [
       {
         "title": "Doctor’s Health Tips",
         "description": "Quick health advice from a medical professional.",
-        "url": "https://www.youtube.com/shorts/TkomAY9aRjM", 
+        "url": "https://www.youtube.com/shorts/TkomAY9aRjM", // Example: Health Info Short
         "account": "@doctor.mike",
-        "details": "Explains medical concepts in simple terms[3]."
       },
       {
         "title": "Healthy Lifestyle Hacks",
         "description": "Tips for maintaining a healthy lifestyle.",
-        "url": "https://www.youtube.com/shorts/h_3xY_z3T8M", 
+        "url": "https://www.youtube.com/shorts/h_3xY_z3T8M", // Example: Health Info Short
         "account": "@healthline",
-        "details": "Evidence-based health information."
       },
       {
-        "title": "Debunking Health Myths",
-        "description": "Separating fact from fiction in health trends.",
-        "url": "https://www.youtube.com/shorts/70nISrI24gM", 
-        "account": "@clevelandclinic",
-        "details": "Reliable info from trusted medical sources."
-      },
-       {
         "title": "CPR in Action | A 3D Look Inside the Body",
         "description": "A dynamic 3D animation showing internal mechanics and importance of effective CPR.",
-        "url": "https://www.youtube.com/watch?v=DUaxt8OlT3o", 
+        "url": "https://www.youtube.com/watch?v=DUaxt8OlT3o",
         "account": "@HealthOrgCPR",
-        "details": "CPR guide"
       },
       {
         "title": "Act FAST animation – Every minute counts",
         "description": "Animated public health video illustrating stroke signs using the FAST acronym.",
         "url": "https://www.youtube.com/watch?v=vc9OF64H4sE",
         "account": "@NHSStrokeAware",
-        "details": "Stroke signs"
       }
     ]
   }
 ];
 
-
-const allReelsFromSource: HealthReel[] = rawInstagramReelsData.flatMap((topicData, topicIndex) => 
+const allReelsFromSource: HealthReel[] = rawReelsData.flatMap((topicData) =>
   topicData.reels.map((reel, reelIndex): HealthReel => {
     const videoId = getYouTubeVideoId(reel.url);
     const embedUrl = videoId ? `https://www.youtube.com/embed/${videoId}` : 'https://www.youtube.com/embed/dQw4w9WgXcQ'; // Fallback
-    
+
     return {
       id: `reel_${topicData.topic.toLowerCase().replace(/\s+/g, '-')}_${reelIndex + 1}`,
       topic: topicData.topic,
       title: reel.title,
       description: reel.description,
-      videoUrl: embedUrl, 
+      videoUrl: embedUrl,
       thumbnailUrl: videoId ? `https://img.youtube.com/vi/${videoId}/0.jpg` : 'https://placehold.co/480x270.png',
       dataAiHint: reel.description ? reel.description.toLowerCase().split(' ').slice(0,2).join(' ') : topicData.topic.toLowerCase(),
       uploader: reel.account,
-      uploaderAvatar: 'https://placehold.co/50x50.png', 
+      uploaderAvatar: 'https://placehold.co/50x50.png',
       likes: Math.floor(Math.random() * 2000) + 500,
     };
   })
 );
 
-// Keep only the 1st, 7th, and 9th reels from the generated list
 const indicesToKeep = [0, 6, 8]; // 0-indexed for 1st, 7th, 9th
 export const mockHealthReels: HealthReel[] = allReelsFromSource.filter((_, index) => indicesToKeep.includes(index));
 
@@ -755,7 +729,7 @@ export const mockFirstAidGuides: FirstAidGuide[] = [
   {
     id: 'fa1',
     title: 'CPR (Cardiopulmonary Resuscitation)',
-    videoUrl: 'https://www.youtube.com/embed/DUaxt8OlT3o', // Using an example video
+    videoUrl: 'https://www.youtube.com/embed/DUaxt8OlT3o',
     imageUrl: 'https://img.youtube.com/vi/DUaxt8OlT3o/0.jpg',
     dataAiHint: 'cpr firstaid',
     steps: [
@@ -770,7 +744,7 @@ export const mockFirstAidGuides: FirstAidGuide[] = [
   {
     id: 'fa2',
     title: 'Treating Minor Burns',
-    imageUrl: 'https://placehold.co/400x225.png', // Placeholder, could be a YouTube thumbnail
+    imageUrl: 'https://placehold.co/400x225.png',
     dataAiHint: 'burn treatment',
     steps: [
       'Cool the burn. Hold under cool (not cold) running water for 10-15 minutes or until pain subsides.',
@@ -790,7 +764,7 @@ export interface Prescription {
   frequency: string;
   doctorName: string;
   dateIssued: string;
-  imageUrl?: string; 
+  imageUrl?: string;
   dataAiHint?: string;
 }
 
@@ -804,8 +778,8 @@ export interface TestResult {
   testName: string;
   dateTaken: string;
   resultSummary: string;
-  reportUrl?: string; 
-  imageUrl?: string; 
+  reportUrl?: string;
+  imageUrl?: string;
   dataAiHint?: string;
 }
 
@@ -817,7 +791,7 @@ export const mockTestResults: TestResult[] = [
 export interface TabletReminder {
   id: string;
   medicineName: string;
-  time: string; 
+  time: string;
   days: ('Mon' | 'Tue' | 'Wed' | 'Thu' | 'Fri' | 'Sat' | 'Sun')[];
   isActive: boolean;
 }
@@ -827,6 +801,3 @@ export const mockTabletReminders: TabletReminder[] = [
   { id: 'rem2', medicineName: 'Metformin 500mg', time: '08:00 PM', days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], isActive: true },
   { id: 'rem3', medicineName: 'Vitamin D', time: '10:00 AM', days: ['Mon', 'Wed', 'Fri'], isActive: false },
 ];
-  
-
-```
