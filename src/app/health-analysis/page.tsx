@@ -193,7 +193,7 @@ export default function HealthAnalysisPage() {
 
   return (
     <AppLayout>
-      <div className="flex flex-col h-[calc(100vh-8rem)]">
+      <div className="flex flex-col h-full">
         <CardHeader className="pb-4">
           <CardTitle className="font-headline text-3xl">AI Health Analysis</CardTitle>
           <CardDescription>
@@ -500,5 +500,7 @@ const TranslationSection: React.FC<{ aiData: AnalyzeMedicalImageOutput | Analyze
   );
 };
 
+
+    
 
     
