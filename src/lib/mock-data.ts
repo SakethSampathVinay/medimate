@@ -10,6 +10,8 @@ export interface Medicine {
   sideEffects: string;
   precautions: string;
   category: string;
+  price: number; // Added price field
+  tags: string[]; // Added tags field
 }
 
 const medicinesData = [
@@ -17,171 +19,172 @@ const medicinesData = [
     "medicine_name": "Paracetamol",
     "tags": ["Pain Relief", "Fever"],
     "description": "Used to reduce fever and relieve mild to moderate pain.",
-    "photo_url": "https://example.com/paracetamol.jpg"
+    "photo_url": "https://www.internationaldrugmart.com/wp-content/uploads/2023/01/Acetaminophen-Paracetamol-650mg-1.webp"
   },
   {
     "medicine_name": "Ibuprofen",
     "tags": ["Anti-inflammatory", "Pain Relief"],
     "description": "Non-steroidal anti-inflammatory drug for pain and inflammation.",
-    "photo_url": "https://example.com/ibuprofen.jpg"
+    "photo_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQegB7poiqWeq0gRJd1FHANAEOo2qVv5-fafw&s"
   },
   {
     "medicine_name": "Amoxicillin",
     "tags": ["Antibiotic", "Bacterial Infections"],
     "description": "Penicillin-based antibiotic used for bacterial infections.",
-    "photo_url": "https://example.com/amoxicillin.jpg"
+    "photo_url": "https://surli.cc/pbnlwz"
   },
   {
     "medicine_name": "Cetirizine",
     "tags": ["Antihistamine", "Allergies"],
     "description": "Used to relieve allergy symptoms such as runny nose and itching.",
-    "photo_url": "https://example.com/cetirizine.jpg"
+    "photo_url": "https://surli.cc/hkfhpu"
   },
   {
     "medicine_name": "Aspirin",
     "tags": ["Blood Thinner", "Pain Relief"],
     "description": "Used for pain relief and reducing the risk of heart attacks.",
-    "photo_url": "https://example.com/aspirin.jpg"
+    "photo_url": "https://www.aspirin.ca/sites/g/files/vrxlpx30151/files/2021-06/Aspirin-81mg-tablets-30ct-carton_3.png"
   },
   {
     "medicine_name": "Metformin",
     "tags": ["Diabetes", "Blood Sugar Control"],
     "description": "Helps control blood sugar levels in people with type 2 diabetes.",
-    "photo_url": "https://example.com/metformin.jpg"
+    "photo_url": "https://www.poison.org/-/media/images/shared/articles/metformin.jpg"
   },
   {
     "medicine_name": "Omeprazole",
     "tags": ["Acid Reflux", "Stomach Ulcers"],
     "description": "Reduces stomach acid for treating GERD and ulcers.",
-    "photo_url": "https://example.com/omeprazole.jpg"
+    "photo_url": "https://surl.li/najtgr"
   },
   {
     "medicine_name": "Ciprofloxacin",
     "tags": ["Antibiotic", "Bacterial Infections"],
     "description": "Broad-spectrum antibiotic used for bacterial infections.",
-    "photo_url": "https://example.com/ciprofloxacin.jpg"
+    "photo_url": "https://surli.cc/qgnsom"
   },
   {
     "medicine_name": "Atorvastatin",
     "tags": ["Cholesterol", "Heart Health"],
     "description": "Used to lower cholesterol and reduce risk of heart disease.",
-    "photo_url": "https://example.com/atorvastatin.jpg"
+    "photo_url": "https://surl.li/blrfzo"
   },
   {
     "medicine_name": "Salbutamol",
     "tags": ["Asthma", "Bronchodilator"],
     "description": "Relieves breathing difficulties in asthma and COPD.",
-    "photo_url": "https://example.com/salbutamol.jpg"
+    "photo_url": "https://surl.li/yvuqqe"
   },
   {
     "medicine_name": "Ranitidine",
     "tags": ["Heartburn", "Acid Reduction"],
     "description": "Reduces stomach acid to relieve heartburn and indigestion.",
-    "photo_url": "https://example.com/ranitidine.jpg"
+    "photo_url": "https://surl.li/ofgody"
   },
   {
     "medicine_name": "Doxycycline",
     "tags": ["Antibiotic", "Bacterial Infections"],
     "description": "Used to treat bacterial infections and acne.",
-    "photo_url": "https://example.com/doxycycline.jpg"
+    "photo_url": "https://surl.li/gfdiqk"
   },
   {
     "medicine_name": "Loratadine",
     "tags": ["Antihistamine", "Allergies"],
     "description": "Non-drowsy antihistamine for allergy relief.",
-    "photo_url": "https://example.com/loratadine.jpg"
+    "photo_url": "https://res.cloudinary.com/zava-www-uk/image/upload/a_exif,f_auto,e_sharpen:100,c_fit,w_800,h_600,fl_lossy/v1708423725/sd/uk/services-setup/hayfever/loratadine/xwmvq3ykdn0l2kjetui4.png"
   },
   {
     "medicine_name": "Clopidogrel",
     "tags": ["Blood Thinner", "Heart Health"],
     "description": "Prevents blood clots and reduces risk of heart attacks.",
-    "photo_url": "https://example.com/clopidogrel.jpg"
+    "photo_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFWNWTqC1Ho6eXwogNdLssvA5AyKH1rA1OmA&s"
   },
   {
     "medicine_name": "Hydrochlorothiazide",
     "tags": ["Diuretic", "Blood Pressure"],
     "description": "Helps control high blood pressure by reducing fluid retention.",
-    "photo_url": "https://example.com/hydrochlorothiazide.jpg"
+    "photo_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSpdWhXMu8bFj09DxmfHXdHgvJPKpRpxyPpCA&s"
   },
   {
     "medicine_name": "Levothyroxine",
     "tags": ["Thyroid Hormone", "Hypothyroidism"],
     "description": "Used to treat underactive thyroid conditions.",
-    "photo_url": "https://example.com/levothyroxine.jpg"
+    "photo_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT64GHQK97Ni_VqnJwwI-Ip5tQj6GxBFMrCJg&s"
   },
   {
     "medicine_name": "Simvastatin",
     "tags": ["Cholesterol", "Heart Health"],
     "description": "Lowers cholesterol and reduces risk of heart disease.",
-    "photo_url": "https://example.com/simvastatin.jpg"
+    "photo_url": "https://surli.cc/nkehgo"
   },
   {
     "medicine_name": "Prednisolone",
     "tags": ["Steroid", "Anti-inflammatory"],
     "description": "Used to reduce inflammation and suppress the immune system.",
-    "photo_url": "https://example.com/prednisolone.jpg"
+    "photo_url": "https://surl.li/qqnxcs"
   },
   {
     "medicine_name": "Acetaminophen",
     "tags": ["Pain Relief", "Fever"],
     "description": "Alternative to Paracetamol for pain and fever relief.",
-    "photo_url": "https://example.com/acetaminophen.jpg"
+    "photo_url": "https://surl.li/qqvbwc"
   },
   {
     "medicine_name": "Losartan",
     "tags": ["Blood Pressure", "Heart Health"],
     "description": "Used to treat high blood pressure and protect kidney function.",
-    "photo_url": "https://example.com/losartan.jpg"
+    "photo_url": "https://surli.cc/scgbsa"
   },
   {
     "medicine_name": "Gabapentin",
     "tags": ["Nerve Pain", "Seizures"],
     "description": "Helps manage nerve pain and epilepsy.",
-    "photo_url": "https://example.com/gabapentin.jpg"
+    "photo_url": "https://surl.li/jfmtxi"
   },
   {
     "medicine_name": "Fluoxetine",
     "tags": ["Antidepressant", "Mental Health"],
     "description": "Used to treat depression and anxiety disorders.",
-    "photo_url": "https://example.com/fluoxetine.jpg"
+    "photo_url": "https://surli.cc/joujvf"
   },
   {
     "medicine_name": "Warfarin",
     "tags": ["Blood Thinner", "Clot Prevention"],
     "description": "Reduces the risk of blood clots and strokes.",
-    "photo_url": "https://example.com/warfarin.jpg"
+    "photo_url": "https://surl.li/cniwtk"
   },
   {
     "medicine_name": "Azithromycin",
     "tags": ["Antibiotic", "Bacterial Infections"],
     "description": "Common antibiotic for treating bacterial infections.",
-    "photo_url": "https://example.com/azithromycin.jpg"
+    "photo_url": "https://surl.li/fcsgla"
   },
   {
     "medicine_name": "Diphenhydramine",
     "tags": ["Antihistamine", "Sleep Aid"],
     "description": "Used for allergies and as a sleep aid.",
-    "photo_url": "https://example.com/diphenhydramine.jpg"
+    "photo_url": "https://surli.cc/ojatvp"
   },
   {
     "medicine_name": "Montelukast",
     "tags": ["Asthma", "Allergy Control"],
     "description": "Helps control asthma and allergic rhinitis.",
-    "photo_url": "https://example.com/montelukast.jpg"
+    "photo_url": "https://surli.cc/dewznl"
   },
   {
     "medicine_name": "Naproxen",
     "tags": ["Pain Relief", "Anti-inflammatory"],
     "description": "Long-lasting pain relief for arthritis and muscle pain.",
-    "photo_url": "https://example.com/naproxen.jpg"
+    "photo_url": "https://5.imimg.com/data5/SELLER/Default/2022/7/RT/TQ/DN/144505622/naproxen-tablets-ip-500mg.jpeg"
   },
   {
     "medicine_name": "Furosemide",
     "tags": ["Diuretic", "Heart Failure"],
     "description": "Used to reduce fluid buildup in conditions like heart failure.",
-    "photo_url": "https://example.com/furosemide.jpg"
+    "photo_url": "https://surli.cc/ckhsoh"
   }
 ];
+
 
 export const mockMedicines: Medicine[] = medicinesData.map((med, index) => {
   const firstTag = med.tags[0] || 'General';
@@ -197,12 +200,14 @@ export const mockMedicines: Medicine[] = medicinesData.map((med, index) => {
     name: med.medicine_name,
     imageUrl: med.photo_url, 
     dataAiHint: dataAiHint || 'medicine',
-    useCase: med.description, 
-    description: `${med.medicine_name} is typically used for ${med.tags.join(', ')}. For detailed information, including specific uses, contraindications, and potential interactions, please consult a healthcare professional or refer to the patient information leaflet that comes with the medicine.`,
+    useCase: med.description, // Using the new description as useCase for brevity on card
+    description: `${med.medicine_name} is typically used for ${med.tags.join(', ')}. ${med.description} For detailed information, including specific uses, contraindications, and potential interactions, please consult a healthcare professional or refer to the patient information leaflet that comes with the medicine.`,
     dosage: 'Dosage varies depending on the condition being treated and individual patient factors. Always follow the dosage instructions provided by your doctor or pharmacist. Do not exceed the recommended dose.',
     sideEffects: 'Like all medicines, this drug can cause side effects, although not everybody gets them. Common side effects may include nausea or headache. If you experience any severe side effects or allergic reactions, seek medical attention immediately.',
     precautions: 'Before taking this medicine, inform your doctor or pharmacist if you have any allergies, pre-existing medical conditions (such as liver or kidney problems), or if you are pregnant, planning to become pregnant, or breastfeeding. Avoid consuming alcohol if advised against it with this medication. Keep out of reach of children.',
     category: firstTag,
+    price: 50, // Default price
+    tags: med.tags,
   };
 });
 

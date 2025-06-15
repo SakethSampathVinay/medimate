@@ -4,12 +4,14 @@
 import React from 'react';
 import TopbarNav, { MobileNav } from './topbar-nav';
 import Link from 'next/link';
-import { Stethoscope, LogOut, Settings, UserCircle, PanelLeft, LogIn } from 'lucide-react';
+import { Stethoscope, LogOut, Settings, UserCircle, PanelLeft, LogIn, ShoppingCart } from 'lucide-react'; // Added ShoppingCart
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useAuth } from '@/contexts/AuthContext'; 
+import { useCart } from '@/contexts/CartContext'; // Added useCart
+import { Badge } from '@/components/ui/badge'; // Added Badge
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -46,6 +48,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
         
         <div className="flex items-center gap-2 md:gap-4">
           <TopbarNav /> 
+          <CartButton /> 
           <UserMenu />
         </div>
       </header>
@@ -55,6 +58,29 @@ export default function AppLayout({ children }: AppLayoutProps) {
     </div>
   );
 }
+
+function CartButton() {
+  const { getTotalItems } = useCart();
+  const totalItems = getTotalItems();
+
+  return (
+    <Button variant="ghost" size="icon" asChild className="relative flex-shrink-0">
+      <Link href="/profile/cart">
+        <ShoppingCart className="h-5 w-5" />
+        {totalItems > 0 && (
+          <Badge 
+            variant="destructive" 
+            className="absolute -top-1 -right-1 h-5 w-5 min-w-[1.25rem] p-0 flex items-center justify-center rounded-full text-xs"
+          >
+            {totalItems > 9 ? '9+' : totalItems}
+          </Badge>
+        )}
+        <span className="sr-only">View Cart</span>
+      </Link>
+    </Button>
+  );
+}
+
 
 function UserMenu() {
   const { user, signOut, isLoading } = useAuth(); 
@@ -104,6 +130,12 @@ function UserMenu() {
                 <Link href="/profile">
                   <UserCircle className="mr-2 h-4 w-4" />
                   <span>Profile</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/profile/cart">
+                  <ShoppingCart className="mr-2 h-4 w-4" />
+                  <span>My Cart</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>

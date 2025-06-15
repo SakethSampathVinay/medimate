@@ -6,13 +6,15 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { mockMedicines, Medicine } from '@/lib/mock-data';
-import { Pill, Search, Info, ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Pill, Search, Info, ChevronLeft, ChevronRight, ShoppingCart } from 'lucide-react'; // Added ShoppingCart
 import React, { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useCart } from '@/contexts/CartContext'; // Added CartContext
+import { useToast } from '@/hooks/use-toast'; // Added useToast
 
 
 const ITEMS_PER_PAGE = 9;
@@ -23,6 +25,9 @@ export default function MedicinesPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
 
+  const { addToCart } = useCart();
+  const { toast } = useToast();
+
   const categories = useMemo(() => {
     const uniqueCategories = new Set(mockMedicines.map(med => med.category));
     return ["All", ...Array.from(uniqueCategories)];
@@ -31,7 +36,8 @@ export default function MedicinesPage() {
   const filteredMedicines = useMemo(() => {
     return mockMedicines.filter(medicine =>
       (medicine.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      medicine.useCase.toLowerCase().includes(searchTerm.toLowerCase())) &&
+      medicine.useCase.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      medicine.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))) &&
       (selectedCategory === "All" || medicine.category === selectedCategory)
     );
   }, [searchTerm, selectedCategory]);
@@ -44,7 +50,7 @@ export default function MedicinesPage() {
   const totalPages = Math.ceil(filteredMedicines.length / ITEMS_PER_PAGE);
 
   useEffect(() => {
-    setCurrentPage(1); // Reset to first page when search term or category changes
+    setCurrentPage(1); 
   }, [searchTerm, selectedCategory]);
 
   const handlePageChange = (page: number) => {
@@ -52,6 +58,16 @@ export default function MedicinesPage() {
       setCurrentPage(page);
     }
   };
+
+  const handleAddToCart = (medicine: Medicine) => {
+    addToCart(medicine, 1); // Add 1 quantity by default
+    toast({
+      title: `${medicine.name} added to cart!`,
+      description: `Price: ₹${medicine.price.toFixed(2)}`,
+      className: "bg-green-500 text-white",
+    });
+  };
+
 
   return (
     <AppLayout>
@@ -62,7 +78,7 @@ export default function MedicinesPage() {
               <Pill className="mr-3 h-8 w-8 text-primary" />
               Medicine Information
             </CardTitle>
-            <CardDescription>Search and learn about various medicines. Find details on usage, dosage, side effects, and more.</CardDescription>
+            <CardDescription>Search and learn about various medicines. Add them to your cart for a quick checkout.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex flex-col sm:flex-row gap-4">
@@ -70,7 +86,7 @@ export default function MedicinesPage() {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input
                   type="text"
-                  placeholder="Search by name or use case (e.g., Paracetamol, pain relief)"
+                  placeholder="Search by name, use case, or tag (e.g., Paracetamol, pain relief, fever)"
                   className="pl-10"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -94,25 +110,32 @@ export default function MedicinesPage() {
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {paginatedMedicines.map(medicine => (
               <Card key={medicine.id} className="flex flex-col overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300">
-                 <div className="relative w-full h-48">
+                 <div className="relative w-full h-48 bg-muted">
                     <Image 
                       src={medicine.imageUrl} 
                       alt={medicine.name} 
                       fill
-                      className="rounded-t-lg object-cover"
+                      className="rounded-t-lg object-contain" // Changed to object-contain
                       data-ai-hint={medicine.dataAiHint || "medicine image"}
+                      onError={(e) => { e.currentTarget.src = 'https://placehold.co/300x200.png?text=Image+Not+Found'; }} // Fallback
                     />
                   </div>
-                <CardHeader className="pt-4">
+                <CardHeader className="pt-4 pb-2">
                   <CardTitle className="font-headline text-xl">{medicine.name}</CardTitle>
-                  <Badge variant="secondary" className="mt-1">{medicine.category}</Badge>
-                  <CardDescription className="mt-1 text-sm h-12 overflow-hidden text-ellipsis">
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    {medicine.tags.slice(0,2).map(tag => <Badge key={tag} variant="secondary" className="text-xs">{tag}</Badge>)}
+                  </div>
+                   <p className="text-primary font-semibold mt-1">₹{medicine.price.toFixed(2)}</p>
+                  <CardDescription className="mt-1 text-sm h-10 overflow-hidden text-ellipsis">
                     {medicine.useCase}
                   </CardDescription>
                 </CardHeader>
-                <CardFooter className="mt-auto">
-                  <Button variant="outline" className="w-full" onClick={() => setSelectedMedicine(medicine)}>
+                <CardFooter className="mt-auto pt-2 flex flex-col sm:flex-row gap-2">
+                  <Button variant="outline" className="w-full sm:w-1/2" onClick={() => setSelectedMedicine(medicine)}>
                     <Info className="mr-2 h-4 w-4" /> View Details
+                  </Button>
+                  <Button className="w-full sm:w-1/2" onClick={() => handleAddToCart(medicine)}>
+                    <ShoppingCart className="mr-2 h-4 w-4" /> Add to Cart
                   </Button>
                 </CardFooter>
               </Card>
@@ -160,18 +183,23 @@ export default function MedicinesPage() {
               <DialogTitle className="font-headline text-2xl flex items-center">
                 <Pill className="mr-2 h-6 w-6 text-primary" /> {selectedMedicine.name}
               </DialogTitle>
-              <DialogDescription>{selectedMedicine.useCase}</DialogDescription>
+               <div className="flex flex-wrap gap-1 pt-1">
+                  {selectedMedicine.tags.map(tag => <Badge key={tag} variant="outline" className="text-xs">{tag}</Badge>)}
+                </div>
+              <DialogDescription className="pt-1">{selectedMedicine.useCase}</DialogDescription>
             </DialogHeader>
             <div className="flex-grow overflow-y-auto pr-2 space-y-4 py-4">
-              <div className="relative w-full h-64">
+              <div className="relative w-full h-64 bg-muted rounded-lg">
                 <Image 
                   src={selectedMedicine.imageUrl} 
                   alt={selectedMedicine.name} 
                   fill
-                  className="rounded-lg object-contain"
+                  className="rounded-lg object-contain" // Changed to object-contain
                   data-ai-hint={selectedMedicine.dataAiHint || "medicine image"}
+                  onError={(e) => { e.currentTarget.src = 'https://placehold.co/400x300.png?text=Image+Not+Found'; }}
                 />
               </div>
+               <p className="text-primary font-semibold text-lg">Price: ₹{selectedMedicine.price.toFixed(2)}</p>
               <Badge variant="default" className="text-sm">{selectedMedicine.category}</Badge>
               <p className="text-sm">{selectedMedicine.description}</p>
               <Accordion type="single" collapsible className="w-full">
@@ -189,8 +217,11 @@ export default function MedicinesPage() {
                 </AccordionItem>
               </Accordion>
             </div>
-            <DialogFooter className="mt-4">
-              <Button variant="outline" onClick={() => setSelectedMedicine(null)}>Close</Button>
+            <DialogFooter className="mt-4 flex-col sm:flex-row gap-2">
+              <Button variant="outline" onClick={() => setSelectedMedicine(null)} className="w-full sm:w-auto">Close</Button>
+              <Button onClick={() => { handleAddToCart(selectedMedicine); setSelectedMedicine(null);}} className="w-full sm:w-auto">
+                 <ShoppingCart className="mr-2 h-4 w-4" /> Add to Cart
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
