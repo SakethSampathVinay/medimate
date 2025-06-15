@@ -4,13 +4,12 @@
 import AppLayout from '@/components/layout/app-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { analyzeMedicalImage, AnalyzeMedicalImageOutput } from '@/ai/flows/analyze-medical-image';
 import { analyzeSymptoms, AnalyzeSymptomsOutput } from '@/ai/flows/analyze-symptoms';
 import { translateText, TranslateTextOutput } from '@/ai/flows/translate-text'; 
-import { Bot, ImageIcon, Send, User, AlertTriangle, CheckCircle, Loader2, Info, Sparkles, ShieldAlert, PillIcon, Stethoscope, HelpCircle, Languages } from 'lucide-react';
-import React, { useState, useRef, ChangeEvent } from 'react';
+import { Bot, ImageIcon, Send, User, AlertTriangle, CheckCircle, Loader2, Info, Sparkles, ShieldAlert, PillIcon, Stethoscope, HelpCircle, Languages, Mic, MicOff } from 'lucide-react';
+import React, { useState, useRef, ChangeEvent, useEffect } from 'react';
 import { useToast } from "@/hooks/use-toast";
 import Image from 'next/image';
 
@@ -19,7 +18,7 @@ interface Message {
   type: 'user' | 'ai' | 'error';
   content: string | React.ReactNode;
   imagePreview?: string;
-  aiData?: AnalyzeMedicalImageOutput | AnalyzeSymptomsOutput; // To hold raw AI data for translation
+  aiData?: AnalyzeMedicalImageOutput | AnalyzeSymptomsOutput; 
 }
 
 export default function HealthAnalysisPage() {
@@ -28,8 +27,95 @@ export default function HealthAnalysisPage() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isListening, setIsListening] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const speechRecognitionRef = useRef<SpeechRecognition | null>(null);
   const { toast } = useToast();
+
+  useEffect(() => {
+    const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!SpeechRecognitionAPI) {
+      console.warn("Speech Recognition API not supported by this browser.");
+      // speechRecognitionRef remains null, button will show error on click or be disabled
+      return;
+    }
+
+    const recognitionInstance = new SpeechRecognitionAPI();
+    recognitionInstance.continuous = false; // Process speech once then stop
+    recognitionInstance.interimResults = false; // We only want final results
+    recognitionInstance.lang = 'en-US'; // Default language
+
+    recognitionInstance.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      setInputText(prev => prev ? prev.trim() + ' ' + transcript : transcript); // Append transcript
+      setIsListening(false); // Stop listening after getting a result
+    };
+
+    recognitionInstance.onerror = (event) => {
+      console.error('Speech recognition error:', event.error);
+      let errorMessage = 'An error occurred during voice input.';
+      if (event.error === 'no-speech') {
+        errorMessage = 'No speech detected. Please try speaking clearly.';
+      } else if (event.error === 'audio-capture') {
+        errorMessage = 'Microphone not found or not accessible. Please check your microphone and browser permissions.';
+      } else if (event.error === 'not-allowed') {
+        errorMessage = 'Microphone access denied. Please allow microphone access in your browser settings to use voice input.';
+      }
+      toast({ title: "Voice Input Error", description: errorMessage, variant: "destructive" });
+      setIsListening(false);
+    };
+
+    recognitionInstance.onend = () => {
+      setIsListening(false); // Ensure listening state is reset
+    };
+
+    speechRecognitionRef.current = recognitionInstance;
+
+    return () => {
+      // Cleanup: stop recognition if component unmounts while listening
+      if (speechRecognitionRef.current) {
+        speechRecognitionRef.current.stop();
+      }
+    };
+  }, [toast]); // toast is included because it's used in the error handler
+
+  const handleToggleListening = async () => {
+    if (!speechRecognitionRef.current) {
+      toast({ title: "Voice Input Not Supported", description: "Your browser does not support this feature or it is not enabled.", variant: "destructive" });
+      return;
+    }
+
+    const recognition = speechRecognitionRef.current;
+
+    if (isListening) {
+      recognition.stop();
+      setIsListening(false);
+    } else {
+      try {
+        // Check/request microphone permission
+        await navigator.mediaDevices.getUserMedia({ audio: true });
+        // Permission granted
+        recognition.start();
+        setIsListening(true);
+      } catch (err) {
+        console.error("Microphone access error:", err);
+        let description = "Could not start voice input. Please ensure microphone access is allowed in your browser settings.";
+        if ((err as Error).name === 'NotAllowedError' || (err as Error).name === 'PermissionDeniedError') {
+          description = "Microphone access denied. Please allow microphone access in your browser settings.";
+        } else if ((err as Error).name === 'NotFoundError') {
+          description = "No microphone found. Please connect a microphone and try again.";
+        }
+        toast({
+          title: "Microphone Error",
+          description: description,
+          variant: "destructive",
+        });
+        setIsListening(false); // Ensure listening state is false if permission denied or error
+      }
+    }
+  };
+
 
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
@@ -115,7 +201,7 @@ export default function HealthAnalysisPage() {
         <CardHeader className="pb-4">
           <CardTitle className="font-headline text-3xl">AI Health Analysis</CardTitle>
           <CardDescription>
-            Describe your symptoms or upload a medical image for a preliminary AI-powered analysis.
+            Describe your symptoms, upload a medical image, or use voice input for a preliminary AI-powered analysis.
             <br />
             <span className="font-semibold text-destructive-foreground bg-destructive/80 px-2 py-1 rounded-md inline-flex items-center mt-2">
               <AlertTriangle className="h-4 w-4 mr-2" />
@@ -170,10 +256,24 @@ export default function HealthAnalysisPage() {
             </div>
           )}
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="icon" onClick={() => fileInputRef.current?.click()}>
-              <ImageIcon className="h-5 w-5" />
-            </Button>
-            <Input type="file" accept="image/*" ref={fileInputRef} onChange={handleImageChange} className="hidden" />
+            <div className="flex gap-2"> {/* Wrapper for icon buttons */}
+              <Button variant="outline" size="icon" onClick={() => fileInputRef.current?.click()} title="Upload Image">
+                <ImageIcon className="h-5 w-5" />
+                <span className="sr-only">Upload Image</span>
+              </Button>
+              <input type="file" accept="image/*" ref={fileInputRef} onChange={handleImageChange} className="hidden" />
+              
+              <Button 
+                variant="outline" 
+                size="icon" 
+                onClick={handleToggleListening} 
+                title={isListening ? "Stop Listening" : "Start Voice Input"}
+                disabled={!speechRecognitionRef.current && typeof window !== 'undefined' && !(window.SpeechRecognition || window.webkitSpeechRecognition)} // Disable if API not supported
+              >
+                {isListening ? <MicOff className="h-5 w-5 text-destructive animate-pulse" /> : <Mic className="h-5 w-5" />}
+                <span className="sr-only">{isListening ? "Stop Listening" : "Start Voice Input"}</span>
+              </Button>
+            </div>
             <Textarea
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
@@ -217,7 +317,7 @@ const ListItems: React.FC<{ items: string[] | undefined }> = ({ items }) => {
   );
 };
 
-const OtcSuggestions: React.FC<{ suggestions: AnalyzeMedicalImageOutput['otcMedicationSuggestions'] | undefined }> = ({ suggestions }) => {
+const OtcSuggestions: React.FC<{ suggestions: AnalyzeMedicalImageOutput['otcMedicationSuggestions'] | AnalyzeSymptomsOutput['otcMedicationSuggestions'] | undefined }> = ({ suggestions }) => {
   if (!suggestions || suggestions.length === 0 || (suggestions.length === 1 && suggestions[0].medication.toLowerCase().includes("not applicable"))) {
     return <p>No specific OTC suggestions applicable or professional advice needed first.</p>;
   }
