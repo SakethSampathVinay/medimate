@@ -520,7 +520,7 @@ export interface HealthReel {
   topic: string; 
   title: string;
   description?: string; 
-  videoUrl: string; 
+  videoUrl: string; // This will be the YouTube embed URL
   thumbnailUrl: string; 
   dataAiHint?: string;
   uploader: string; 
@@ -528,7 +528,32 @@ export interface HealthReel {
   likes: number; 
 }
 
-const rawReelsData = [
+// Helper to extract YouTube video ID from various URL formats
+const getYouTubeVideoId = (url: string): string | null => {
+  try {
+      const parsedUrl = new URL(url);
+      if (parsedUrl.hostname === 'youtu.be') { // For short URLs like youtu.be/VIDEO_ID
+          return parsedUrl.pathname.substring(1);
+      }
+      if (parsedUrl.hostname === 'www.youtube.com' || parsedUrl.hostname === 'youtube.com') {
+          if (parsedUrl.pathname === '/watch') { // For watch?v=VIDEO_ID
+            return parsedUrl.searchParams.get('v');
+          }
+          if (parsedUrl.pathname.startsWith('/embed/')) { // For /embed/VIDEO_ID
+            return parsedUrl.pathname.substring('/embed/'.length).split('?')[0];
+          }
+          if (parsedUrl.pathname.startsWith('/shorts/')) { // For /shorts/VIDEO_ID
+            return parsedUrl.pathname.substring('/shorts/'.length);
+          }
+      }
+  } catch (e) {
+      console.error("Error parsing YouTube URL for ID:", url, e);
+  }
+  return null;
+};
+
+
+const rawInstagramReelsData = [
   {
     "topic": "Fitness",
     "reels": [
@@ -587,7 +612,7 @@ const rawReelsData = [
       {
         "title": "Simple Mental Health Reminder",
         "description": "Gentle reminders to prioritize self-care and mental health.",
-        "url": "https://www.youtube.com/shorts/inpok4MKVLM", // Maintained from previous
+        "url": "https://www.youtube.com/shorts/inpok4MKVLM",
         "account": "@howmental",
         "details": "Soothing visuals and powerful quotes for mindfulness[2][5]."
       },
@@ -613,7 +638,7 @@ const rawReelsData = [
       {
         "title": "Morning Yoga Flow",
         "description": "Gentle yoga routine to start your day.",
-        "url": "https://www.youtube.com/shorts/s2NQhpFGIOg", // Maintained from previous
+        "url": "https://www.youtube.com/shorts/s2NQhpFGIOg",
         "account": "@yoga_girl",
         "details": "Easy-to-follow poses for all levels."
       },
@@ -660,63 +685,48 @@ const rawReelsData = [
        {
         "title": "CPR in Action | A 3D Look Inside the Body",
         "description": "A dynamic 3D animation showing internal mechanics and importance of effective CPR.",
-        "url": "https://www.youtube.com/watch?v=DUaxt8OlT3o", // Original long form
-        "account": "@HealthOrg",
+        "url": "https://www.youtube.com/watch?v=DUaxt8OlT3o", 
+        "account": "@HealthOrgCPR",
         "details": "CPR guide"
       },
       {
         "title": "Act FAST animation – Every minute counts",
         "description": "Animated public health video illustrating stroke signs using the FAST acronym.",
-        "url": "https://www.youtube.com/watch?v=vc9OF64H4sE", // Original long form
-        "account": "@HealthOrg",
+        "url": "https://www.youtube.com/watch?v=vc9OF64H4sE",
+        "account": "@NHSStrokeAware",
         "details": "Stroke signs"
       }
     ]
   }
 ];
 
-const getYouTubeVideoId = (url: string): string | null => {
-  try {
-      const parsedUrl = new URL(url);
-      if (parsedUrl.hostname === 'youtu.be') {
-          return parsedUrl.pathname.substring(1);
-      }
-      if (parsedUrl.hostname === 'www.youtube.com' || parsedUrl.hostname === 'youtube.com') {
-          if (parsedUrl.pathname === '/watch') {
-            return parsedUrl.searchParams.get('v');
-          }
-          if (parsedUrl.pathname.startsWith('/embed/')) {
-            // Handles /embed/VIDEO_ID and /embed/VIDEO_ID?params
-            return parsedUrl.pathname.substring('/embed/'.length).split('?')[0];
-          }
-          if (parsedUrl.pathname.startsWith('/shorts/')) {
-            return parsedUrl.pathname.substring('/shorts/'.length);
-          }
-      }
-  } catch (e) {
-      console.error("Error parsing YouTube URL for ID:", url, e);
-  }
-  return null;
+// Example YouTube Video IDs to be used for substitution
+const exampleYouTubeVideoIdsByTopic: Record<string, string[]> = {
+  "Fitness": ["gC_L9qAHVJ8", "41n9K3TRTY4", "VfVdJAUh2Yw"],
+  "Nutrition": ["rG3xXQdyuPM", "t0Y2GIR-L2I", "2VvK5t7Q9qU"],
+  "Mental Wellness": ["inpok4MKVLM", "XQ3o_4V0YJw", "zSkFFW--Ma0"],
+  "Yoga": ["s2NQhpFGIOg", "NjjK2n27J0s", "0pBu_n0_vIA"],
+  "Health Info": ["TkomAY9aRjM", "h_3xY_z3T8M", "70nISrI24gM", "DUaxt8OlT3o", "vc9OF64H4sE"],
 };
 
-export const mockHealthReels: HealthReel[] = rawReelsData.flatMap((topicData, topicIndex) => 
+export const mockHealthReels: HealthReel[] = rawInstagramReelsData.flatMap((topicData, topicIndex) => 
   topicData.reels.map((reel, reelIndex): HealthReel => {
-    const videoId = getYouTubeVideoId(reel.url);
-    const embedUrl = videoId 
-      ? `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&loop=1&playlist=${videoId}&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1` 
-      : 'https://www.youtube.com/embed/error'; // Fallback for unparsable URLs
+    const exampleVideoIds = exampleYouTubeVideoIdsByTopic[topicData.topic] || [];
+    const videoId = exampleVideoIds[reelIndex % exampleVideoIds.length] || 'dQw4w9WgXcQ'; // Fallback to a known video if not enough examples
 
+    const embedUrl = `https://www.youtube.com/embed/${videoId}`; // Base embed URL
+    
     return {
       id: `reel_${topicData.topic.toLowerCase().replace(/\s+/g, '-')}_${reelIndex + 1}`,
       topic: topicData.topic,
       title: reel.title,
       description: reel.description,
-      videoUrl: embedUrl,
-      thumbnailUrl: videoId ? `https://img.youtube.com/vi/${videoId}/0.jpg` : 'https://placehold.co/360x640.png?text=Video',
+      videoUrl: embedUrl, // Use the constructed embed URL
+      thumbnailUrl: `https://img.youtube.com/vi/${videoId}/0.jpg`,
       dataAiHint: reel.description ? reel.description.toLowerCase().split(' ').slice(0,2).join(' ') : topicData.topic.toLowerCase(),
       uploader: reel.account,
-      uploaderAvatar: 'https://placehold.co/50x50.png', // Generic avatar
-      likes: Math.floor(Math.random() * 2000) + 500, // Random likes
+      uploaderAvatar: 'https://placehold.co/50x50.png', 
+      likes: Math.floor(Math.random() * 2000) + 500,
     };
   })
 );

@@ -5,7 +5,7 @@ import AppLayout from '@/components/layout/app-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { mockHealthReels, HealthReel } from '@/lib/mock-data';
-import { PlaySquare, Heart, Bookmark, Share2, Eye, Volume2, VolumeX } from 'lucide-react'; // Added volume icons
+import { PlaySquare, Heart, Bookmark, Share2, Eye, Volume2, VolumeX } from 'lucide-react'; 
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -50,29 +50,35 @@ const ReelCard: React.FC<{ reel: HealthReel; isVisible: boolean; isMuted: boolea
     }
   };
   
-  // Construct the embed URL with autoplay and mute state
-  const videoId = reel.videoUrl.includes('embed/') ? reel.videoUrl.split('embed/')[1].split('?')[0] : null;
-  const embedUrl = videoId 
-    ? `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=${isMuted ? 1 : 0}&loop=1&playlist=${videoId}&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&enablejsapi=1&widgetid=1`
-    : reel.videoUrl; // Fallback if parsing fails, though data should be clean
+  const videoId = useMemo(() => {
+    try {
+        const url = new URL(reel.videoUrl);
+        if (url.pathname.startsWith('/embed/')) {
+            return url.pathname.split('/embed/')[1].split('?')[0];
+        }
+    } catch (e) { console.error("Error parsing videoId for reel: ", reel.title, e); }
+    return 'error'; // Fallback video ID
+  }, [reel.videoUrl, reel.title]);
+  
+  const embedUrl = useMemo(() => 
+    `${reel.videoUrl}?autoplay=1&mute=${isMuted ? 1 : 0}&loop=1&playlist=${videoId}&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&enablejsapi=1&widgetid=1`,
+    [reel.videoUrl, isMuted, videoId]
+  );
 
   useEffect(() => {
     if (isVisible && iframeRef.current) {
-      // The embedUrl already has autoplay and mute based on isMuted state.
-      // Forcing play/pause/mute via postMessage can be complex with YouTube API
-      // and often requires the iframe to be fully loaded and API ready.
-      // The current approach relies on URL parameters for initial state.
+      // The embedUrl already has autoplay and mute.
+      // Forcing play/pause/mute via postMessage can be complex.
     }
   }, [isVisible, isMuted, embedUrl]);
 
   return (
-    <Card className="w-full max-w-sm mx-auto snap-center shrink-0 h-[calc(100vh-12rem)] md:h-[calc(100vh-10rem)] flex flex-col overflow-hidden shadow-xl rounded-xl bg-black relative aspect-[9/16]">
-      {/* Video Player Area */}
+    <Card className="w-full h-full flex flex-col overflow-hidden shadow-xl rounded-xl bg-black relative aspect-[9/16]">
       <div className="relative flex-grow flex items-center justify-center bg-black">
         {isVisible ? (
           <iframe
             ref={iframeRef}
-            key={reel.id} // Force re-render if reel changes
+            key={reel.id + (isMuted ? '-muted' : '-unmuted')} // Force re-render if mute state changes for the src
             className="w-full h-full absolute top-0 left-0"
             src={embedUrl}
             title={reel.title}
@@ -93,9 +99,7 @@ const ReelCard: React.FC<{ reel: HealthReel; isVisible: boolean; isMuted: boolea
         )}
       </div>
 
-      {/* Overlay UI Elements */}
       <div className="absolute inset-0 flex flex-col justify-between p-4 pointer-events-none">
-        {/* Top Section: Title & Uploader (optional, can be part of bottom overlay) */}
         <CardHeader className="z-10 w-full bg-gradient-to-b from-black/50 to-transparent pointer-events-auto p-0">
           <div className="flex items-center space-x-2">
             <Avatar className="h-8 w-8 border-2 border-white">
@@ -107,9 +111,7 @@ const ReelCard: React.FC<{ reel: HealthReel; isVisible: boolean; isMuted: boolea
           <Badge variant="secondary" className="mt-1 text-xs self-start bg-black/30 text-white border-none">{reel.topic}</Badge>
         </CardHeader>
 
-        {/* Bottom Section: Info and Actions */}
         <div className="flex items-end justify-between w-full">
-          {/* Left side: Uploader, Description, Views */}
           <div className="z-10 text-white text-sm p-2 rounded space-y-1 pointer-events-auto max-w-[calc(100%-5rem)]">
             <p className="font-semibold text-base">{reel.uploader}</p>
             {reel.description && <p className="text-xs mt-0.5 line-clamp-2">{reel.description}</p>}
@@ -118,21 +120,20 @@ const ReelCard: React.FC<{ reel: HealthReel; isVisible: boolean; isMuted: boolea
             </div>
           </div>
 
-          {/* Right side: Action Buttons (Like, Save, Share, Mute) */}
           <CardFooter className="z-10 flex flex-col items-center space-y-3 pointer-events-auto p-0">
-            <Button variant="ghost" size="icon" className="text-white hover:text-white p-0 h-auto" onClick={handleLike}>
+            <Button variant="ghost" size="icon" className="text-white hover:text-white p-0 h-auto pointer-events-auto" onClick={handleLike}>
               <Heart className={`h-7 w-7 transition-colors ${liked ? 'fill-red-500 text-red-500' : 'hover:fill-red-500/30'}`} />
               <span className="sr-only">{reel.likes + (liked ? 1 : 0)} likes</span>
             </Button>
-            <Button variant="ghost" size="icon" className="text-white hover:text-white p-0 h-auto" onClick={handleSave}>
+            <Button variant="ghost" size="icon" className="text-white hover:text-white p-0 h-auto pointer-events-auto" onClick={handleSave}>
               <Bookmark className={`h-7 w-7 transition-colors ${saved ? 'fill-yellow-500 text-yellow-500' : 'hover:fill-yellow-500/30'}`} />
               <span className="sr-only">Save</span>
             </Button>
-            <Button variant="ghost" size="icon" className="text-white hover:text-white p-0 h-auto" onClick={handleShare}>
+            <Button variant="ghost" size="icon" className="text-white hover:text-white p-0 h-auto pointer-events-auto" onClick={handleShare}>
               <Share2 className="h-7 w-7 hover:text-blue-400 transition-colors" />
               <span className="sr-only">Share</span>
             </Button>
-            <Button variant="ghost" size="icon" className="text-white hover:text-white p-0 h-auto" onClick={onToggleMute}>
+            <Button variant="ghost" size="icon" className="text-white hover:text-white p-0 h-auto pointer-events-auto" onClick={onToggleMute}>
               {isMuted ? <VolumeX className="h-7 w-7" /> : <Volume2 className="h-7 w-7" />}
               <span className="sr-only">{isMuted ? 'Unmute' : 'Mute'}</span>
             </Button>
@@ -150,29 +151,20 @@ export default function HealthReelsPage() {
   const [visibleReelId, setVisibleReelId] = useState<string | null>(null);
   const observer = useRef<IntersectionObserver | null>(null);
   const reelRefs = useRef<Map<string, HTMLDivElement | null>>(new Map());
-  const [isMuted, setIsMuted] = useState(true); // Global mute state for all reels
+  const [isMuted, setIsMuted] = useState(false); // Default to sound ON
 
   const filteredReels = useMemo(() => {
-    const reels = activeTopic === 'All' ? mockHealthReels : mockHealthReels.filter(reel => reel.topic === activeTopic);
-    if (reels.length > 0 && !visibleReelId) {
-        // Set initial visible reel only if not already set
-        // This can be problematic if filteredReels updates frequently
-        // and visibleReelId is reset.
-    }
-    return reels;
-  }, [activeTopic, visibleReelId]);
+    return activeTopic === 'All' ? mockHealthReels : mockHealthReels.filter(reel => reel.topic === activeTopic);
+  }, [activeTopic]);
 
   useEffect(() => {
-    // Set initial visible reel when component mounts or filteredReels changes
     if (filteredReels.length > 0) {
         setVisibleReelId(filteredReels[0].id);
     } else {
         setVisibleReelId(null);
     }
-    // Clear refs on filter change to ensure correct observation
     reelRefs.current.clear();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTopic]); // Rerun only when activeTopic changes to reset initial visible reel
+  }, [filteredReels]); 
 
   useEffect(() => {
     const currentObserver = observer.current;
@@ -183,14 +175,14 @@ export default function HealthReelsPage() {
     observer.current = new IntersectionObserver(
       (entries) => {
         entries.forEach(entry => {
-          if (entry.isIntersecting && entry.intersectionRatio >= 0.65) { // Adjusted threshold
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.65) { 
             setVisibleReelId(entry.target.id);
           }
         });
       },
       { 
         root: null, 
-        threshold: 0.65, // Element needs to be 65% visible
+        threshold: 0.65, 
       }
     );
     
@@ -213,8 +205,8 @@ export default function HealthReelsPage() {
 
   return (
     <AppLayout>
-      <div className="flex flex-col h-full">
-        <header className="p-4 border-b bg-background z-20"> {/* Increased z-index */}
+      <div className="flex flex-col h-full"> {/* Ensure AppLayout allows this page to be full height */}
+        <header className="p-4 border-b bg-background z-20">
           <CardTitle className="font-headline text-3xl flex items-center mb-3">
             <PlaySquare className="mr-3 h-8 w-8 text-primary" />
             Health Reels
@@ -234,31 +226,34 @@ export default function HealthReelsPage() {
           </div>
         </header>
 
-        {filteredReels.length > 0 ? (
-          <div className="flex-grow overflow-y-auto snap-y snap-mandatory scroll-smooth hide-scrollbar md:p-0 relative"> {/* Added relative for z-index context */}
-            {filteredReels.map((reel) => (
+        {/* Full height scrollable container for reels */}
+        <div className="flex-grow overflow-y-auto snap-y snap-mandatory scroll-smooth hide-scrollbar relative">
+          {filteredReels.length > 0 ? (
+            filteredReels.map((reel) => (
                <div 
                 key={reel.id} 
                 id={reel.id}
                 ref={el => reelRefs.current.set(reel.id, el)}
-                className="h-full flex items-center justify-center py-2 md:py-4" // Ensure full height for snap
+                className="h-full snap-center shrink-0 flex items-center justify-center p-0 md:p-0" // Full height snap item
               >
-                <ReelCard 
-                  reel={reel} 
-                  isVisible={visibleReelId === reel.id} 
-                  isMuted={isMuted}
-                  onToggleMute={handleToggleMute}
-                />
+                <div className="w-full max-w-sm h-full"> {/* Constrain width, maintain full height */}
+                  <ReelCard 
+                    reel={reel} 
+                    isVisible={visibleReelId === reel.id} 
+                    isMuted={isMuted}
+                    onToggleMute={handleToggleMute}
+                  />
+                </div>
               </div>
-            ))}
-          </div>
-        ) : (
-          <div className="flex-grow flex flex-col items-center justify-center text-center p-8">
-            <PlaySquare className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
-            <p className="text-xl font-medium">No reels available</p>
-            <p className="text-muted-foreground">Try selecting a different category or check back later.</p>
-          </div>
-        )}
+            ))
+          ) : (
+            <div className="h-full flex flex-col items-center justify-center text-center p-8">
+              <PlaySquare className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
+              <p className="text-xl font-medium">No reels available</p>
+              <p className="text-muted-foreground">Try selecting a different category or check back later.</p>
+            </div>
+          )}
+        </div>
       </div>
       <style jsx global>{`
         .hide-scrollbar::-webkit-scrollbar {
@@ -268,6 +263,9 @@ export default function HealthReelsPage() {
           -ms-overflow-style: none; 
           scrollbar-width: none; 
         }
+        /* Ensure the main content area within AppLayout can take full height if needed */
+        /* This might need adjustment based on AppLayout's structure */
+        /* main { display: flex; flex-direction: column; flex-grow: 1; } */
       `}</style>
     </AppLayout>
   );
