@@ -43,7 +43,7 @@ export default function HealthAnalysisPage() {
     const recognitionInstance = new SpeechRecognitionAPI();
     recognitionInstance.continuous = false; 
     recognitionInstance.interimResults = false; 
-    recognitionInstance.lang = 'hi-IN'; // Changed to Hindi
+    recognitionInstance.lang = 'hi-IN'; 
 
     recognitionInstance.onresult = (event) => {
       const transcript = event.results[0][0].transcript;
@@ -91,7 +91,7 @@ export default function HealthAnalysisPage() {
       setIsListening(false);
     } else {
       try {
-        await navigator.mediaDevices.getUserMedia({ audio: true });
+        await navigator.mediaDevices.getUserMedia({ audio: true }); // Request permission
         recognition.start();
         setIsListening(true);
       } catch (err) {
@@ -195,7 +195,7 @@ export default function HealthAnalysisPage() {
     <AppLayout>
       <div className="flex flex-col h-full">
         <CardHeader className="pb-4">
-          <CardTitle className="font-headline text-3xl">AI Health Analysis</CardTitle>
+          <CardTitle className="font-headline text-3xl text-foreground">AI Health Analysis</CardTitle>
           <CardDescription>
             Describe your symptoms, upload a medical image, or use voice input (Hindi supported) for a preliminary AI-powered analysis.
             <br />
@@ -206,7 +206,7 @@ export default function HealthAnalysisPage() {
           </CardDescription>
         </CardHeader>
         
-        <CardContent className="flex-grow overflow-y-auto p-4 space-y-4 bg-muted/30 rounded-lg shadow-inner">
+        <CardContent className="flex-grow overflow-y-auto p-4 space-y-4 bg-muted/30 dark:bg-background/20 rounded-lg shadow-inner">
           {messages.map(msg => (
             <div key={msg.id} className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}>
               <div className={`max-w-2xl w-full p-3 rounded-lg shadow ${
@@ -224,7 +224,7 @@ export default function HealthAnalysisPage() {
                 </div>
                 {typeof msg.content === 'string' ? <p className="text-sm whitespace-pre-wrap">{msg.content}</p> : msg.content}
                 {msg.imagePreview && (
-                  <Image src={msg.imagePreview} alt="Uploaded preview" width={200} height={200} className="mt-2 rounded-md max-w-xs" />
+                  <Image src={msg.imagePreview} alt="Uploaded preview" width={200} height={200} className="mt-2 rounded-md max-w-xs" data-ai-hint="medical image"/>
                 )}
                  {msg.type === 'ai' && msg.aiData && (
                   <TranslationSection aiData={msg.aiData} />
@@ -244,17 +244,17 @@ export default function HealthAnalysisPage() {
           )}
         </CardContent>
 
-        <div className="p-4 border-t bg-background">
+        <div className="p-4 border-t bg-background dark:bg-card">
           {imagePreview && (
             <div className="mb-2 flex items-center gap-2">
-              <Image src={imagePreview} alt="Preview" width={60} height={60} className="rounded" />
+              <Image src={imagePreview} alt="Preview" width={60} height={60} className="rounded" data-ai-hint="upload preview"/>
               <Button variant="ghost" size="sm" onClick={() => { setImageFile(null); setImagePreview(null); if(fileInputRef.current) fileInputRef.current.value = ''; }}>Remove Image</Button>
             </div>
           )}
           <div className="flex items-center gap-2">
             <div className="flex gap-2"> 
-              <Button variant="outline" size="icon" onClick={() => fileInputRef.current?.click()} title="Upload Image">
-                <ImageIcon className="h-5 w-5" />
+              <Button variant="outline" size="icon" onClick={() => fileInputRef.current?.click()} title="Upload Image" className="hover:bg-accent/10">
+                <ImageIcon className="h-5 w-5 text-primary" />
                 <span className="sr-only">Upload Image</span>
               </Button>
               <input type="file" accept="image/*" ref={fileInputRef} onChange={handleImageChange} className="hidden" />
@@ -263,11 +263,12 @@ export default function HealthAnalysisPage() {
                 variant="outline" 
                 size="icon" 
                 onClick={handleToggleListening} 
-                title={isListening ? "Stop Listening" : "Start Voice Input (Hindi)"}
+                title={isListening ? "Stop Listening (Hindi)" : "Start Voice Input (Hindi)"}
                 disabled={!speechRecognitionRef.current && typeof window !== 'undefined' && !(window.SpeechRecognition || window.webkitSpeechRecognition)} 
+                className="hover:bg-accent/10"
               >
-                {isListening ? <MicOff className="h-5 w-5 text-destructive animate-pulse" /> : <Mic className="h-5 w-5" />}
-                <span className="sr-only">{isListening ? "Stop Listening" : "Start Voice Input (Hindi)"}</span>
+                {isListening ? <MicOff className="h-5 w-5 text-destructive animate-pulse" /> : <Mic className="h-5 w-5 text-primary" />}
+                <span className="sr-only">{isListening ? "Stop Listening (Hindi)" : "Start Voice Input (Hindi)"}</span>
               </Button>
             </div>
             <Textarea
@@ -283,7 +284,7 @@ export default function HealthAnalysisPage() {
                 }
               }}
             />
-            <Button onClick={handleSubmit} disabled={isLoading || (!inputText.trim() && !imageFile)}>
+            <Button onClick={handleSubmit} disabled={isLoading || (!inputText.trim() && !imageFile)} className="bg-primary hover:bg-primary/90">
               {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
               <span className="sr-only">Send</span>
             </Button>
@@ -371,7 +372,7 @@ const AIImageAnalysisResponse: React.FC<{ data: AnalyzeMedicalImageOutput }> = (
       </Section>
     )}
     <p className="text-xs text-muted-foreground pt-2 border-t mt-3">
-      <AlertTriangle className="h-3 w-3 inline mr-1" />
+      <AlertTriangle className="h-3 w-3 inline mr-1 text-destructive" />
       This AI provides general information, not medical advice. Always consult a qualified healthcare professional for diagnosis and treatment.
     </p>
   </div>
@@ -415,7 +416,7 @@ const AISymptomAnalysisResponse: React.FC<{ data: AnalyzeSymptomsOutput }> = ({ 
       </Section>
     )}
      <p className="text-xs text-muted-foreground pt-2 border-t mt-3">
-      <AlertTriangle className="h-3 w-3 inline mr-1" />
+      <AlertTriangle className="h-3 w-3 inline mr-1 text-destructive" />
       This AI provides general information, not medical advice. Always consult a qualified healthcare professional for diagnosis and treatment.
     </p>
   </div>
@@ -475,23 +476,23 @@ const TranslationSection: React.FC<{ aiData: AnalyzeMedicalImageOutput | Analyze
   return (
     <div className="mt-3 pt-3 border-t">
       <div className="flex items-center gap-2 mb-2">
-         <Languages className="h-4 w-4 text-muted-foreground" />
-        <Button variant="outline" size="sm" onClick={() => handleTranslate('Hindi')} disabled={isTranslating && targetLang === 'Hindi'}>
+         <Languages className="h-4 w-4 text-primary" />
+        <Button variant="outline" size="sm" onClick={() => handleTranslate('Hindi')} disabled={isTranslating && targetLang === 'Hindi'} className="hover:bg-accent/10">
           {isTranslating && targetLang === 'Hindi' ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
           Translate to Hindi
         </Button>
-        <Button variant="outline" size="sm" onClick={() => handleTranslate('Telugu')} disabled={isTranslating && targetLang === 'Telugu'}>
+        <Button variant="outline" size="sm" onClick={() => handleTranslate('Telugu')} disabled={isTranslating && targetLang === 'Telugu'} className="hover:bg-accent/10">
           {isTranslating && targetLang === 'Telugu' ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
           Translate to Telugu
         </Button>
       </div>
       {isTranslating && <p className="text-xs text-muted-foreground">Translating to {targetLang}...</p>}
       {translatedContent && !isTranslating && (
-        <Card className="mt-2 bg-muted/50">
+        <Card className="mt-2 bg-muted/50 dark:bg-background/30">
           <CardHeader className="pb-2 pt-3">
-            <CardTitle className="text-sm font-semibold">Translation ({targetLang})</CardTitle>
+            <CardTitle className="text-sm font-semibold text-card-foreground">Translation ({targetLang})</CardTitle>
           </CardHeader>
-          <CardContent className="text-xs whitespace-pre-wrap">
+          <CardContent className="text-xs whitespace-pre-wrap text-card-foreground">
             {translatedContent}
           </CardContent>
         </Card>
@@ -499,8 +500,3 @@ const TranslationSection: React.FC<{ aiData: AnalyzeMedicalImageOutput | Analyze
     </div>
   );
 };
-
-
-    
-
-    

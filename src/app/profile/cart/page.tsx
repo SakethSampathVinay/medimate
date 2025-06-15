@@ -25,10 +25,10 @@ export default function CartPage() {
     }
   }, [user, authLoading, router]);
 
-  if (authLoading || !user) { // Show loader until auth state is confirmed and user exists
+  if (authLoading || (!user && typeof window !== 'undefined')) { 
     return (
       <AppLayout>
-        <div className="flex flex-col items-center justify-center h-[calc(100vh-10rem)]">
+        <div className="flex flex-col items-center justify-center h-[calc(100vh-8rem)]">
           <Loader2 className="h-12 w-12 animate-spin text-primary" />
           <p className="mt-4 text-lg text-muted-foreground">Loading cart...</p>
         </div>
@@ -40,9 +40,8 @@ export default function CartPage() {
     toast({
         title: "Checkout Initiated (Mock)",
         description: `Your order for ₹${getCartTotal().toFixed(2)} is being processed. This is a mock action.`,
-        className: "bg-blue-500 text-white", // Using a blue color for info
+        className: "bg-primary text-primary-foreground",
     });
-    // clearCart(); // Uncomment if you want to clear cart after mock checkout
   };
 
   const handleUpdateQuantity = (itemId: string, newQuantity: number) => {
@@ -56,9 +55,9 @@ export default function CartPage() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <Card>
+        <Card className="dark:bg-card">
           <CardHeader>
-            <CardTitle className="font-headline text-3xl flex items-center">
+            <CardTitle className="font-headline text-3xl flex items-center text-card-foreground">
               <ShoppingCart className="mr-3 h-8 w-8 text-primary" /> My Shopping Cart
             </CardTitle>
             <CardDescription>Review items in your cart and proceed to checkout.</CardDescription>
@@ -67,9 +66,9 @@ export default function CartPage() {
             {cartItems.length === 0 ? (
               <div className="text-center py-12">
                 <ShoppingCart className="mx-auto h-16 w-16 text-muted-foreground mb-6" />
-                <p className="text-2xl font-medium mb-2">Your cart is empty</p>
+                <p className="text-2xl font-medium mb-2 text-card-foreground">Your cart is empty</p>
                 <p className="text-muted-foreground mb-8">Looks like you haven't added anything to your cart yet.</p>
-                <Button asChild size="lg">
+                <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground">
                   <Link href="/medicines">
                     <Pill className="mr-2 h-5 w-5" /> Browse Medicines
                   </Link>
@@ -78,8 +77,8 @@ export default function CartPage() {
             ) : (
               <div className="space-y-4">
                 {cartItems.map((item) => (
-                  <Card key={item.id} className="flex flex-col sm:flex-row items-center gap-4 p-4 shadow-sm hover:shadow-md transition-shadow">
-                    <div className="relative w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 bg-muted rounded-md overflow-hidden">
+                  <Card key={item.id} className="flex flex-col sm:flex-row items-center gap-4 p-4 shadow-sm hover:shadow-md transition-shadow dark:bg-card/60">
+                    <div className="relative w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 bg-muted dark:bg-muted/50 rounded-md overflow-hidden">
                       <Image 
                         src={item.imageUrl} 
                         alt={item.name} 
@@ -90,19 +89,19 @@ export default function CartPage() {
                       />
                     </div>
                     <div className="flex-grow text-center sm:text-left">
-                      <h3 className="font-headline text-lg">{item.name}</h3>
+                      <h3 className="font-headline text-lg text-card-foreground">{item.name}</h3>
                       <p className="text-sm text-muted-foreground">₹{item.price.toFixed(2)} per unit</p>
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0 my-2 sm:my-0">
-                      <Button variant="outline" size="icon" onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)} >
+                      <Button variant="outline" size="icon" onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)} className="hover:bg-accent/10" >
                         <Minus className="h-4 w-4" />
                       </Button>
-                      <span className="w-8 text-center font-medium">{item.quantity}</span>
-                      <Button variant="outline" size="icon" onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}>
+                      <span className="w-8 text-center font-medium text-card-foreground">{item.quantity}</span>
+                      <Button variant="outline" size="icon" onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)} className="hover:bg-accent/10">
                         <Plus className="h-4 w-4" />
                       </Button>
                     </div>
-                    <p className="font-semibold text-md flex-shrink-0 w-24 text-right">₹{(item.price * item.quantity).toFixed(2)}</p>
+                    <p className="font-semibold text-md flex-shrink-0 w-24 text-right text-primary">₹{(item.price * item.quantity).toFixed(2)}</p>
                     <Button variant="ghost" size="icon" onClick={() => removeFromCart(item.id)} className="text-destructive hover:text-destructive/90 hover:bg-destructive/10 flex-shrink-0">
                       <Trash2 className="h-5 w-5" />
                       <span className="sr-only">Remove item</span>
@@ -124,7 +123,7 @@ export default function CartPage() {
           )}
         </Card>
         {cartItems.length > 0 && (
-            <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-md text-sm text-blue-700 flex items-start">
+            <div className="mt-4 p-4 bg-blue-50 border border-blue-200 dark:bg-blue-900/30 dark:border-blue-700 rounded-md text-sm text-blue-700 dark:text-blue-300 flex items-start">
                 <Info className="h-5 w-5 mr-3 flex-shrink-0 mt-0.5" />
                 <div>
                     <span className="font-semibold">Note:</span> This is a demo application. No real purchases will be made. Cart items are stored in your browser's local storage and will persist on this device until cleared.
@@ -136,11 +135,9 @@ export default function CartPage() {
   );
 }
 
-// Placeholder for Pill icon if not imported, for robustness
 const Pill = ({ className }: { className?: string }) => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
     <path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"></path>
     <path d="m8.5 8.5 7 7"></path>
   </svg>
 );
-

@@ -4,7 +4,7 @@
 import AppLayout from '@/components/layout/app-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import type { Prescription, TestResult, TabletReminder, DayOfWeek } from '@/lib/mock-data'; // Import DayOfWeek
+import type { Prescription, TestResult, TabletReminder, DayOfWeek } from '@/lib/mock-data';
 import { mockPrescriptions, mockTestResults } from '@/lib/mock-data';
 
 import { FileText, Beaker, Bell, PlusCircle, Download, ChevronRight, CalendarClock, Edit2, LogIn, Loader2, UserCircle as UserProfileIcon, Save, Trash2, AlertTriangle } from 'lucide-react';
@@ -19,7 +19,7 @@ import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useToast } from "@/hooks/use-toast";
-import { Checkbox } from '@/components/ui/checkbox'; // Import Checkbox
+import { Checkbox } from '@/components/ui/checkbox';
 
 const LOCAL_STORAGE_REMINDERS_KEY = 'mediMateReminders';
 const DAYS_OF_WEEK: DayOfWeek[] = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -33,7 +33,6 @@ export default function ProfilePage() {
   const [isAddPrescriptionModalOpen, setIsAddPrescriptionModalOpen] = useState(false);
   const [isAddTestResultModalOpen, setIsAddTestResultModalOpen] = useState(false);
   
-  // Reminder State
   const [reminders, setReminders] = useState<TabletReminder[]>([]);
   const [isReminderModalOpen, setIsReminderModalOpen] = useState(false);
   const [currentReminder, setCurrentReminder] = useState<Partial<TabletReminder> & { tempId?: string }>({});
@@ -45,7 +44,6 @@ export default function ProfilePage() {
   const [newUsername, setNewUsername] = useState('');
   const [usernameLoading, setUsernameLoading] = useState(false);
 
-  // Load reminders from localStorage on mount
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const storedReminders = localStorage.getItem(LOCAL_STORAGE_REMINDERS_KEY);
@@ -55,20 +53,18 @@ export default function ProfilePage() {
     }
   }, []);
 
-  // Save reminders to localStorage when they change
   useEffect(() => {
     if (typeof window !== 'undefined') {
       localStorage.setItem(LOCAL_STORAGE_REMINDERS_KEY, JSON.stringify(reminders));
     }
   }, [reminders]);
   
-  // Request notification permission
   useEffect(() => {
     if (typeof window !== 'undefined' && 'Notification' in window) {
       if (Notification.permission === 'default') {
         Notification.requestPermission().then(permission => {
           if (permission === 'granted') {
-            toast({ title: "Notifications Enabled", description: "You will now receive pill reminders." });
+            toast({ title: "Notifications Enabled", description: "You will now receive pill reminders.", className: "bg-green-500 text-white dark:bg-green-600" });
           } else {
             toast({ title: "Notifications Disabled", description: "You can enable reminders in browser settings.", variant: "destructive" });
           }
@@ -77,7 +73,6 @@ export default function ProfilePage() {
     }
   }, [toast]);
 
-  // Check for due reminders and send notifications
   useEffect(() => {
     const checkReminders = () => {
       if (Notification.permission !== 'granted') return;
@@ -94,29 +89,29 @@ export default function ProfilePage() {
           if (!notifiedMinute.has(notificationKey)) {
             new Notification("MediMate Pill Reminder", {
               body: `Time to take your ${reminder.medicineName} at ${reminder.time}.`,
-              icon: '/logo.png', // Optional: Add a logo in your public folder
+              icon: '/logo.png', 
             });
             toast({
               title: `Reminder: ${reminder.medicineName}`,
               description: `It's time to take your medication at ${reminder.time}.`,
+              className: "bg-primary text-primary-foreground"
             });
             newNotifiedForThisMinute.add(notificationKey);
           } else {
-             newNotifiedForThisMinute.add(notificationKey); // Keep it in the set if already notified this minute
+             newNotifiedForThisMinute.add(notificationKey); 
           }
         }
       });
       setNotifiedMinute(newNotifiedForThisMinute);
     };
 
-    // Clear notifiedMinute when the minute changes
     const minuteChangeInterval = setInterval(() => {
-      setNotifiedMinute(new Set()); // Reset for the new minute
+      setNotifiedMinute(new Set()); 
     }, 60 * 1000);
 
 
-    const intervalId = setInterval(checkReminders, 30000); // Check every 30 seconds
-    checkReminders(); // Initial check
+    const intervalId = setInterval(checkReminders, 30000); 
+    checkReminders(); 
 
     return () => {
       clearInterval(intervalId);
@@ -129,14 +124,13 @@ export default function ProfilePage() {
     if (user?.user_metadata?.username) {
       setNewUsername(user.user_metadata.username);
     } else if (user?.email) {
-      setNewUsername(user.email.split('@')[0]); // Default to part of email
+      setNewUsername(user.email.split('@')[0]); 
     }
   }, [user]);
   
   useEffect(() => {
-    // Redirect if not authenticated and not loading
     if (!authLoading && !user) {
-      // The UI below handles the display for unauthenticated users
+      // UI handles unauthenticated display
     }
   }, [user, authLoading, router]);
 
@@ -151,12 +145,11 @@ export default function ProfilePage() {
     if (error) {
       toast({ title: "Update Failed", description: error.message, variant: "destructive" });
     } else {
-      toast({ title: "Success", description: "Username updated successfully!", className: "bg-green-500 text-white" });
+      toast({ title: "Success", description: "Username updated successfully!", className: "bg-green-500 text-white dark:bg-green-600" });
       setIsEditingUsername(false);
     }
   };
 
-  // Reminder Modal Handlers
   const openAddReminderModal = () => {
     setEditingReminderId(null);
     setCurrentReminder({ medicineName: '', time: '08:00', days: [], isActive: true, tempId: Date.now().toString() });
@@ -194,14 +187,14 @@ export default function ProfilePage() {
       toast({ title: "Reminder Updated", description: `${currentReminder.medicineName} reminder updated.` });
     } else {
       const newReminder: TabletReminder = {
-        id: currentReminder.tempId || Date.now().toString(), // Use tempId or generate new
+        id: currentReminder.tempId || Date.now().toString(),
         medicineName: currentReminder.medicineName!,
         time: currentReminder.time!,
         days: currentReminder.days as DayOfWeek[],
         isActive: currentReminder.isActive !== undefined ? currentReminder.isActive : true,
       };
       setReminders(prev => [...prev, newReminder]);
-      toast({ title: "Reminder Added", description: `${newReminder.medicineName} reminder set.` });
+      toast({ title: "Reminder Added", description: `${newReminder.medicineName} reminder set.`, className: "bg-green-500 text-white dark:bg-green-600" });
     }
     setIsReminderModalOpen(false);
     setCurrentReminder({});
@@ -221,7 +214,7 @@ export default function ProfilePage() {
   if (authLoading) {
     return (
       <AppLayout>
-        <div className="flex flex-col items-center justify-center h-[calc(100vh-10rem)]">
+        <div className="flex flex-col items-center justify-center h-[calc(100vh-8rem)]">
           <Loader2 className="h-12 w-12 animate-spin text-primary" />
           <p className="mt-4 text-lg text-muted-foreground">Loading your profile...</p>
         </div>
@@ -232,14 +225,14 @@ export default function ProfilePage() {
   if (!user) {
     return (
       <AppLayout>
-        <div className="flex flex-col items-center justify-center h-[calc(100vh-10rem)] text-center p-4">
-          <Card className="max-w-md w-full p-8 shadow-lg">
+        <div className="flex flex-col items-center justify-center h-[calc(100vh-8rem)] text-center p-4">
+          <Card className="max-w-md w-full p-8 shadow-lg dark:bg-card">
             <UserProfileIcon className="h-16 w-16 text-primary mx-auto mb-6" />
-            <h2 className="font-headline text-2xl mb-3">Access Denied</h2>
+            <h2 className="font-headline text-2xl mb-3 text-card-foreground">Access Denied</h2>
             <p className="text-muted-foreground mb-6">
               Please log in to access your personal health profile and medical records.
             </p>
-            <Button asChild className="w-full">
+            <Button asChild className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
               <Link href="/login?redirect=/profile">
                 <LogIn className="mr-2 h-4 w-4" /> Log In or Sign Up
               </Link>
@@ -255,21 +248,21 @@ export default function ProfilePage() {
   return (
     <AppLayout>
       <div className="space-y-8">
-        <Card>
+        <Card className="dark:bg-card">
           <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
-            <Image src="https://placehold.co/100x100.png" alt="User Avatar" width={80} height={80} className="rounded-full border shadow" data-ai-hint="profile avatar" />
+            <Image src="https://placehold.co/100x100.png" alt="User Avatar" width={80} height={80} className="rounded-full border-2 border-primary shadow" data-ai-hint="profile avatar" />
             <div className="flex-grow">
               {!isEditingUsername ? (
                 <>
-                  <CardTitle className="font-headline text-3xl">{currentDisplayName}</CardTitle>
+                  <CardTitle className="font-headline text-3xl text-card-foreground">{currentDisplayName}</CardTitle>
                   <CardDescription>{user.email || 'Manage your health information securely.'}</CardDescription>
-                  <Button variant="outline" size="sm" className="mt-2" onClick={() => { setNewUsername(currentDisplayName); setIsEditingUsername(true); }}>
-                    <Edit2 className="mr-2 h-3 w-3" /> Edit Username
+                  <Button variant="outline" size="sm" className="mt-2 hover:bg-accent/10" onClick={() => { setNewUsername(currentDisplayName); setIsEditingUsername(true); }}>
+                    <Edit2 className="mr-2 h-3 w-3 text-primary" /> Edit Username
                   </Button>
                 </>
               ) : (
                 <div className="space-y-2">
-                  <Label htmlFor="username">Edit Username</Label>
+                  <Label htmlFor="username" className="text-card-foreground">Edit Username</Label>
                   <Input 
                     id="username" 
                     value={newUsername} 
@@ -278,7 +271,7 @@ export default function ProfilePage() {
                     placeholder="Enter your new username"
                   />
                   <div className="flex space-x-2 mt-2">
-                    <Button onClick={handleUsernameUpdate} disabled={usernameLoading} size="sm">
+                    <Button onClick={handleUsernameUpdate} disabled={usernameLoading} size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground">
                       {usernameLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                       Save
                     </Button>
@@ -292,30 +285,30 @@ export default function ProfilePage() {
 
         <Tabs defaultValue="prescriptions" className="w-full">
           <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3">
-            <TabsTrigger value="prescriptions"><FileText className="mr-2 h-4 w-4" />Prescriptions</TabsTrigger>
-            <TabsTrigger value="results"><Beaker className="mr-2 h-4 w-4" />Test Results</TabsTrigger>
-            <TabsTrigger value="reminders"><Bell className="mr-2 h-4 w-4" />Tablet Reminders</TabsTrigger>
+            <TabsTrigger value="prescriptions"><FileText className="mr-2 h-4 w-4 text-primary group-data-[state=active]:text-primary" />Prescriptions</TabsTrigger>
+            <TabsTrigger value="results"><Beaker className="mr-2 h-4 w-4 text-primary group-data-[state=active]:text-primary" />Test Results</TabsTrigger>
+            <TabsTrigger value="reminders"><Bell className="mr-2 h-4 w-4 text-primary group-data-[state=active]:text-primary" />Tablet Reminders</TabsTrigger>
           </TabsList>
 
           <TabsContent value="prescriptions" className="mt-6">
-            <Card>
+            <Card className="dark:bg-card">
               <CardHeader className="flex flex-row justify-between items-center">
-                <CardTitle className="font-headline text-2xl">My Prescriptions</CardTitle>
-                <Button onClick={() => setIsAddPrescriptionModalOpen(true)}><PlusCircle className="mr-2 h-4 w-4" /> Add New</Button>
+                <CardTitle className="font-headline text-2xl text-card-foreground">My Prescriptions</CardTitle>
+                <Button onClick={() => setIsAddPrescriptionModalOpen(true)} className="bg-primary hover:bg-primary/90 text-primary-foreground"><PlusCircle className="mr-2 h-4 w-4" /> Add New</Button>
               </CardHeader>
               <CardContent className="space-y-4">
                 {mockPrescriptions.length > 0 ? mockPrescriptions.map(p => (
-                  <Card key={p.id} className="shadow-sm">
+                  <Card key={p.id} className="shadow-sm dark:bg-card/50">
                     <CardHeader className="flex flex-row justify-between items-start p-4">
                       <div>
-                        <CardTitle className="font-headline text-lg">{p.medicineName}</CardTitle>
+                        <CardTitle className="font-headline text-lg text-card-foreground">{p.medicineName}</CardTitle>
                         <CardDescription className="text-xs">Dr. {p.doctorName} - Issued: {p.dateIssued}</CardDescription>
                       </div>
                       {p.imageUrl && <Download className="h-5 w-5 text-primary cursor-pointer" onClick={() => alert('Download prescription (mock)')} />}
                     </CardHeader>
-                    <CardContent className="p-4 pt-0">
-                      <p className="text-sm"><span className="font-semibold">Dosage:</span> {p.dosage}</p>
-                      <p className="text-sm"><span className="font-semibold">Frequency:</span> {p.frequency}</p>
+                    <CardContent className="p-4 pt-0 text-muted-foreground">
+                      <p className="text-sm"><span className="font-semibold text-card-foreground">Dosage:</span> {p.dosage}</p>
+                      <p className="text-sm"><span className="font-semibold text-card-foreground">Frequency:</span> {p.frequency}</p>
                     </CardContent>
                     {p.imageUrl && 
                         <div className="p-4 pt-0">
@@ -329,22 +322,22 @@ export default function ProfilePage() {
           </TabsContent>
 
           <TabsContent value="results" className="mt-6">
-            <Card>
+            <Card className="dark:bg-card">
               <CardHeader className="flex flex-row justify-between items-center">
-                <CardTitle className="font-headline text-2xl">My Test Results</CardTitle>
-                 <Button onClick={() => setIsAddTestResultModalOpen(true)}><PlusCircle className="mr-2 h-4 w-4" /> Add New</Button>
+                <CardTitle className="font-headline text-2xl text-card-foreground">My Test Results</CardTitle>
+                 <Button onClick={() => setIsAddTestResultModalOpen(true)} className="bg-primary hover:bg-primary/90 text-primary-foreground"><PlusCircle className="mr-2 h-4 w-4" /> Add New</Button>
               </CardHeader>
               <CardContent className="space-y-4">
                 {mockTestResults.length > 0 ? mockTestResults.map(r => (
-                  <Card key={r.id} className="shadow-sm">
+                  <Card key={r.id} className="shadow-sm dark:bg-card/50">
                     <CardHeader className="p-4">
-                      <CardTitle className="font-headline text-lg">{r.testName}</CardTitle>
+                      <CardTitle className="font-headline text-lg text-card-foreground">{r.testName}</CardTitle>
                       <CardDescription className="text-xs">Date: {r.dateTaken}</CardDescription>
                     </CardHeader>
                     <CardContent className="p-4 pt-0">
-                      <p className="text-sm mb-2">{r.resultSummary}</p>
+                      <p className="text-sm mb-2 text-muted-foreground">{r.resultSummary}</p>
                       <div className="flex items-center space-x-2">
-                        {r.reportUrl && <Button variant="outline" size="sm" asChild><a href={r.reportUrl} target="_blank" rel="noopener noreferrer"><Download className="mr-2 h-3 w-3" /> View Full Report</a></Button>}
+                        {r.reportUrl && <Button variant="outline" size="sm" asChild className="hover:bg-accent/10"><a href={r.reportUrl} target="_blank" rel="noopener noreferrer"><Download className="mr-2 h-3 w-3 text-primary" /> View Full Report</a></Button>}
                         {r.imageUrl && <Image src={r.imageUrl} alt={`Result for ${r.testName}`} width={100} height={100} className="rounded border" data-ai-hint={r.dataAiHint || "test result"} />}
                       </div>
                     </CardContent>
@@ -355,31 +348,31 @@ export default function ProfilePage() {
           </TabsContent>
 
           <TabsContent value="reminders" className="mt-6">
-            <Card>
+            <Card className="dark:bg-card">
               <CardHeader className="flex flex-row justify-between items-center">
-                <CardTitle className="font-headline text-2xl">Tablet Reminders</CardTitle>
-                 <Button onClick={openAddReminderModal}><PlusCircle className="mr-2 h-4 w-4" /> Add New Reminder</Button>
+                <CardTitle className="font-headline text-2xl text-card-foreground">Tablet Reminders</CardTitle>
+                 <Button onClick={openAddReminderModal} className="bg-primary hover:bg-primary/90 text-primary-foreground"><PlusCircle className="mr-2 h-4 w-4" /> Add New Reminder</Button>
               </CardHeader>
               <CardContent className="space-y-4">
                 {Notification.permission !== 'granted' && (
-                    <div className="p-3 bg-yellow-100 border border-yellow-300 rounded-md text-yellow-700 text-sm flex items-center gap-2">
+                    <div className="p-3 bg-yellow-100 border border-yellow-300 dark:bg-yellow-900/30 dark:border-yellow-700 rounded-md text-yellow-700 dark:text-yellow-300 text-sm flex items-center gap-2">
                         <AlertTriangle className="h-5 w-5" />
                         <span>Browser notifications are currently disabled. Please enable them in your browser settings to receive reminders.</span>
                     </div>
                 )}
                 {reminders.length > 0 ? reminders.map(rem => (
-                  <Card key={rem.id} className={`shadow-sm ${rem.isActive ? '' : 'opacity-60'}`}>
+                  <Card key={rem.id} className={`shadow-sm dark:bg-card/50 ${rem.isActive ? '' : 'opacity-60'}`}>
                     <CardContent className="p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                       <div className="flex-grow">
-                        <p className="font-headline text-lg">{rem.medicineName}</p>
+                        <p className="font-headline text-lg text-card-foreground">{rem.medicineName}</p>
                         <p className="text-sm text-muted-foreground flex items-center">
-                          <CalendarClock className="h-4 w-4 mr-1.5" /> {rem.time} - {rem.days.join(', ')}
+                          <CalendarClock className="h-4 w-4 mr-1.5 text-secondary" /> {rem.time} - {rem.days.join(', ')}
                         </p>
                       </div>
                       <div className="flex items-center gap-2 mt-2 sm:mt-0 flex-shrink-0">
                         <Switch checked={rem.isActive} onCheckedChange={() => toggleReminderActiveState(rem.id)} aria-label={`Toggle reminder for ${rem.medicineName}`} />
-                        <Button variant="outline" size="icon" onClick={() => openEditReminderModal(rem)} aria-label="Edit reminder">
-                            <Edit2 className="h-4 w-4" />
+                        <Button variant="outline" size="icon" onClick={() => openEditReminderModal(rem)} aria-label="Edit reminder" className="hover:bg-accent/10">
+                            <Edit2 className="h-4 w-4 text-primary" />
                         </Button>
                         <Button variant="destructive" size="icon" onClick={() => handleDeleteReminder(rem.id)} aria-label="Delete reminder">
                             <Trash2 className="h-4 w-4" />
@@ -393,73 +386,71 @@ export default function ProfilePage() {
           </TabsContent>
         </Tabs>
 
-        <Card>
+        <Card className="dark:bg-card">
           <CardHeader>
-            <CardTitle className="font-headline text-2xl">Health History</CardTitle>
+            <CardTitle className="font-headline text-2xl text-card-foreground">Health History</CardTitle>
             <CardDescription>A timeline of your significant health events and appointments (mock data).</CardDescription>
           </CardHeader>
           <CardContent>
             <ul className="space-y-3">
               {['Annual Checkup - Jan 2024', 'Flu Vaccination - Oct 2023', 'Dental Cleaning - Jul 2023'].map(item => (
-                <li key={item} className="flex items-center text-sm p-3 bg-muted/50 rounded-md">
+                <li key={item} className="flex items-center text-sm p-3 bg-muted/50 dark:bg-muted/30 rounded-md text-muted-foreground">
                   <ChevronRight className="h-4 w-4 mr-2 text-primary" /> {item}
                 </li>
               ))}
             </ul>
-             <Button variant="link" className="mt-2 px-0">View Full Health History</Button>
+             <Button variant="link" className="mt-2 px-0 text-primary hover:text-primary/80">View Full Health History</Button>
           </CardContent>
         </Card>
       </div>
 
-      {/* Add Prescription Modal */}
       <Dialog open={isAddPrescriptionModalOpen} onOpenChange={setIsAddPrescriptionModalOpen}>
-        <DialogContent>
+        <DialogContent className="dark:bg-card">
           <DialogHeader>
-            <DialogTitle className="font-headline text-xl">Add New Prescription</DialogTitle>
+            <DialogTitle className="font-headline text-xl text-card-foreground">Add New Prescription</DialogTitle>
             <DialogDescription>Enter the details of your new prescription.</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="medNamePrescription" className="text-right">Medicine</Label>
+              <Label htmlFor="medNamePrescription" className="text-right text-card-foreground">Medicine</Label>
               <Input id="medNamePrescription" placeholder="e.g., Paracetamol 500mg" className="col-span-3" />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsAddPrescriptionModalOpen(false)}>Cancel</Button>
-            <Button type="submit" onClick={() => { setIsAddPrescriptionModalOpen(false); toast({title: "Mock Action", description: "Prescription saved (mock)." }); }}>Save Prescription</Button>
+            <Button variant="outline" onClick={() => setIsAddPrescriptionModalOpen(false)} className="hover:bg-muted/50">Cancel</Button>
+            <Button type="submit" onClick={() => { setIsAddPrescriptionModalOpen(false); toast({title: "Mock Action", description: "Prescription saved (mock)." }); }} className="bg-primary text-primary-foreground hover:bg-primary/90">Save Prescription</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
       
        <Dialog open={isAddTestResultModalOpen} onOpenChange={setIsAddTestResultModalOpen}>
-        <DialogContent>
+        <DialogContent className="dark:bg-card">
           <DialogHeader>
-            <DialogTitle className="font-headline text-xl">Add New Test Result</DialogTitle>
+            <DialogTitle className="font-headline text-xl text-card-foreground">Add New Test Result</DialogTitle>
             <DialogDescription>Enter the details of your new test result.</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="testNameResult" className="text-right">Test Name</Label>
+              <Label htmlFor="testNameResult" className="text-right text-card-foreground">Test Name</Label>
               <Input id="testNameResult" placeholder="e.g., Lipid Profile" className="col-span-3" />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsAddTestResultModalOpen(false)}>Cancel</Button>
-            <Button type="submit" onClick={() => { setIsAddTestResultModalOpen(false); toast({title: "Mock Action", description: "Test result saved (mock)." }); }}>Save Result</Button>
+            <Button variant="outline" onClick={() => setIsAddTestResultModalOpen(false)} className="hover:bg-muted/50">Cancel</Button>
+            <Button type="submit" onClick={() => { setIsAddTestResultModalOpen(false); toast({title: "Mock Action", description: "Test result saved (mock)." }); }} className="bg-primary text-primary-foreground hover:bg-primary/90">Save Result</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Add/Edit Reminder Modal */}
       <Dialog open={isReminderModalOpen} onOpenChange={setIsReminderModalOpen}>
-        <DialogContent>
+        <DialogContent className="dark:bg-card">
           <DialogHeader>
-            <DialogTitle className="font-headline text-xl">{editingReminderId ? 'Edit Reminder' : 'Add New Reminder'}</DialogTitle>
+            <DialogTitle className="font-headline text-xl text-card-foreground">{editingReminderId ? 'Edit Reminder' : 'Add New Reminder'}</DialogTitle>
             <DialogDescription>Set up a new tablet reminder.</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="remMedName">Medicine Name</Label>
+              <Label htmlFor="remMedName" className="text-card-foreground">Medicine Name</Label>
               <Input 
                 id="remMedName" 
                 placeholder="e.g., Vitamin C" 
@@ -468,7 +459,7 @@ export default function ProfilePage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="remTime">Time</Label>
+              <Label htmlFor="remTime" className="text-card-foreground">Time</Label>
               <Input 
                 id="remTime" 
                 type="time"
@@ -477,7 +468,7 @@ export default function ProfilePage() {
               />
             </div>
             <div className="space-y-2">
-              <Label>Days</Label>
+              <Label className="text-card-foreground">Days</Label>
               <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
                 {DAYS_OF_WEEK.map(day => (
                   <div key={day} className="flex items-center space-x-2">
@@ -486,7 +477,7 @@ export default function ProfilePage() {
                       checked={currentReminder.days?.includes(day)}
                       onCheckedChange={() => handleDayToggle(day)}
                     />
-                    <Label htmlFor={`day-${day}`} className="font-normal">{day}</Label>
+                    <Label htmlFor={`day-${day}`} className="font-normal text-muted-foreground">{day}</Label>
                   </div>
                 ))}
               </div>
@@ -497,12 +488,12 @@ export default function ProfilePage() {
                     checked={currentReminder.isActive !== undefined ? currentReminder.isActive : true}
                     onCheckedChange={(checked) => handleReminderFormChange('isActive', checked)}
                 />
-                <Label htmlFor="reminderActive">Enable Reminder</Label>
+                <Label htmlFor="reminderActive" className="text-card-foreground">Enable Reminder</Label>
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => { setIsReminderModalOpen(false); setCurrentReminder({}); setEditingReminderId(null);}}>Cancel</Button>
-            <Button onClick={handleSaveReminder}>{editingReminderId ? 'Save Changes' : 'Add Reminder'}</Button>
+            <Button variant="outline" onClick={() => { setIsReminderModalOpen(false); setCurrentReminder({}); setEditingReminderId(null);}} className="hover:bg-muted/50">Cancel</Button>
+            <Button onClick={handleSaveReminder} className="bg-primary text-primary-foreground hover:bg-primary/90">{editingReminderId ? 'Save Changes' : 'Add Reminder'}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -24,7 +24,7 @@ const ReelCard: React.FC<{ reel: HealthReel; isVisible: boolean; isMuted: boolea
 
   const handleLike = () => {
     setLiked(!liked);
-    toast({ title: liked ? "Unliked" : "Liked!", description: reel.title });
+    toast({ title: liked ? "Unliked" : "Liked!", description: reel.title, className: liked ? "" : "bg-pink-500 text-white dark:bg-pink-600" });
   };
   
   const handleSave = () => {
@@ -34,7 +34,7 @@ const ReelCard: React.FC<{ reel: HealthReel; isVisible: boolean; isMuted: boolea
       return;
     }
     setSaved(!saved);
-    toast({ title: saved ? "Removed from saved" : "Saved to collection!", description: reel.title });
+    toast({ title: saved ? "Removed from saved" : "Saved to collection!", description: reel.title, className: saved ? "" : "bg-yellow-500 text-white dark:bg-yellow-600" });
   };
 
   const handleShare = () => {
@@ -66,10 +66,8 @@ const ReelCard: React.FC<{ reel: HealthReel; isVisible: boolean; isMuted: boolea
   );
 
   useEffect(() => {
-    if (isVisible && iframeRef.current) {
-      // The embedUrl already has autoplay and mute.
-      // Forcing play/pause/mute via postMessage can be complex.
-    }
+    // The iframe's src attribute is updated when isMuted or embedUrl changes,
+    // which handles playing/muting via URL parameters.
   }, [isVisible, isMuted, embedUrl]);
 
   return (
@@ -108,11 +106,11 @@ const ReelCard: React.FC<{ reel: HealthReel; isVisible: boolean; isMuted: boolea
             </Avatar>
             <CardTitle className="font-headline text-base text-white truncate">{reel.title}</CardTitle>
           </div>
-          <Badge variant="secondary" className="mt-1 text-xs self-start bg-black/30 text-white border-none">{reel.topic}</Badge>
+          <Badge variant="secondary" className="mt-1 text-xs self-start bg-black/40 text-white border-none backdrop-blur-sm">{reel.topic}</Badge>
         </CardHeader>
 
         <div className="flex items-end justify-between w-full">
-          <div className="z-10 text-white text-sm p-2 rounded space-y-1 pointer-events-auto max-w-[calc(100%-5rem)]">
+          <div className="z-10 text-white text-sm p-2 rounded space-y-1 pointer-events-auto max-w-[calc(100%-5rem)] bg-black/20 backdrop-blur-sm">
             <p className="font-semibold text-base">{reel.uploader}</p>
             {reel.description && <p className="text-xs mt-0.5 line-clamp-2">{reel.description}</p>}
             <div className="flex items-center text-xs">
@@ -126,7 +124,7 @@ const ReelCard: React.FC<{ reel: HealthReel; isVisible: boolean; isMuted: boolea
               <span className="sr-only">{reel.likes + (liked ? 1 : 0)} likes</span>
             </Button>
             <Button variant="ghost" size="icon" className="text-white hover:text-white p-0 h-auto pointer-events-auto" onClick={handleSave}>
-              <Bookmark className={`h-7 w-7 transition-colors ${saved ? 'fill-yellow-500 text-yellow-500' : 'hover:fill-yellow-500/30'}`} />
+              <Bookmark className={`h-7 w-7 transition-colors ${saved ? 'fill-yellow-400 text-yellow-400' : 'hover:fill-yellow-400/30'}`} />
               <span className="sr-only">Save</span>
             </Button>
             <Button variant="ghost" size="icon" className="text-white hover:text-white p-0 h-auto pointer-events-auto" onClick={handleShare}>
@@ -151,7 +149,7 @@ export default function HealthReelsPage() {
   const [visibleReelId, setVisibleReelId] = useState<string | null>(null);
   const observer = useRef<IntersectionObserver | null>(null);
   const reelRefs = useRef<Map<string, HTMLDivElement | null>>(new Map());
-  const [isMuted, setIsMuted] = useState(false); // Default to sound ON
+  const [isMuted, setIsMuted] = useState(false); 
 
   const filteredReels = useMemo(() => {
     return activeTopic === 'All' ? mockHealthReels : mockHealthReels.filter(reel => reel.topic === activeTopic);
@@ -205,9 +203,9 @@ export default function HealthReelsPage() {
 
   return (
     <AppLayout>
-      <div className="flex flex-col h-full"> {/* Ensure AppLayout allows this page to be full height */}
-        <header className="p-4 border-b bg-background z-20">
-          <CardTitle className="font-headline text-3xl flex items-center mb-3">
+      <div className="flex flex-col h-full">
+        <header className="p-4 border-b bg-background dark:bg-card z-20">
+          <CardTitle className="font-headline text-3xl flex items-center mb-3 text-foreground">
             <PlaySquare className="mr-3 h-8 w-8 text-primary" />
             Health Reels
           </CardTitle>
@@ -218,7 +216,7 @@ export default function HealthReelsPage() {
                 variant={activeTopic === topic ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setActiveTopic(topic)}
-                className="shrink-0 rounded-full px-4"
+                className={`shrink-0 rounded-full px-4 ${activeTopic === topic ? 'bg-primary text-primary-foreground' : 'hover:bg-accent/10'}`}
               >
                 {topic}
               </Button>
@@ -226,17 +224,16 @@ export default function HealthReelsPage() {
           </div>
         </header>
 
-        {/* Full height scrollable container for reels */}
-        <div className="flex-grow overflow-y-auto snap-y snap-mandatory scroll-smooth hide-scrollbar relative">
+        <div className="flex-grow overflow-y-auto snap-y snap-mandatory scroll-smooth hide-scrollbar relative bg-neutral-900 dark:bg-black">
           {filteredReels.length > 0 ? (
             filteredReels.map((reel) => (
                <div 
                 key={reel.id} 
                 id={reel.id}
                 ref={el => reelRefs.current.set(reel.id, el)}
-                className="h-full snap-center shrink-0 flex items-center justify-center p-0 md:p-0" // Full height snap item
+                className="h-full snap-center shrink-0 flex items-center justify-center p-0 md:p-0"
               >
-                <div className="w-full max-w-sm h-full"> {/* Constrain width, maintain full height */}
+                <div className="w-full max-w-sm h-full">
                   <ReelCard 
                     reel={reel} 
                     isVisible={visibleReelId === reel.id} 
@@ -247,10 +244,10 @@ export default function HealthReelsPage() {
               </div>
             ))
           ) : (
-            <div className="h-full flex flex-col items-center justify-center text-center p-8">
-              <PlaySquare className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
+            <div className="h-full flex flex-col items-center justify-center text-center p-8 text-muted-foreground">
+              <PlaySquare className="mx-auto h-16 w-16 mb-4" />
               <p className="text-xl font-medium">No reels available</p>
-              <p className="text-muted-foreground">Try selecting a different category or check back later.</p>
+              <p>Try selecting a different category or check back later.</p>
             </div>
           )}
         </div>
@@ -263,9 +260,6 @@ export default function HealthReelsPage() {
           -ms-overflow-style: none; 
           scrollbar-width: none; 
         }
-        /* Ensure the main content area within AppLayout can take full height if needed */
-        /* This might need adjustment based on AppLayout's structure */
-        /* main { display: flex; flex-direction: column; flex-grow: 1; } */
       `}</style>
     </AppLayout>
   );
