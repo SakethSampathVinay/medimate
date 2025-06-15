@@ -37,6 +37,8 @@ export default function ProfilePage() {
   const [isReminderModalOpen, setIsReminderModalOpen] = useState(false);
   const [currentReminder, setCurrentReminder] = useState<Partial<TabletReminder> & { tempId?: string }>({});
   const [editingReminderId, setEditingReminderId] = useState<string | null>(null);
+  
+  // notifiedMinute stores keys like 'reminderId-HH:MM' to prevent spamming notifications for the same reminder in the same minute.
   const [notifiedMinute, setNotifiedMinute] = useState<Set<string>>(new Set());
 
 
@@ -94,11 +96,12 @@ export default function ProfilePage() {
       if (reminder.isActive && reminder.days.includes(currentDay) && reminder.time === currentTime) {
         const notificationKey = `${reminder.id}-${currentTime}`;
         
+        // Use functional update for setNotifiedMinute to avoid 'notifiedMinute' in useCallback deps
         setNotifiedMinute(prevNotifiedMinute => {
           if (!prevNotifiedMinute.has(notificationKey)) {
             new Notification("MediMate Pill Reminder", {
               body: `Time to take your ${reminder.medicineName} at ${reminder.time}.`,
-              icon: '/logo.png', // Ensure this logo.png is in your public folder
+              icon: '/logo.png', 
             });
             toast({
               title: `Reminder: ${reminder.medicineName}`,
@@ -109,19 +112,20 @@ export default function ProfilePage() {
             newSet.add(notificationKey);
             return newSet;
           }
-          return prevNotifiedMinute;
+          return prevNotifiedMinute; 
         });
       }
     });
   }, [reminders, toast, setNotifiedMinute]);
 
+
   useEffect(() => {
-    checkReminders(); // Initial check
-    const reminderIntervalId = setInterval(checkReminders, 30000); // Check every 30 seconds
+    checkReminders(); 
+    const reminderIntervalId = setInterval(checkReminders, 30000); 
 
     const minuteResetIntervalId = setInterval(() => {
-      setNotifiedMinute(new Set()); // Reset the set of notified reminders for the current minute
-    }, 60 * 1000); // Reset every minute
+      setNotifiedMinute(new Set()); 
+    }, 60 * 1000); 
 
     return () => {
       clearInterval(reminderIntervalId);

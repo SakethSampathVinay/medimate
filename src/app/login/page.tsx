@@ -73,7 +73,7 @@ export default function LoginPage() {
       toast({
         title: isSignUpMode ? "Sign Up Successful!" : "Login Successful!",
         description: isSignUpMode ? "Please check your email if confirmation is required." : "Redirecting...",
-        className: "bg-green-500 text-white",
+        className: "bg-green-500 text-white dark:bg-green-600",
       });
       router.push(redirectUrl);
     }

@@ -552,7 +552,7 @@ const getYouTubeVideoId = (url: string): string | null => {
   return null;
 };
 
-// Example YouTube Video IDs for placeholders - replace with actual relevant short video IDs if available
+
 const exampleShortVideoIds: Record<string, string[]> = {
   "Fitness": ["gC_L9qAHVJ8", "41n9K3TRTY4", "VfVdJAUh2Yw"],
   "Nutrition": ["rG3xXQdyuPM", "t0Y2GIR-L2I", "2VvK5t7Q9qU"],
@@ -568,19 +568,19 @@ const rawInstagramReelsData = [
       {
         "title": "Beginner Calisthenics Workout",
         "description": "Quick calisthenics routine for beginners—perfect for home workouts.",
-        "url": "https://www.instagram.com/reel/CvXyZzqI3Y9/", // This will be replaced
+        "url": "https://www.instagram.com/reel/CvXyZzqI3Y9/",
         "account": "@learn_calisthenics",
       },
       {
         "title": "5-Minute Full Body Workout",
         "description": "Fast and effective full body workout for all fitness levels.",
-        "url": "https://www.instagram.com/reel/CvXyZzqI3Y9/", // This will be replaced
+        "url": "https://www.instagram.com/reel/CvXyZzqI3Y9/",
         "account": "@docjenfit",
       },
       {
         "title": "Fun Workout Challenge",
         "description": "Try this challenge to spice up your fitness routine!",
-        "url": "https://www.instagram.com/reel/CvXyZzqI3Y9/", // This will be replaced
+        "url": "https://www.instagram.com/reel/CvXyZzqI3Y9/",
         "account": "@michalynnrivas",
       }
     ]
@@ -591,19 +591,19 @@ const rawInstagramReelsData = [
       {
         "title": "Healthy Meal Prep Ideas",
         "description": "Simple, nutritious meal prep for busy weekdays.",
-        "url": "https://www.instagram.com/reel/CvXyZzqI3Y9/", // This will be replaced
+        "url": "https://www.instagram.com/reel/CvXyZzqI3Y9/",
         "account": "@nutritionstripped",
       },
       {
         "title": "Balanced Breakfast Recipes",
         "description": "Easy breakfast ideas to start your day right.",
-        "url": "https://www.instagram.com/reel/CvXyZzqI3Y9/", // This will be replaced
+        "url": "https://www.instagram.com/reel/CvXyZzqI3Y9/",
         "account": "@healthyfoodguide",
       },
       {
         "title": "Snack Hacks for Energy",
         "description": "Healthy snack ideas to keep you energized.",
-        "url": "https://www.instagram.com/reel/CvXyZzqI3Y9/", // This will be replaced
+        "url": "https://www.instagram.com/reel/CvXyZzqI3Y9/",
         "account": "@mindfulnutritionist",
       }
     ]
@@ -614,19 +614,19 @@ const rawInstagramReelsData = [
       {
         "title": "Simple Mental Health Reminder",
         "description": "Gentle reminders to prioritize self-care and mental health.",
-        "url": "https://www.instagram.com/reel/CvXyZzqI3Y9/", // This will be replaced
+        "url": "https://www.instagram.com/reel/CvXyZzqI3Y9/",
         "account": "@howmental",
       },
       {
         "title": "Daily Gratitude Practice",
         "description": "Quick gratitude journaling tips for positivity.",
-        "url": "https://www.instagram.com/reel/CvXyZzqI3Y9/", // This will be replaced
+        "url": "https://www.instagram.com/reel/CvXyZzqI3Y9/",
         "account": "@fiveminutejournal",
       },
       {
         "title": "Mindfulness Meditation",
         "description": "Short guided meditation for stress relief.",
-        "url": "https://www.instagram.com/reel/CvXyZzqI3Y9/", // This will be replaced
+        "url": "https://www.instagram.com/reel/CvXyZzqI3Y9/",
         "account": "@selfcareisapriority",
       }
     ]
@@ -637,19 +637,19 @@ const rawInstagramReelsData = [
       {
         "title": "Morning Yoga Flow",
         "description": "Gentle yoga routine to start your day.",
-        "url": "https://www.instagram.com/reel/CvXyZzqI3Y9/", // This will be replaced
+        "url": "https://www.instagram.com/reel/CvXyZzqI3Y9/",
         "account": "@yoga_girl",
       },
       {
         "title": "Yoga for Stress Relief",
         "description": "Yoga sequence to reduce anxiety and stress.",
-        "url": "https://www.instagram.com/reel/CvXyZzqI3Y9/", // This will be replaced
+        "url": "https://www.instagram.com/reel/CvXyZzqI3Y9/",
         "account": "@yogawithadriene",
       },
       {
         "title": "5-Minute Yoga Break",
         "description": "Quick yoga break for work or study.",
-        "url": "https://www.instagram.com/reel/CvXyZzqI3Y9/", // This will be replaced
+        "url": "https://www.instagram.com/reel/CvXyZzqI3Y9/",
         "account": "@yogawithkassandra",
       }
     ]
@@ -660,44 +660,41 @@ const rawInstagramReelsData = [
       {
         "title": "Doctor’s Health Tips",
         "description": "Quick health advice from a medical professional.",
-        "url": "https://www.instagram.com/reel/CvXyZzqI3Y9/", // This will be replaced
+        "url": "https://www.instagram.com/reel/CvXyZzqI3Y9/",
         "account": "@doctor.mike",
       },
       {
         "title": "Healthy Lifestyle Hacks",
         "description": "Tips for maintaining a healthy lifestyle.",
-        "url": "https://www.instagram.com/reel/CvXyZzqI3Y9/", // This will be replaced
+        "url": "https://www.instagram.com/reel/CvXyZzqI3Y9/",
         "account": "@healthline",
       },
       {
         "title": "Debunking Health Myths",
         "description": "Separating fact from fiction in health trends.",
-        "url": "https://www.instagram.com/reel/CvXyZzqI3Y9/", // This will be replaced
+        "url": "https://www.instagram.com/reel/CvXyZzqI3Y9/",
         "account": "@clevelandclinic",
       }
     ]
   }
 ];
 
-let reelCounter = 0; // To cycle through example video IDs
+let reelCounter = 0; 
 
-const allReelsFromSource: HealthReel[] = rawInstagramReelsData.flatMap((topicData) =>
+const allReelsFromSource: HealthReel[] = rawInstagramReelsData.flatMap((topicData, topicIndex) =>
   topicData.reels.map((reel, reelIndex): HealthReel => {
     let videoId: string | null = null;
-    // Attempt to get ID if it's already a YouTube link
-    videoId = getYouTubeVideoId(reel.url);
-
-    // If it's an Instagram URL (or couldn't parse a YouTube ID), use an example ID
-    if (!videoId || reel.url.includes("instagram.com")) {
-        const exampleIdsForTopic = exampleShortVideoIds[topicData.topic] || exampleShortVideoIds["Health Info"];
-        videoId = exampleIdsForTopic[reelCounter % exampleIdsForTopic.length];
-        reelCounter++;
-    }
+    
+    // Use example YouTube video IDs based on topic and index
+    const exampleIdsForTopic = exampleShortVideoIds[topicData.topic] || exampleShortVideoIds["Health Info"];
+    // Cycle through the example IDs for the current topic
+    videoId = exampleIdsForTopic[reelCounter % exampleIdsForTopic.length];
+    reelCounter++;
     
     const embedUrl = videoId ? `https://www.youtube.com/embed/${videoId}` : 'https://www.youtube.com/embed/dQw4w9WgXcQ'; // Fallback
 
     return {
-      id: `reel_${topicData.topic.toLowerCase().replace(/\s+/g, '-')}_${reel.title.toLowerCase().replace(/\s+/g, '-').substring(0,10)}_${reelIndex + 1}`,
+      id: `reel_${topicData.topic.toLowerCase().replace(/\s+/g, '-')}_${reel.title.toLowerCase().replace(/\s+/g, '-').substring(0,10)}_${topicIndex}_${reelIndex + 1}`,
       topic: topicData.topic,
       title: reel.title,
       description: reel.description,
@@ -705,14 +702,14 @@ const allReelsFromSource: HealthReel[] = rawInstagramReelsData.flatMap((topicDat
       thumbnailUrl: videoId ? `https://img.youtube.com/vi/${videoId}/0.jpg` : 'https://placehold.co/480x270.png?text=No+Thumbnail',
       dataAiHint: reel.description ? reel.description.toLowerCase().split(' ').slice(0,2).join(' ') : topicData.topic.toLowerCase(),
       uploader: reel.account,
-      uploaderAvatar: 'https://placehold.co/50x50.png', // Placeholder avatar
+      uploaderAvatar: 'https://placehold.co/50x50.png', 
       likes: Math.floor(Math.random() * 2000) + 500,
     };
   })
 );
 
 // Filter to keep only 1st, 7th, and 9th reels from the generated 'allReelsFromSource'
-const indicesToKeep = [0, 6, 8]; // 0-indexed for 1st, 7th, 9th from the FLATTENED list
+const indicesToKeep = [0, 6, 8]; // 0-indexed: 1st reel, 7th reel, 9th reel
 export const mockHealthReels: HealthReel[] = allReelsFromSource.filter((_, index) => indicesToKeep.includes(index));
 
 
@@ -812,8 +809,3 @@ export interface TabletReminder {
   days: DayOfWeek[];
   isActive: boolean;
 }
-// mockTabletReminders is removed as reminders are now user-managed and stored in localStorage.
-// The TabletReminder interface remains for type safety.
-
-
-    

@@ -28,7 +28,7 @@ export default function CartPage() {
   if (authLoading || (!user && typeof window !== 'undefined')) { 
     return (
       <AppLayout>
-        <div className="flex flex-col items-center justify-center h-[calc(100vh-8rem)]">
+        <div className="flex flex-col items-center justify-center h-full">
           <Loader2 className="h-12 w-12 animate-spin text-primary" />
           <p className="mt-4 text-lg text-muted-foreground">Loading cart...</p>
         </div>
