@@ -1,3 +1,4 @@
+
 'use client';
 
 import AppLayout from '@/components/layout/app-layout';
@@ -7,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { analyzeMedicalImage, AnalyzeMedicalImageOutput } from '@/ai/flows/analyze-medical-image';
 import { analyzeSymptoms, AnalyzeSymptomsOutput } from '@/ai/flows/analyze-symptoms';
-import { Bot, ImageIcon, Send, User, AlertTriangle, CheckCircle, Loader2 } from 'lucide-react';
+import { Bot, ImageIcon, Send, User, AlertTriangle, CheckCircle, Loader2, Info, Sparkles, ShieldAlert, PillIcon, Stethoscope, HelpCircle } from 'lucide-react';
 import React, { useState, useRef, ChangeEvent } from 'react';
 import { useToast } from "@/hooks/use-toast";
 import Image from 'next/image';
@@ -114,17 +115,17 @@ export default function HealthAnalysisPage() {
         <CardContent className="flex-grow overflow-y-auto p-4 space-y-4 bg-muted/30 rounded-lg shadow-inner">
           {messages.map(msg => (
             <div key={msg.id} className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-xl p-3 rounded-lg shadow ${
-                msg.type === 'user' ? 'bg-primary text-primary-foreground' : 
-                msg.type === 'ai' ? 'bg-card text-card-foreground border' : 
-                'bg-destructive text-destructive-foreground'
+              <div className={`max-w-2xl w-full p-3 rounded-lg shadow ${
+                msg.type === 'user' ? 'bg-primary text-primary-foreground ml-auto' : 
+                msg.type === 'ai' ? 'bg-card text-card-foreground border mr-auto' : 
+                'bg-destructive text-destructive-foreground mr-auto'
               }`}>
-                <div className="flex items-start gap-2 mb-1">
-                  {msg.type === 'ai' && <Bot className="h-5 w-5 text-accent" />}
-                  {msg.type === 'user' && <User className="h-5 w-5 text-primary-foreground" />}
-                  {msg.type === 'error' && <AlertTriangle className="h-5 w-5 text-destructive-foreground" />}
-                  <span className="font-semibold text-sm">
-                    {msg.type === 'user' ? 'You' : msg.type === 'ai' ? 'MediMate AI' : 'Error'}
+                <div className="flex items-start gap-2 mb-2">
+                  {msg.type === 'ai' && <Bot className="h-6 w-6 text-accent flex-shrink-0" />}
+                  {msg.type === 'user' && <User className="h-6 w-6 text-primary-foreground flex-shrink-0" />}
+                  {msg.type === 'error' && <AlertTriangle className="h-6 w-6 text-destructive-foreground flex-shrink-0" />}
+                  <span className="font-headline text-base">
+                    {msg.type === 'user' ? 'You' : msg.type === 'ai' ? 'MediMate AI Analysis' : 'Error'}
                   </span>
                 </div>
                 {typeof msg.content === 'string' ? <p className="text-sm whitespace-pre-wrap">{msg.content}</p> : msg.content}
@@ -182,29 +183,132 @@ export default function HealthAnalysisPage() {
   );
 }
 
+const Section: React.FC<{ title: string; icon: React.ElementType; children: React.ReactNode }> = ({ title, icon: Icon, children }) => (
+  <div className="space-y-1 border-l-2 border-accent pl-3 py-1">
+    <h5 className="font-semibold text-sm flex items-center text-accent">
+      <Icon className="h-4 w-4 mr-1.5" />
+      {title}
+    </h5>
+    <div className="text-xs text-muted-foreground">{children}</div>
+  </div>
+);
+
+const ListItems: React.FC<{ items: string[] | undefined }> = ({ items }) => {
+  if (!items || items.length === 0) return <p>Not specified.</p>;
+  return (
+    <ul className="list-disc list-inside space-y-0.5">
+      {items.map((item, i) => <li key={i}>{item}</li>)}
+    </ul>
+  );
+};
+
+const OtcSuggestions: React.FC<{ suggestions: AnalyzeMedicalImageOutput['otcMedicationSuggestions'] | undefined }> = ({ suggestions }) => {
+  if (!suggestions || suggestions.length === 0 || (suggestions.length === 1 && suggestions[0].medication.toLowerCase().includes("not applicable"))) {
+    return <p>No specific OTC suggestions applicable or professional advice needed first.</p>;
+  }
+  return (
+    <ul className="space-y-1.5">
+      {suggestions.map((s, i) => (
+        <li key={i} className="border-t border-border/50 pt-1 first:border-t-0">
+          <strong>{s.medication}:</strong> {s.usageCautions}
+        </li>
+      ))}
+    </ul>
+  );
+};
+
 const AIImageAnalysisResponse: React.FC<{ data: AnalyzeMedicalImageOutput }> = ({ data }) => (
   <div className="space-y-3 text-sm">
-    <h4 className="font-semibold text-base">Image Analysis:</h4>
-    <p><CheckCircle className="h-4 w-4 inline mr-1 text-green-500" /><strong>Analysis:</strong> {data.analysis}</p>
-    <p><CheckCircle className="h-4 w-4 inline mr-1 text-green-500" /><strong>Suggested Conditions:</strong> {data.suggestedConditions}</p>
-    <p><CheckCircle className="h-4 w-4 inline mr-1 text-green-500" /><strong>Recommended Next Steps:</strong> {data.recommendedNextSteps}</p>
+    {data.imageInterpretation && (
+      <Section title="Image Interpretation" icon={Sparkles}>
+        <p>{data.imageInterpretation}</p>
+      </Section>
+    )}
+    {data.possibleConditions && data.possibleConditions.length > 0 && (
+      <Section title="Possible Conditions" icon={HelpCircle}>
+        <ListItems items={data.possibleConditions} />
+      </Section>
+    )}
+    {data.commonCausesForFindings && data.commonCausesForFindings.length > 0 && (
+      <Section title="Common Causes for Findings" icon={Info}>
+        <ListItems items={data.commonCausesForFindings} />
+      </Section>
+    )}
+    {data.simpleHomeRemedies && data.simpleHomeRemedies.length > 0 && (
+      <Section title="Simple Home Remedies" icon={CheckCircle}>
+        <ListItems items={data.simpleHomeRemedies} />
+      </Section>
+    )}
+    {data.otcMedicationSuggestions && (
+      <Section title="Over-the-Counter Suggestions" icon={PillIcon}>
+        <OtcSuggestions suggestions={data.otcMedicationSuggestions} />
+      </Section>
+    )}
+    {data.warningSignsBasedOnImage && data.warningSignsBasedOnImage.length > 0 && (
+      <Section title="Warning Signs (Seek Medical Attention)" icon={ShieldAlert}>
+        <ListItems items={data.warningSignsBasedOnImage} />
+      </Section>
+    )}
+    {data.doctorConsultationRecommendation && (
+      <Section title="Doctor Consultation Recommendation" icon={Stethoscope}>
+        <p>{data.doctorConsultationRecommendation}</p>
+      </Section>
+    )}
+    {data.specialistReferral && (
+      <Section title="Specialist Referral Suggestion" icon={User}>
+        <p>{data.specialistReferral}</p>
+      </Section>
+    )}
+    <p className="text-xs text-muted-foreground pt-2 border-t mt-3">
+      <AlertTriangle className="h-3 w-3 inline mr-1" />
+      This AI provides general information, not medical advice. Always consult a qualified healthcare professional for diagnosis and treatment.
+    </p>
   </div>
 );
 
 const AISymptomAnalysisResponse: React.FC<{ data: AnalyzeSymptomsOutput }> = ({ data }) => (
   <div className="space-y-3 text-sm">
-    <h4 className="font-semibold text-base">Symptom Analysis (Confidence: {(data.confidenceLevel * 100).toFixed(0)}%):</h4>
-    <div>
-      <strong>Possible Conditions:</strong>
-      <ul className="list-disc list-inside ml-4">
-        {data.possibleConditions.map((condition, i) => <li key={i}>{condition}</li>)}
-      </ul>
-    </div>
-    <div>
-      <strong>Recommended Next Steps:</strong>
-      <ul className="list-disc list-inside ml-4">
-        {data.nextSteps.map((step, i) => <li key={i}>{step}</li>)}
-      </ul>
-    </div>
+     {data.possibleConditions && data.possibleConditions.length > 0 && (
+      <Section title="Possible Conditions" icon={HelpCircle}>
+        <ListItems items={data.possibleConditions} />
+      </Section>
+    )}
+    {data.commonCauses && data.commonCauses.length > 0 && (
+      <Section title="Common Causes" icon={Info}>
+        <ListItems items={data.commonCauses} />
+      </Section>
+    )}
+     {data.simpleHomeRemedies && data.simpleHomeRemedies.length > 0 && (
+      <Section title="Simple Home Remedies" icon={CheckCircle}>
+        <ListItems items={data.simpleHomeRemedies} />
+      </Section>
+    )}
+    {data.otcMedicationSuggestions && (
+      <Section title="Over-the-Counter Suggestions" icon={PillIcon}>
+        <OtcSuggestions suggestions={data.otcMedicationSuggestions} />
+      </Section>
+    )}
+    {data.warningSigns && data.warningSigns.length > 0 && (
+       <Section title="Warning Signs (Seek Medical Attention)" icon={ShieldAlert}>
+        <ListItems items={data.warningSigns} />
+      </Section>
+    )}
+    {data.doctorConsultationRecommendation && (
+      <Section title="Doctor Consultation Recommendation" icon={Stethoscope}>
+        <p>{data.doctorConsultationRecommendation}</p>
+      </Section>
+    )}
+    {data.specialistReferral && (
+      <Section title="Specialist Referral Suggestion" icon={User}>
+        <p>{data.specialistReferral}</p>
+      </Section>
+    )}
+     <p className="text-xs text-muted-foreground pt-2 border-t mt-3">
+      <AlertTriangle className="h-3 w-3 inline mr-1" />
+      This AI provides general information, not medical advice. Always consult a qualified healthcare professional for diagnosis and treatment.
+    </p>
   </div>
 );
+
+
+    
