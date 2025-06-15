@@ -558,7 +558,7 @@ const exampleShortVideoIds: Record<string, string[]> = {
   "Nutrition": ["rG3xXQdyuPM", "t0Y2GIR-L2I", "2VvK5t7Q9qU"],
   "Mental Wellness": ["inpok4MKVLM", "XQ3o_4V0YJw", "zSkFFW--Ma0"],
   "Yoga": ["s2NQhpFGIOg", "NjjK2n27J0s", "0pBu_n0_vIA"],
-  "Health Info": ["TkomAY9aRjM", "h_3xY_z3T8M", "DUaxt8OlT3o", "vc9OF64H4sE", "SY14OSblksQ"] // Added more IDs
+  "Health Info": ["DUaxt8OlT3o", "vc9OF64H4sE", "j45WfhxK_Hs", "FSiDT5P0ZlI", "SY14OSblksQ"] 
 };
 
 const rawInstagramReelsData = [
@@ -664,16 +664,16 @@ const rawInstagramReelsData = [
         "account": "@doctor.mike",
       },
       {
-        "title": "CPR in Action | A 3D Look Inside the Body",
-        "description": "A dynamic 3D animation showing internal mechanics and importance of effective CPR.",
-        "url": "https://www.youtube.com/watch?v=DUaxt8OlT3o", // This is a valid YouTube link
-        "account": "@HealthOrgCPR",
+        "title": "Healthy Lifestyle Hacks",
+        "description": "Tips for maintaining a healthy lifestyle.",
+        "url": "https://www.instagram.com/reel/CvXyZzqI3Y9/", // This will be replaced
+        "account": "@healthline",
       },
       {
-        "title": "Act FAST animation – Every minute counts",
-        "description": "Animated public health video illustrating stroke signs using the FAST acronym.",
-        "url": "https://www.youtube.com/watch?v=vc9OF64H4sE", // This is a valid YouTube link
-        "account": "@NHSStrokeAware",
+        "title": "Debunking Health Myths",
+        "description": "Separating fact from fiction in health trends.",
+        "url": "https://www.instagram.com/reel/CvXyZzqI3Y9/", // This will be replaced
+        "account": "@clevelandclinic",
       }
     ]
   }
@@ -711,6 +711,7 @@ const allReelsFromSource: HealthReel[] = rawInstagramReelsData.flatMap((topicDat
   })
 );
 
+// Filter to keep only 1st, 7th, and 9th reels from the generated 'allReelsFromSource'
 const indicesToKeep = [0, 6, 8]; // 0-indexed for 1st, 7th, 9th from the FLATTENED list
 export const mockHealthReels: HealthReel[] = allReelsFromSource.filter((_, index) => indicesToKeep.includes(index));
 
@@ -723,7 +724,7 @@ export interface EmergencyContact {
 }
 
 export const mockEmergencyContacts: EmergencyContact[] = [
-  { id: 'ec1', name: 'Medical Emergency / Ambulance', number: '102', type: 'Ambulance' },
+  { id: 'ec1', name: 'Medical Emergency / Ambulance', number: '108', type: 'Ambulance' },
   { id: 'ec2', name: 'Police Control Room', number: '100', type: 'Police' },
   { id: 'ec3', name: 'Fire Control Room', number: '101', type: 'Fire' },
   { id: 'ec4', name: 'National Emergency Helpline', number: '112', type: 'General Emergency' },
@@ -748,7 +749,7 @@ export const mockFirstAidGuides: FirstAidGuide[] = [
     dataAiHint: 'cpr firstaid',
     steps: [
       'Check for responsiveness. Shout "Are you OK?" and gently shake the person\'s shoulder.',
-      'Call for emergency help (e.g., 102 or your local emergency number).',
+      'Call for emergency help (e.g., 108 or your local emergency number).',
       'Begin chest compressions: Place the heel of one hand in the center of the chest. Place your other hand on top. Push hard and fast (100-120 compressions per minute), about 2 inches (5 cm) deep.',
       'If trained, give rescue breaths: Tilt head, lift chin, pinch nose. Give 2 breaths, each lasting 1 second, ensuring the chest rises.',
       'Continue 30 compressions and 2 breaths until help arrives or the person starts breathing.'
@@ -813,3 +814,6 @@ export interface TabletReminder {
 }
 // mockTabletReminders is removed as reminders are now user-managed and stored in localStorage.
 // The TabletReminder interface remains for type safety.
+
+
+    
