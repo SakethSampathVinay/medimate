@@ -517,128 +517,210 @@ export const mockHealthCheckupPacks: HealthCheckupPack[] = [
 
 export interface HealthReel {
   id: string;
-  title: string; 
-  videoUrl: string; // Will be YouTube embed URL
-  thumbnailUrl: string; // Fallback or for non-visible items
+  topic: string; 
+  title: string;
+  description?: string; 
+  videoUrl: string; 
+  thumbnailUrl: string; 
   dataAiHint?: string;
-  category: 'Fitness' | 'Nutrition' | 'Mental Wellness' | 'Yoga' | 'Health Info'; 
-  likes: number; 
   uploader: string; 
   uploaderAvatar: string; 
+  likes: number; 
 }
 
-const newHealthInfoReels = [
+const rawReelsData = [
   {
-    name: "CPR in Action | A 3D Look Inside the Body",
-    description: "A dynamic 3D animation showing internal mechanics and importance of effective CPR.",
-    link: "https://www.youtube.com/watch?v=DUaxt8OlT3o"
+    "topic": "Fitness",
+    "reels": [
+      {
+        "title": "Beginner Calisthenics Workout",
+        "description": "Quick calisthenics routine for beginners—perfect for home workouts.",
+        "url": "https://www.youtube.com/shorts/gC_L9qAHVJ8", // Example YouTube Short
+        "account": "@learn_calisthenics",
+        "details": "Demonstrates basic movements and progressions for newbies."
+      },
+      {
+        "title": "5-Minute Full Body Workout",
+        "description": "Fast and effective full body workout for all fitness levels.",
+        "url": "https://www.youtube.com/shorts/41n9K3TRTY4", // Example YouTube Short
+        "account": "@docjenfit",
+        "details": "Short, dynamic routine with clear instructions."
+      },
+      {
+        "title": "Fun Workout Challenge",
+        "description": "Try this challenge to spice up your fitness routine!",
+        "url": "https://www.youtube.com/shorts/VfVdJAUh2Yw", // Example YouTube Short
+        "account": "@michalynnrivas",
+        "details": "Encourages participation and community engagement."
+      }
+    ]
   },
   {
-    name: "Act FAST animation – Every minute counts",
-    description: "Animated public health video illustrating stroke signs using the FAST acronym.",
-    link: "https://www.youtube.com/watch?v=vc9OF64H4sE"
+    "topic": "Nutrition",
+    "reels": [
+      {
+        "title": "Healthy Meal Prep Ideas",
+        "description": "Simple, nutritious meal prep for busy weekdays.",
+        "url": "https://www.youtube.com/shorts/rG3xXQdyuPM", // Example YouTube Short
+        "account": "@nutritionstripped",
+        "details": "Step-by-step guide to healthy eating."
+      },
+      {
+        "title": "Balanced Breakfast Recipes",
+        "description": "Easy breakfast ideas to start your day right.",
+        "url": "https://www.youtube.com/shorts/t0Y2GIR-L2I", // Example YouTube Short
+        "account": "@healthyfoodguide",
+        "details": "Quick recipes with nutritional breakdowns."
+      },
+      {
+        "title": "Snack Hacks for Energy",
+        "description": "Healthy snack ideas to keep you energized.",
+        "url": "https://www.youtube.com/shorts/2VvK5t7Q9qU", // Example YouTube Short
+        "account": "@mindfulnutritionist",
+        "details": "Smart snack choices for sustained energy."
+      }
+    ]
   },
   {
-    name: "Choking – Animated",
-    description: "Clear animation demonstrating back blows and abdominal thrusts to relieve choking.",
-    link: "https://www.youtube.com/watch?v=j45WfhxK_Hs"
+    "topic": "Mental Wellness",
+    "reels": [
+      {
+        "title": "Simple Mental Health Reminder",
+        "description": "Gentle reminders to prioritize self-care and mental health.",
+        "url": "https://www.youtube.com/shorts/inpok4MKVLM", // Maintained from previous
+        "account": "@howmental",
+        "details": "Soothing visuals and powerful quotes for mindfulness[2][5]."
+      },
+      {
+        "title": "Daily Gratitude Practice",
+        "description": "Quick gratitude journaling tips for positivity.",
+        "url": "https://www.youtube.com/shorts/XQ3o_4V0YJw", // Example YouTube Short
+        "account": "@fiveminutejournal",
+        "details": "Encourages daily reflection and happiness[5]."
+      },
+      {
+        "title": "Mindfulness Meditation",
+        "description": "Short guided meditation for stress relief.",
+        "url": "https://www.youtube.com/shorts/zSkFFW--Ma0", // Example YouTube Short
+        "account": "@selfcareisapriority",
+        "details": "Helps center and calm the mind[5]."
+      }
+    ]
   },
   {
-    name: "AED in Action | A 3D Look Inside the Body",
-    description: "3D animation showing how an Automated External Defibrillator works during cardiac arrest.",
-    link: "https://www.youtube.com/watch?v=FSiDT5P0ZlI"
+    "topic": "Yoga",
+    "reels": [
+      {
+        "title": "Morning Yoga Flow",
+        "description": "Gentle yoga routine to start your day.",
+        "url": "https://www.youtube.com/shorts/s2NQhpFGIOg", // Maintained from previous
+        "account": "@yoga_girl",
+        "details": "Easy-to-follow poses for all levels."
+      },
+      {
+        "title": "Yoga for Stress Relief",
+        "description": "Yoga sequence to reduce anxiety and stress.",
+        "url": "https://www.youtube.com/shorts/NjjK2n27J0s", // Example YouTube Short
+        "account": "@yogawithadriene",
+        "details": "Focuses on relaxation and breathing."
+      },
+      {
+        "title": "5-Minute Yoga Break",
+        "description": "Quick yoga break for work or study.",
+        "url": "https://www.youtube.com/shorts/0pBu_n0_vIA", // Example YouTube Short
+        "account": "@yogawithkassandra",
+        "details": "Short, effective routine for busy schedules."
+      }
+    ]
   },
   {
-    name: "When Stroke Strikes Act F.A.S.T. | NHS | BSL version",
-    description: "Animated British NHS video (with BSL) on recognizing stroke symptoms and acting FAST.",
-    link: "https://www.youtube.com/watch?v=SY14OSblksQ"
+    "topic": "Health Info",
+    "reels": [
+      {
+        "title": "Doctor’s Health Tips",
+        "description": "Quick health advice from a medical professional.",
+        "url": "https://www.youtube.com/shorts/TkomAY9aRjM", // Example YouTube Short
+        "account": "@doctor.mike",
+        "details": "Explains medical concepts in simple terms[3]."
+      },
+      {
+        "title": "Healthy Lifestyle Hacks",
+        "description": "Tips for maintaining a healthy lifestyle.",
+        "url": "https://www.youtube.com/shorts/h_3xY_z3T8M", // Example YouTube Short
+        "account": "@healthline",
+        "details": "Evidence-based health information."
+      },
+      {
+        "title": "Debunking Health Myths",
+        "description": "Separating fact from fiction in health trends.",
+        "url": "https://www.youtube.com/shorts/70nISrI24gM", // Example YouTube Short
+        "account": "@clevelandclinic",
+        "details": "Reliable info from trusted medical sources."
+      },
+       {
+        "title": "CPR in Action | A 3D Look Inside the Body",
+        "description": "A dynamic 3D animation showing internal mechanics and importance of effective CPR.",
+        "url": "https://www.youtube.com/watch?v=DUaxt8OlT3o", // Original long form
+        "account": "@HealthOrg",
+        "details": "CPR guide"
+      },
+      {
+        "title": "Act FAST animation – Every minute counts",
+        "description": "Animated public health video illustrating stroke signs using the FAST acronym.",
+        "url": "https://www.youtube.com/watch?v=vc9OF64H4sE", // Original long form
+        "account": "@HealthOrg",
+        "details": "Stroke signs"
+      }
+    ]
   }
 ];
 
-const getVideoId = (url: string): string | null => {
+const getYouTubeVideoId = (url: string): string | null => {
   try {
-    const parsedUrl = new URL(url);
-    if (parsedUrl.hostname === 'youtu.be') {
-      return parsedUrl.pathname.substring(1);
-    }
-    if (parsedUrl.hostname === 'www.youtube.com' || parsedUrl.hostname === 'youtube.com') {
-      if (parsedUrl.pathname === '/watch') {
-        return parsedUrl.searchParams.get('v');
+      const parsedUrl = new URL(url);
+      if (parsedUrl.hostname === 'youtu.be') {
+          return parsedUrl.pathname.substring(1);
       }
-      if (parsedUrl.pathname.startsWith('/embed/')) {
-        return parsedUrl.pathname.substring('/embed/'.length);
+      if (parsedUrl.hostname === 'www.youtube.com' || parsedUrl.hostname === 'youtube.com') {
+          if (parsedUrl.pathname === '/watch') {
+            return parsedUrl.searchParams.get('v');
+          }
+          if (parsedUrl.pathname.startsWith('/embed/')) {
+            // Handles /embed/VIDEO_ID and /embed/VIDEO_ID?params
+            return parsedUrl.pathname.substring('/embed/'.length).split('?')[0];
+          }
+          if (parsedUrl.pathname.startsWith('/shorts/')) {
+            return parsedUrl.pathname.substring('/shorts/'.length);
+          }
       }
-      if (parsedUrl.pathname.startsWith('/shorts/')) {
-        return parsedUrl.pathname.substring('/shorts/'.length);
-      }
-    }
   } catch (e) {
-    console.error("Error parsing YouTube URL:", url, e);
+      console.error("Error parsing YouTube URL for ID:", url, e);
   }
   return null;
 };
 
+export const mockHealthReels: HealthReel[] = rawReelsData.flatMap((topicData, topicIndex) => 
+  topicData.reels.map((reel, reelIndex): HealthReel => {
+    const videoId = getYouTubeVideoId(reel.url);
+    const embedUrl = videoId 
+      ? `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&loop=1&playlist=${videoId}&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1` 
+      : 'https://www.youtube.com/embed/error'; // Fallback for unparsable URLs
 
-export const mockHealthReels: HealthReel[] = [
-  ...newHealthInfoReels.map((reel, index): HealthReel => {
-    const videoId = getVideoId(reel.link);
     return {
-      id: `r_healthinfo_${index + 1}`,
-      title: reel.name,
-      videoUrl: videoId ? `https://www.youtube.com/embed/${videoId}` : 'https://www.youtube.com/embed/error',
+      id: `reel_${topicData.topic.toLowerCase().replace(/\s+/g, '-')}_${reelIndex + 1}`,
+      topic: topicData.topic,
+      title: reel.title,
+      description: reel.description,
+      videoUrl: embedUrl,
       thumbnailUrl: videoId ? `https://img.youtube.com/vi/${videoId}/0.jpg` : 'https://placehold.co/360x640.png?text=Video',
-      dataAiHint: reel.description.toLowerCase().split(' ').slice(0,2).join(' ') || 'health info',
-      category: 'Health Info',
-      likes: Math.floor(Math.random() * 1000) + 500, // Random likes
-      uploader: 'Health Org',
-      uploaderAvatar: 'https://placehold.co/50x50.png'
+      dataAiHint: reel.description ? reel.description.toLowerCase().split(' ').slice(0,2).join(' ') : topicData.topic.toLowerCase(),
+      uploader: reel.account,
+      uploaderAvatar: 'https://placehold.co/50x50.png', // Generic avatar
+      likes: Math.floor(Math.random() * 2000) + 500, // Random likes
     };
-  }),
-  {
-    id: 'r1_yoga',
-    title: 'Beginner Yoga Short',
-    videoUrl: 'https://www.youtube.com/embed/s2NQhpFGIOg',
-    thumbnailUrl: 'https://img.youtube.com/vi/s2NQhpFGIOg/0.jpg',
-    dataAiHint: 'yoga fitness',
-    category: 'Yoga',
-    likes: 1256,
-    uploader: 'YogaWithDivya',
-    uploaderAvatar: 'https://placehold.co/50x50.png'
-  },
-  {
-    id: 'r2_fitness',
-    title: 'Quick HIIT Workout Short',
-    videoUrl: 'https://www.youtube.com/embed/gey73xiS8F4',
-    thumbnailUrl: 'https://img.youtube.com/vi/gey73xiS8F4/0.jpg',
-    dataAiHint: 'workout exercise',
-    category: 'Fitness',
-    likes: 2530,
-    uploader: 'FitBharatFitness',
-    uploaderAvatar: 'https://placehold.co/50x50.png'
-  },
-  {
-    id: 'r3_nutrition',
-    title: 'Healthy Smoothie Tip',
-    videoUrl: 'https://www.youtube.com/embed/Cb20A03T0Dk',
-    thumbnailUrl: 'https://img.youtube.com/vi/Cb20A03T0Dk/0.jpg',
-    dataAiHint: 'smoothie recipe',
-    category: 'Nutrition',
-    likes: 980,
-    uploader: 'SwasthRecipesIndia',
-    uploaderAvatar: 'https://placehold.co/50x50.png'
-  },
-  {
-    id: 'r4_mental',
-    title: 'Mindfulness Moment',
-    videoUrl: 'https://www.youtube.com/embed/inpok4MKVLM',
-    thumbnailUrl: 'https://img.youtube.com/vi/inpok4MKVLM/0.jpg',
-    dataAiHint: 'meditation wellness',
-    category: 'Mental Wellness',
-    likes: 1802,
-    uploader: 'ShaantMannWellness',
-    uploaderAvatar: 'https://placehold.co/50x50.png'
-  },
-];
+  })
+);
+
 
 export interface EmergencyContact {
   id: string;
@@ -668,8 +750,8 @@ export const mockFirstAidGuides: FirstAidGuide[] = [
   {
     id: 'fa1',
     title: 'CPR (Cardiopulmonary Resuscitation)',
-    videoUrl: 'https://placehold.co/400x225.mp4/000000/FFFFFF?text=CPR+Guide',
-    imageUrl: 'https://placehold.co/400x225.png',
+    videoUrl: 'https://www.youtube.com/embed/DUaxt8OlT3o', // Using an example video
+    imageUrl: 'https://img.youtube.com/vi/DUaxt8OlT3o/0.jpg',
     dataAiHint: 'cpr firstaid',
     steps: [
       'Check for responsiveness. Shout "Are you OK?" and gently shake the person\'s shoulder.',
@@ -683,7 +765,7 @@ export const mockFirstAidGuides: FirstAidGuide[] = [
   {
     id: 'fa2',
     title: 'Treating Minor Burns',
-    imageUrl: 'https://placehold.co/400x225.png',
+    imageUrl: 'https://placehold.co/400x225.png', // Placeholder, could be a YouTube thumbnail
     dataAiHint: 'burn treatment',
     steps: [
       'Cool the burn. Hold under cool (not cold) running water for 10-15 minutes or until pain subsides.',
