@@ -15,30 +15,14 @@ import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 
 const ReelCard: React.FC<{ reel: HealthReel; isVisible: boolean }> = ({ reel, isVisible }) => {
-  const videoRef = useRef<HTMLVideoElement>(null); // Keep for future video implementation
-  const [isPlaying, setIsPlaying] = useState(false);
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
 
-  useEffect(() => {
-    // Simulate autoplay: if isVisible, set isPlaying true, else false.
-    // Actual video .play() / .pause() would go here.
-    setIsPlaying(isVisible);
-  }, [isVisible]);
-
-  const togglePlay = () => {
-    setIsPlaying(!isPlaying);
-    // if (videoRef.current) {
-    //   if (isPlaying) videoRef.current.pause();
-    //   else videoRef.current.play();
-    // }
-  };
-
   const handleLike = () => {
-    // if (!user) {
+    // if (!user) { // Login check can be enabled later
     //   toast({ title: "Login Required", description: "Please log in to like reels.", variant: "destructive" });
     //   router.push('/login?redirect=/reels');
     //   return;
@@ -62,13 +46,40 @@ const ReelCard: React.FC<{ reel: HealthReel; isVisible: boolean }> = ({ reel, is
       navigator.share({
         title: reel.title,
         text: `Check out this health reel: ${reel.title}`,
-        url: window.location.href, // or specific reel URL if available
+        url: window.location.href, 
       }).catch(console.error);
     } else {
-      navigator.clipboard.writeText(window.location.href); // Fallback to copy link
+      navigator.clipboard.writeText(window.location.href); 
       toast({ title: "Link Copied!", description: "Reel link copied to clipboard." });
     }
   };
+  
+  const getYouTubeVideoId = (url: string): string | null => {
+    try {
+        const parsedUrl = new URL(url);
+        if (parsedUrl.hostname === 'youtu.be') {
+            return parsedUrl.pathname.substring(1);
+        }
+        if (parsedUrl.hostname === 'www.youtube.com' || parsedUrl.hostname === 'youtube.com') {
+            if (parsedUrl.pathname === '/watch') {
+            return parsedUrl.searchParams.get('v');
+            }
+            if (parsedUrl.pathname.startsWith('/embed/')) {
+            return parsedUrl.pathname.substring('/embed/'.length).split('?')[0];
+            }
+            if (parsedUrl.pathname.startsWith('/shorts/')) {
+            return parsedUrl.pathname.substring('/shorts/'.length);
+            }
+        }
+    } catch (e) {
+        console.error("Error parsing YouTube URL for ID:", url, e);
+    }
+    return null;
+  };
+
+  const videoId = getYouTubeVideoId(reel.videoUrl);
+  const embedUrl = videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0&showinfo=0&rel=0&modestbranding=1` : reel.videoUrl;
+
 
   return (
     <Card className="w-full max-w-sm mx-auto snap-center shrink-0 h-[calc(100vh-12rem)] md:h-[calc(100vh-10rem)] flex flex-col overflow-hidden shadow-xl rounded-xl bg-black relative aspect-[9/16]">
@@ -83,29 +94,27 @@ const ReelCard: React.FC<{ reel: HealthReel; isVisible: boolean }> = ({ reel, is
          <Badge variant="secondary" className="mt-2 text-xs self-start">{reel.category}</Badge>
       </CardHeader>
       
-      <div className="relative flex-grow flex items-center justify-center cursor-pointer" onClick={togglePlay}>
-        <Image 
+      <div className="relative flex-grow flex items-center justify-center bg-black">
+        {isVisible ? (
+          <iframe
+            key={reel.id}
+            className="w-full h-full absolute top-0 left-0"
+            src={embedUrl}
+            title={reel.title}
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+            sandbox="allow-forms allow-scripts allow-same-origin allow-popups allow-presentation"
+          ></iframe>
+        ) : (
+          <Image 
             src={reel.thumbnailUrl} 
-            alt={reel.title} 
+            alt={reel.title + " thumbnail"}
             fill
             className="object-cover"
-            data-ai-hint={reel.dataAiHint || "health video"}
-            priority={isVisible} // Prioritize loading visible reel image
-        />
-        {/* 
-         <video
-          ref={videoRef}
-          src={reel.videoUrl} // This would be the actual video source
-          loop
-          playsInline
-          className="w-full h-full object-cover"
-          poster={reel.thumbnailUrl} // Thumbnail before video loads or if autoplay is blocked
-        />
-        */}
-        {!isPlaying && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-            <PlaySquare className="h-20 w-20 text-white/80 opacity-75 hover:opacity-100 transition-opacity" />
-          </div>
+            data-ai-hint={reel.dataAiHint || "health video thumbnail"}
+            priority={false}
+          />
         )}
       </div>
 
@@ -138,7 +147,7 @@ const ReelCard: React.FC<{ reel: HealthReel; isVisible: boolean }> = ({ reel, is
 
 export default function HealthReelsPage() {
   const [activeCategory, setActiveCategory] = useState<'All' | HealthReel['category']>('All');
-  const reelCategories: ('All' | HealthReel['category'])[] = ['All', 'Fitness', 'Nutrition', 'Mental Wellness', 'Yoga'];
+  const reelCategories: ('All' | HealthReel['category'])[] = ['All', 'Fitness', 'Nutrition', 'Mental Wellness', 'Yoga', 'Health Info'];
   
   const [visibleReelId, setVisibleReelId] = useState<string | null>(mockHealthReels.length > 0 ? mockHealthReels[0].id : null);
   const observer = useRef<IntersectionObserver | null>(null);
@@ -151,7 +160,7 @@ export default function HealthReelsPage() {
   }, [activeCategory]);
 
   useEffect(() => {
-    reelRefs.current.clear(); // Clear refs when filteredReels changes
+    reelRefs.current.clear(); 
     if (filteredReels.length > 0) {
         setVisibleReelId(filteredReels[0].id);
     } else {
@@ -162,7 +171,6 @@ export default function HealthReelsPage() {
 
   useEffect(() => {
     const currentObserver = observer.current;
-    // Disconnect previous observer if it exists
     if (currentObserver) {
         currentObserver.disconnect();
     }
@@ -176,8 +184,8 @@ export default function HealthReelsPage() {
         });
       },
       { 
-        root: null, // observing intersections with the viewport
-        threshold: 0.7, // 70% of the item must be visible
+        root: null, 
+        threshold: 0.7, 
       }
     );
     
@@ -189,7 +197,7 @@ export default function HealthReelsPage() {
     return () => {
       newObserver?.disconnect();
     };
-  }, [filteredReels]); // Re-run when filteredReels change to observe new elements
+  }, [filteredReels]); 
 
 
   return (
@@ -222,7 +230,7 @@ export default function HealthReelsPage() {
                 key={reel.id} 
                 id={reel.id}
                 ref={el => reelRefs.current.set(reel.id, el)}
-                className="h-full flex items-center justify-center py-2 md:py-4" // py for some spacing if cards don't perfectly fill
+                className="h-full flex items-center justify-center py-2 md:py-4"
               >
                 <ReelCard reel={reel} isVisible={visibleReelId === reel.id} />
               </div>
@@ -248,3 +256,4 @@ export default function HealthReelsPage() {
     </AppLayout>
   );
 }
+

@@ -10,8 +10,8 @@ export interface Medicine {
   sideEffects: string;
   precautions: string;
   category: string;
-  price: number; // Added price field
-  tags: string[]; // Added tags field
+  price: number; 
+  tags: string[]; 
 }
 
 const medicinesData = [
@@ -200,13 +200,13 @@ export const mockMedicines: Medicine[] = medicinesData.map((med, index) => {
     name: med.medicine_name,
     imageUrl: med.photo_url, 
     dataAiHint: dataAiHint || 'medicine',
-    useCase: med.description, // Using the new description as useCase for brevity on card
+    useCase: med.description, 
     description: `${med.medicine_name} is typically used for ${med.tags.join(', ')}. ${med.description} For detailed information, including specific uses, contraindications, and potential interactions, please consult a healthcare professional or refer to the patient information leaflet that comes with the medicine.`,
     dosage: 'Dosage varies depending on the condition being treated and individual patient factors. Always follow the dosage instructions provided by your doctor or pharmacist. Do not exceed the recommended dose.',
     sideEffects: 'Like all medicines, this drug can cause side effects, although not everybody gets them. Common side effects may include nausea or headache. If you experience any severe side effects or allergic reactions, seek medical attention immediately.',
     precautions: 'Before taking this medicine, inform your doctor or pharmacist if you have any allergies, pre-existing medical conditions (such as liver or kidney problems), or if you are pregnant, planning to become pregnant, or breastfeeding. Avoid consuming alcohol if advised against it with this medication. Keep out of reach of children.',
     category: firstTag,
-    price: 50, // Default price
+    price: 50, 
     tags: med.tags,
   };
 });
@@ -518,21 +518,87 @@ export const mockHealthCheckupPacks: HealthCheckupPack[] = [
 export interface HealthReel {
   id: string;
   title: string; 
-  videoUrl: string; 
-  thumbnailUrl: string;
+  videoUrl: string; // Will be YouTube embed URL
+  thumbnailUrl: string; // Fallback or for non-visible items
   dataAiHint?: string;
-  category: 'Fitness' | 'Nutrition' | 'Mental Wellness' | 'Yoga'; 
+  category: 'Fitness' | 'Nutrition' | 'Mental Wellness' | 'Yoga' | 'Health Info'; 
   likes: number; 
   uploader: string; 
   uploaderAvatar: string; 
 }
 
-export const mockHealthReels: HealthReel[] = [
+const newHealthInfoReels = [
   {
-    id: 'r1',
-    title: '5 Minute Morning Yoga Flow for Beginners',
-    videoUrl: 'https://placehold.co/1080x1920.mp4/1E1E1E/FFFFFF?text=Yoga+Reel',
-    thumbnailUrl: 'https://placehold.co/360x640.png', 
+    name: "CPR in Action | A 3D Look Inside the Body",
+    description: "A dynamic 3D animation showing internal mechanics and importance of effective CPR.",
+    link: "https://www.youtube.com/watch?v=DUaxt8OlT3o"
+  },
+  {
+    name: "Act FAST animation – Every minute counts",
+    description: "Animated public health video illustrating stroke signs using the FAST acronym.",
+    link: "https://www.youtube.com/watch?v=vc9OF64H4sE"
+  },
+  {
+    name: "Choking – Animated",
+    description: "Clear animation demonstrating back blows and abdominal thrusts to relieve choking.",
+    link: "https://www.youtube.com/watch?v=j45WfhxK_Hs"
+  },
+  {
+    name: "AED in Action | A 3D Look Inside the Body",
+    description: "3D animation showing how an Automated External Defibrillator works during cardiac arrest.",
+    link: "https://www.youtube.com/watch?v=FSiDT5P0ZlI"
+  },
+  {
+    name: "When Stroke Strikes Act F.A.S.T. | NHS | BSL version",
+    description: "Animated British NHS video (with BSL) on recognizing stroke symptoms and acting FAST.",
+    link: "https://www.youtube.com/watch?v=SY14OSblksQ"
+  }
+];
+
+const getVideoId = (url: string): string | null => {
+  try {
+    const parsedUrl = new URL(url);
+    if (parsedUrl.hostname === 'youtu.be') {
+      return parsedUrl.pathname.substring(1);
+    }
+    if (parsedUrl.hostname === 'www.youtube.com' || parsedUrl.hostname === 'youtube.com') {
+      if (parsedUrl.pathname === '/watch') {
+        return parsedUrl.searchParams.get('v');
+      }
+      if (parsedUrl.pathname.startsWith('/embed/')) {
+        return parsedUrl.pathname.substring('/embed/'.length);
+      }
+      if (parsedUrl.pathname.startsWith('/shorts/')) {
+        return parsedUrl.pathname.substring('/shorts/'.length);
+      }
+    }
+  } catch (e) {
+    console.error("Error parsing YouTube URL:", url, e);
+  }
+  return null;
+};
+
+
+export const mockHealthReels: HealthReel[] = [
+  ...newHealthInfoReels.map((reel, index): HealthReel => {
+    const videoId = getVideoId(reel.link);
+    return {
+      id: `r_healthinfo_${index + 1}`,
+      title: reel.name,
+      videoUrl: videoId ? `https://www.youtube.com/embed/${videoId}` : 'https://www.youtube.com/embed/error',
+      thumbnailUrl: videoId ? `https://img.youtube.com/vi/${videoId}/0.jpg` : 'https://placehold.co/360x640.png?text=Video',
+      dataAiHint: reel.description.toLowerCase().split(' ').slice(0,2).join(' ') || 'health info',
+      category: 'Health Info',
+      likes: Math.floor(Math.random() * 1000) + 500, // Random likes
+      uploader: 'Health Org',
+      uploaderAvatar: 'https://placehold.co/50x50.png'
+    };
+  }),
+  {
+    id: 'r1_yoga',
+    title: 'Beginner Yoga Short',
+    videoUrl: 'https://www.youtube.com/embed/s2NQhpFGIOg',
+    thumbnailUrl: 'https://img.youtube.com/vi/s2NQhpFGIOg/0.jpg',
     dataAiHint: 'yoga fitness',
     category: 'Yoga',
     likes: 1256,
@@ -540,10 +606,10 @@ export const mockHealthReels: HealthReel[] = [
     uploaderAvatar: 'https://placehold.co/50x50.png'
   },
   {
-    id: 'r2',
-    title: 'Quick HIIT Workout - No Equipment Needed!',
-    videoUrl: 'https://placehold.co/1080x1920.mp4/1E1E1E/FFFFFF?text=HIIT+Reel',
-    thumbnailUrl: 'https://placehold.co/360x640.png',
+    id: 'r2_fitness',
+    title: 'Quick HIIT Workout Short',
+    videoUrl: 'https://www.youtube.com/embed/gey73xiS8F4',
+    thumbnailUrl: 'https://img.youtube.com/vi/gey73xiS8F4/0.jpg',
     dataAiHint: 'workout exercise',
     category: 'Fitness',
     likes: 2530,
@@ -551,10 +617,10 @@ export const mockHealthReels: HealthReel[] = [
     uploaderAvatar: 'https://placehold.co/50x50.png'
   },
   {
-    id: 'r3',
-    title: 'Healthy Green Smoothie Recipe for Energy',
-    videoUrl: 'https://placehold.co/1080x1920.mp4/1E1E1E/FFFFFF?text=Recipe+Reel',
-    thumbnailUrl: 'https://placehold.co/360x640.png',
+    id: 'r3_nutrition',
+    title: 'Healthy Smoothie Tip',
+    videoUrl: 'https://www.youtube.com/embed/Cb20A03T0Dk',
+    thumbnailUrl: 'https://img.youtube.com/vi/Cb20A03T0Dk/0.jpg',
     dataAiHint: 'smoothie recipe',
     category: 'Nutrition',
     likes: 980,
@@ -562,25 +628,14 @@ export const mockHealthReels: HealthReel[] = [
     uploaderAvatar: 'https://placehold.co/50x50.png'
   },
   {
-    id: 'r4',
-    title: 'Mindfulness Meditation: 3 Minute Guide',
-    videoUrl: 'https://placehold.co/1080x1920.mp4/1E1E1E/FFFFFF?text=Meditation+Reel',
-    thumbnailUrl: 'https://placehold.co/360x640.png',
+    id: 'r4_mental',
+    title: 'Mindfulness Moment',
+    videoUrl: 'https://www.youtube.com/embed/inpok4MKVLM',
+    thumbnailUrl: 'https://img.youtube.com/vi/inpok4MKVLM/0.jpg',
     dataAiHint: 'meditation wellness',
     category: 'Mental Wellness',
     likes: 1802,
     uploader: 'ShaantMannWellness',
-    uploaderAvatar: 'https://placehold.co/50x50.png'
-  },
-    {
-    id: 'r5',
-    title: 'Stretching Routine for Desk Workers',
-    videoUrl: 'https://placehold.co/1080x1920.mp4/1E1E1E/FFFFFF?text=Stretching+Reel',
-    thumbnailUrl: 'https://placehold.co/360x640.png',
-    dataAiHint: 'office stretches',
-    category: 'Fitness',
-    likes: 750,
-    uploader: 'ActiveOffice',
     uploaderAvatar: 'https://placehold.co/50x50.png'
   },
 ];
@@ -685,6 +740,4 @@ export const mockTabletReminders: TabletReminder[] = [
   { id: 'rem2', medicineName: 'Metformin 500mg', time: '08:00 PM', days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], isActive: true },
   { id: 'rem3', medicineName: 'Vitamin D', time: '10:00 AM', days: ['Mon', 'Wed', 'Fri'], isActive: false },
 ];
-
-
   
