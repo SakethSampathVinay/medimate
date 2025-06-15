@@ -6,7 +6,6 @@ import { usePathname } from 'next/navigation';
 import { 
   Bot, 
   Pill, 
-  Hospital, 
   CalendarDays, 
   PlaySquare, 
   Siren,
@@ -19,7 +18,6 @@ import { Button } from '@/components/ui/button';
 const navItems = [
   { href: '/health-analysis', label: 'AI Analysis', icon: Bot },
   { href: '/medicines', label: 'Medicines', icon: Pill },
-  { href: '/hospitals', label: 'Hospitals', icon: Hospital },
   { href: '/appointments', label: 'Appointments', icon: CalendarDays },
   { href: '/reels', label: 'Reels', icon: PlaySquare },
   { href: '/emergency', label: 'Emergency', icon: Siren },

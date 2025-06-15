@@ -1,7 +1,7 @@
 import AppLayout from '@/components/layout/app-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowRight, Bot, Pill, Hospital, CalendarDays, PlaySquare, Siren, UserCircle } from 'lucide-react';
+import { ArrowRight, Bot, Pill, CalendarDays, PlaySquare, Siren, UserCircle } from 'lucide-react';
 import Link from 'next/link';
 
 const features = [
@@ -22,15 +22,6 @@ const features = [
     bgColor: 'bg-green-100',
     iconColor: 'text-green-600',
     dataAiHint: 'medicine search'
-  },
-  {
-    title: 'Hospital Locator',
-    description: 'Find nearby hospitals with contact information and directions.',
-    icon: Hospital,
-    href: '/hospitals',
-    bgColor: 'bg-red-100',
-    iconColor: 'text-red-600',
-    dataAiHint: 'hospital map'
   },
   {
     title: 'Appointment Scheduling',
