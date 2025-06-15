@@ -52,7 +52,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
           <UserMenu />
         </div>
       </header>
-      <main className="flex-1 pt-32 p-4 md:p-6 lg:p-8">
+      <main className="flex-1 mt-16 p-4 md:p-6 lg:p-8">
         {children}
       </main>
     </div>
